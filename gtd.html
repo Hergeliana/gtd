@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>📗 GTD — Getting Things Done</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, serif; background: #f5f0e8; color: #2c2416; }
+  input, select, button { font-family: inherit; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f5f0e8; }
+  ::-webkit-scrollbar-thumb { background: #c8a96e; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const CONTEXTS = ["@anywhere","@computer","@home","@errands","@calls","@waiting"];
+const SECTIONS = ["inbox","next","today","projects","someday","reference","trash"];
+const sectionLabels = {
+  inbox:"📥 Inbox", next:"⚡ Next Actions", today:"🌟 Today",
+  projects:"📁 Projects", someday:"💭 Someday / Maybe",
+  reference:"📚 Reference", trash:"🗑 Trash", review:"🔄 Weekly Review"
+};
+
+function App() {
+  const [view, setView] = useState("inbox");
+  const [data, setData] = useState({ items:[], projects:[], nextId:1 });
+  const [input, setInput] = useState("");
+  const [clarifyItem, setClarifyItem] = useState(null);
+  const [clarify, setClarify] = useState({});
+  const [newProject, setNewProject] = useState("");
+  const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    try { const s = localStorage.getItem("gtd-data"); if(s) setData(JSON.parse(s)); } catch{}
+  }, []);
+
+  useEffect(() => {
+    try { localStorage.setItem("gtd-data", JSON.stringify(data)); } catch{}
+  }, [data]);
+
+  const showToast = msg => { setToast(msg); setTimeout(()=>setToast(null),2500); };
+
+  const addToInbox = () => {
+    if(!input.trim()) return;
+    const id = data.nextId;
+    setData(d=>({...d, nextId:d.nextId+1, items:[...d.items,{id,text:input.trim(),section:"inbox",context:"@anywhere",project:null,due:null,twoMin:false,done:false,created:Date.now()}]}));
+    setInput(""); showToast("Captured to Inbox!");
+  };
+
+  const openClarify = item => {
+    setClarifyItem(item);
+    setClarify({actionable:null,twoMin:false,context:item.context||"@anywhere",project:item.project||"",due:item.due||"",destination:"next",text:item.text,naSection:"reference"});
+  };
+
+  const applyClarify = () => {
+    const {actionable,twoMin,context,project,due,destination,text,naSection} = clarify;
+    if(actionable===null) return;
+    let section = actionable ? (twoMin?"today":destination) : naSection;
+    setData(d=>({...d,items:d.items.map(i=>i.id===clarifyItem.id?{...i,text,section,context,project:project||null,due:due||null,twoMin,done:false}:i)}));
+    setClarifyItem(null);
+    showToast(twoMin?"2-min task → Today!":`Moved to ${sectionLabels[section]||section}`);
+  };
+
+  const moveItem = (id,section) => setData(d=>({...d,items:d.items.map(i=>i.id===id?{...i,section}:i)}));
+  const toggleDone = id => setData(d=>({...d,items:d.items.map(i=>i.id===id?{...i,done:!i.done}:i)}));
+  const deleteItem = id => setData(d=>({...d,items:d.items.filter(i=>i.id!==id)}));
+
+  const addProject = () => {
+    if(!newProject.trim()) return;
+    setData(d=>({...d,projects:[...d.projects,{id:d.nextId,name:newProject.trim()}],nextId:d.nextId+1}));
+    setNewProject("");
+  };
+
+  const inboxItems = data.items.filter(i=>i.section==="inbox");
+  const viewItems = view==="projects"?[]:data.items.filter(i=>i.section===view);
+  const stats = {
+    inbox: data.items.filter(i=>i.section==="inbox").length,
+    today: data.items.filter(i=>i.section==="today"&&!i.done).length,
+    next:  data.items.filter(i=>i.section==="next"&&!i.done).length,
+  };
+  const totalDone   = data.items.filter(i=>i.done).length;
+  const totalActive = data.items.filter(i=>!i.done&&i.section!=="trash").length;
+  const progress    = totalActive+totalDone>0?Math.round((totalDone/(totalActive+totalDone))*100):0;
+  const isOverdue  = due => due && new Date(due)<new Date(new Date().toDateString());
+  const isDueSoon  = due => { if(!due)return false; const d=new Date(due),now=new Date(); return d>=new Date(now.toDateString())&&d<=new Date(now.getTime()+2*86400000); };
+
+  const S = { // inline styles shorthand
+    sidebar:  {width:210,background:"#2c2416",color:"#f5f0e8",padding:"24px 0",display:"flex",flexDirection:"column",flexShrink:0,minHeight:"100vh"},
+    navItem:  (active)=>({padding:"10px 20px",cursor:"pointer",background:active?"#4a3c2a":"transparent",borderLeft:active?"3px solid #c8a96e":"3px solid transparent",fontSize:14,display:"flex",justifyContent:"space-between",alignItems:"center"}),
+    badge:    (color)=>({background:color,color:color==="#c8a96e"?"#2c2416":"#fff",borderRadius:10,fontSize:11,padding:"1px 7px",fontFamily:"sans-serif"}),
+    card:     (done,due)=>({background:done?"#f0ebe0":"#fffdf7",border:`1px solid ${isOverdue(due)?"#e07050":isDueSoon(due)?"#c8a96e":"#d4c5a9"}`,borderRadius:8,padding:"12px 16px",marginBottom:10,display:"flex",alignItems:"center",gap:12,opacity:done?0.6:1}),
+    btn:      (bg,color="#f5f0e8")=>({padding:"9px 18px",background:bg,color,border:"none",borderRadius:7,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}),
+    input:    {flex:1,padding:"12px 16px",borderRadius:8,border:"2px solid #d4c5a9",background:"#fffdf7",fontSize:15,fontFamily:"Georgia,serif",outline:"none"},
+    label:    {fontSize:12,fontFamily:"sans-serif",color:"#5a4a3a",marginBottom:5},
+    select:   {width:"100%",padding:"8px",borderRadius:6,border:"1px solid #d4c5a9",background:"#f5f0e8",fontSize:13,fontFamily:"sans-serif"},
+  };
+
+  return (
+    <div style={{display:"flex",minHeight:"100vh"}}>
+      {/* Sidebar */}
+      <div style={S.sidebar}>
+        <div style={{padding:"0 20px 20px",borderBottom:"1px solid #4a3c2a"}}>
+          <div style={{fontSize:20,fontWeight:"bold",letterSpacing:1}}>📗 GTD</div>
+          <div style={{fontSize:11,color:"#a89070",marginTop:4}}>Getting Things Done</div>
+        </div>
+        <div style={{padding:"12px 0",flex:1}}>
+          {[...SECTIONS,"review"].map(s=>(
+            <div key={s} onClick={()=>setView(s)} style={S.navItem(view===s)}>
+              <span>{sectionLabels[s]}</span>
+              {s==="inbox"&&stats.inbox>0&&<span style={S.badge("#c8a96e")}>{stats.inbox}</span>}
+              {s==="today"&&stats.today>0&&<span style={S.badge("#e07050")}>{stats.today}</span>}
+            </div>
+          ))}
+        </div>
+        <div style={{padding:"16px 20px",borderTop:"1px solid #4a3c2a"}}>
+          <div style={{fontSize:11,color:"#a89070",marginBottom:6,fontFamily:"sans-serif"}}>OVERALL PROGRESS</div>
+          <div style={{background:"#4a3c2a",borderRadius:4,height:6,overflow:"hidden"}}>
+            <div style={{width:`${progress}%`,background:"#c8a96e",height:"100%",transition:"width 0.4s"}}/>
+          </div>
+          <div style={{fontSize:11,color:"#a89070",marginTop:5,fontFamily:"sans-serif"}}>{totalDone} done · {totalActive} active</div>
+        </div>
+      </div>
+
+      {/* Main */}
+      <div style={{flex:1,padding:"32px 40px",maxWidth:800,overflowY:"auto"}}>
+        {/* Capture */}
+        <div style={{display:"flex",gap:10,marginBottom:32}}>
+          <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addToInbox()} placeholder="Capture a thought, task, or idea…" style={S.input}/>
+          <button onClick={addToInbox} style={S.btn("#2c2416")}>Capture</button>
+        </div>
+
+        <h2 style={{margin:"0 0 20px",fontSize:22,fontWeight:"normal",borderBottom:"2px solid #d4c5a9",paddingBottom:10}}>{sectionLabels[view]}</h2>
+
+        {/* INBOX */}
+        {view==="inbox"&&(
+          <div>
+            {inboxItems.length===0&&<p style={{color:"#8a7a65",fontStyle:"italic"}}>Your inbox is empty. Capture something above!</p>}
+            {inboxItems.map(item=>(
+              <div key={item.id} style={{background:"#fffdf7",border:"1px solid #d4c5a9",borderRadius:8,padding:"14px 16px",marginBottom:10,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <span style={{fontSize:15}}>{item.text}</span>
+                <div style={{display:"flex",gap:8}}>
+                  <button onClick={()=>openClarify(item)} style={S.btn("#c8a96e","#2c2416")}>Clarify</button>
+                  <button onClick={()=>moveItem(item.id,"trash")} style={S.btn("#e8dfd0","#2c2416")}>🗑</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* LIST VIEWS */}
+        {["next","today","someday","reference","trash"].includes(view)&&(
+          <div>
+            {viewItems.length===0&&<p style={{color:"#8a7a65",fontStyle:"italic"}}>Nothing here yet.</p>}
+            {viewItems.map(item=>(
+              <div key={item.id} style={S.card(item.done,item.due)}>
+                {["next","today"].includes(view)&&<input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:18,height:18,cursor:"pointer",accentColor:"#2c2416"}}/>}
+                <div style={{flex:1}}>
+                  <div style={{fontSize:15,textDecoration:item.done?"line-through":"none"}}>
+                    {item.twoMin&&<span style={{fontSize:11,background:"#c8a96e",color:"#2c2416",borderRadius:4,padding:"1px 6px",marginRight:6,fontFamily:"sans-serif"}}>2 MIN</span>}
+                    {item.text}
+                  </div>
+                  <div style={{fontSize:12,color:"#8a7a65",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:10}}>
+                    {item.context&&<span>{item.context}</span>}
+                    {item.project&&<span>📁 {item.project}</span>}
+                    {item.due&&<span style={{color:isOverdue(item.due)?"#e07050":isDueSoon(item.due)?"#b07820":"#8a7a65"}}>📅 {item.due}</span>}
+                  </div>
+                </div>
+                <div style={{display:"flex",gap:6}}>
+                  {view!=="trash"&&<button onClick={()=>moveItem(item.id,"trash")} style={S.btn("#e8dfd0","#2c2416")}>🗑</button>}
+                  {view==="trash"&&<button onClick={()=>deleteItem(item.id)} style={S.btn("#e07050")}>Delete</button>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* PROJECTS */}
+        {view==="projects"&&(
+          <div>
+            <div style={{display:"flex",gap:10,marginBottom:20}}>
+              <input value={newProject} onChange={e=>setNewProject(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addProject()} placeholder="New project name…"
+                style={{flex:1,padding:"10px 14px",borderRadius:7,border:"1px solid #d4c5a9",background:"#fffdf7",fontSize:14,fontFamily:"Georgia,serif",outline:"none"}}/>
+              <button onClick={addProject} style={S.btn("#2c2416")}>Add</button>
+            </div>
+            {data.projects.length===0&&<p style={{color:"#8a7a65",fontStyle:"italic"}}>No projects yet.</p>}
+            {data.projects.map(p=>{
+              const tasks=data.items.filter(i=>i.project===p.name&&i.section!=="trash");
+              const done=tasks.filter(i=>i.done).length;
+              return(
+                <div key={p.id} style={{background:"#fffdf7",border:"1px solid #d4c5a9",borderRadius:8,padding:"14px 18px",marginBottom:12}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <div style={{fontSize:16}}>📁 {p.name}</div>
+                    <div style={{fontSize:12,color:"#8a7a65",fontFamily:"sans-serif"}}>{done}/{tasks.length} done</div>
+                  </div>
+                  {tasks.length>0&&(
+                    <div style={{marginTop:8}}>
+                      <div style={{background:"#e8dfd0",borderRadius:4,height:5,overflow:"hidden"}}>
+                        <div style={{width:`${tasks.length?(done/tasks.length)*100:0}%`,background:"#c8a96e",height:"100%"}}/>
+                      </div>
+                      <div style={{marginTop:8}}>{tasks.map(t=><div key={t.id} style={{fontSize:13,color:"#5a4a3a",padding:"3px 0",textDecoration:t.done?"line-through":"none",opacity:t.done?0.5:1}}>• {t.text}</div>)}</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* REVIEW */}
+        {view==="review"&&(
+          <div>
+            <p style={{color:"#5a4a3a",lineHeight:1.7,marginBottom:24}}>Your weekly review keeps the GTD system trustworthy. Work through each step below.</p>
+            {[
+              {title:"1. Collect loose papers & materials",desc:"Gather any physical notes, receipts, or papers and add them to your inbox."},
+              {title:"2. Empty your inbox",desc:`You have ${stats.inbox} item(s) in your inbox. Clarify each one.`,action:()=>setView("inbox"),label:"Go to Inbox"},
+              {title:"3. Review Next Actions",desc:`${stats.next} active next actions. Mark off completed ones.`,action:()=>setView("next"),label:"Go to Next Actions"},
+              {title:"4. Review Projects",desc:"Ensure every project has at least one next action.",action:()=>setView("projects"),label:"Go to Projects"},
+              {title:"5. Review Someday/Maybe",desc:"Decide what to activate, delete, or keep.",action:()=>setView("someday"),label:"Go to Someday"},
+              {title:"6. Be creative & courageous",desc:"Any new ideas? Capture them in your inbox."},
+            ].map((step,i)=>(
+              <div key={i} style={{background:"#fffdf7",border:"1px solid #d4c5a9",borderRadius:8,padding:"16px 20px",marginBottom:12}}>
+                <div style={{fontWeight:"bold",fontSize:15,marginBottom:4}}>{step.title}</div>
+                <div style={{fontSize:14,color:"#5a4a3a",lineHeight:1.6}}>{step.desc}</div>
+                {step.action&&<button onClick={step.action} style={{...S.btn("#2c2416"),marginTop:10}}>{step.label}</button>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* CLARIFY MODAL */}
+      {clarifyItem&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
+          <div style={{background:"#fffdf7",borderRadius:12,padding:32,width:460,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}}>
+            <h3 style={{margin:"0 0 12px",fontSize:18}}>Clarify Item</h3>
+            <input value={clarify.text} onChange={e=>setClarify(c=>({...c,text:e.target.value}))}
+              style={{width:"100%",padding:"10px 12px",borderRadius:7,border:"1px solid #d4c5a9",fontSize:14,fontFamily:"Georgia,serif",background:"#f5f0e8",marginBottom:18,outline:"none"}}/>
+
+            <div style={{marginBottom:14}}>
+              <div style={{...S.label,fontWeight:"bold",marginBottom:8}}>Is it actionable?</div>
+              <div style={{display:"flex",gap:10}}>
+                {["Yes","No"].map(v=>(
+                  <button key={v} onClick={()=>setClarify(c=>({...c,actionable:v==="Yes"}))}
+                    style={{flex:1,padding:"9px",border:`2px solid ${clarify.actionable===(v==="Yes")?"#2c2416":"#d4c5a9"}`,borderRadius:7,background:clarify.actionable===(v==="Yes")?"#2c2416":"#f5f0e8",color:clarify.actionable===(v==="Yes")?"#f5f0e8":"#2c2416",cursor:"pointer",fontSize:14,fontFamily:"sans-serif"}}>{v}</button>
+                ))}
+              </div>
+            </div>
+
+            {clarify.actionable===false&&(
+              <div style={{marginBottom:14}}>
+                <div style={{...S.label,fontWeight:"bold",marginBottom:8}}>Send to:</div>
+                <div style={{display:"flex",gap:8}}>
+                  {["reference","someday","trash"].map(s=>(
+                    <button key={s} onClick={()=>setClarify(c=>({...c,naSection:s}))}
+                      style={{flex:1,padding:"8px",border:`2px solid ${clarify.naSection===s?"#2c2416":"#d4c5a9"}`,borderRadius:7,background:clarify.naSection===s?"#2c2416":"#f5f0e8",color:clarify.naSection===s?"#f5f0e8":"#2c2416",cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}}>
+                      {s==="reference"?"📚 Reference":s==="someday"?"💭 Someday":"🗑 Trash"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {clarify.actionable===true&&(
+              <>
+                <div style={{marginBottom:14}}>
+                  <label style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer",fontSize:14}}>
+                    <input type="checkbox" checked={clarify.twoMin} onChange={e=>setClarify(c=>({...c,twoMin:e.target.checked}))} style={{width:17,height:17,accentColor:"#2c2416"}}/>
+                    Takes less than 2 minutes → Do it now!
+                  </label>
+                </div>
+                <div style={{display:"flex",gap:14,marginBottom:14}}>
+                  <div style={{flex:1}}>
+                    <div style={S.label}>DESTINATION</div>
+                    <select value={clarify.destination} onChange={e=>setClarify(c=>({...c,destination:e.target.value}))} style={S.select}>
+                      <option value="next">Next Actions</option>
+                      <option value="today">Today</option>
+                      <option value="someday">Someday</option>
+                    </select>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={S.label}>CONTEXT</div>
+                    <select value={clarify.context} onChange={e=>setClarify(c=>({...c,context:e.target.value}))} style={S.select}>
+                      {CONTEXTS.map(ctx=><option key={ctx}>{ctx}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div style={{display:"flex",gap:14,marginBottom:18}}>
+                  <div style={{flex:1}}>
+                    <div style={S.label}>PROJECT (optional)</div>
+                    <input value={clarify.project} onChange={e=>setClarify(c=>({...c,project:e.target.value}))} list="proj-list" placeholder="e.g. Work, Home…"
+                      style={{width:"100%",padding:"8px",borderRadius:6,border:"1px solid #d4c5a9",background:"#f5f0e8",fontSize:13,fontFamily:"sans-serif",outline:"none"}}/>
+                    <datalist id="proj-list">{data.projects.map(p=><option key={p.id} value={p.name}/>)}</datalist>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={S.label}>DUE DATE (optional)</div>
+                    <input type="date" value={clarify.due} onChange={e=>setClarify(c=>({...c,due:e.target.value}))}
+                      style={{width:"100%",padding:"8px",borderRadius:6,border:"1px solid #d4c5a9",background:"#f5f0e8",fontSize:13,fontFamily:"sans-serif",outline:"none"}}/>
+                  </div>
+                </div>
+              </>
+            )}
+
+            <div style={{display:"flex",gap:10}}>
+              <button onClick={()=>setClarifyItem(null)} style={S.btn("#e8dfd0","#2c2416")}>Cancel</button>
+              <button onClick={applyClarify} style={{...S.btn("#2c2416"),flex:2}}>Confirm</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TOAST */}
+      {toast&&(
+        <div style={{position:"fixed",bottom:28,left:"50%",transform:"translateX(-50%)",background:"#2c2416",color:"#f5f0e8",padding:"12px 24px",borderRadius:30,fontSize:14,fontFamily:"sans-serif",boxShadow:"0 4px 20px rgba(0,0,0,0.2)",zIndex:200}}>{toast}</div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
