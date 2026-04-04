@@ -6,15 +6,15 @@
     "sb_publishable_PUSu6S2fKZcFXhe_wnJ0_w_2fwYFUHO"
   );
 
-  async function checkLogin() {
+  async function checkAuth() {
     const { data } = await supabase.auth.getUser();
 
     if (!data.user) {
-      window.location.href = "login.html";
+      window.location.replace("login.html");
     }
   }
 
-  checkLogin();
+  checkAuth();
 </script>
 <!DOCTYPE html>
 <html lang="en">
