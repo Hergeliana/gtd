@@ -42,17 +42,19 @@
     }
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  supabaseClient.auth.onAuthStateChange((event, session) => {
-    const page = window.location.pathname;
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  const page = window.location.pathname;
 
-    if (!session && !page.includes("login.html")) {
-      window.location.replace("login.html");
-    }
+  // If NOT logged in and NOT already on login page → go to login
+  if (!session && !page.includes("login.html")) {
+    window.location.replace("login.html");
+  }
 
-    if (session && page.includes("login.html")) {
-      window.location.replace("index.html");
-    }
-  })
+  // If logged in and currently on login page → go to index
+  if (session && page.includes("login.html")) {
+    window.location.replace("index.html");
+  }
+})
     check();
   </script>
 </body>
