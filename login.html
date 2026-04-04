@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
+
+  <h2>Login</h2>
+
+  <input id="email" placeholder="Email" />
+  <br><br>
+
+  <input id="password" type="password" placeholder="Password" />
+  <br><br>
+
+  <button onclick="login()">Login</button>
+  <button onclick="signup()">Sign Up</button>
+
+  <p id="msg"></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const supabase = window.supabase.createClient(
+      "https://fnwmaaoatjbjuteehdjm.supabase.co",
+      "sb_publishable_PUSu6S2fKZcFXhe_wnJ0_w_2fwYFUHO"
+    );
+
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        document.getElementById("msg").innerText = error.message;
+      } else {
+        window.location.href = "app.html";
+      }
+    }
+
+    async function signup() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        document.getElementById("msg").innerText = error.message;
+      } else {
+        document.getElementById("msg").innerText =
+          "Account created! You can now log in.";
+      }
+    }
+  </script>
+
+</body>
+</html>
