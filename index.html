@@ -56,9 +56,10 @@ function startApp(user) {
 
 async function logout() {
   await supabase.auth.signOut();
+  localStorage.clear();
   window.location.replace("login.html");
 }
-
+  
 initApp();
 </script>
   
