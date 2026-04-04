@@ -29,28 +29,10 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   .modal-overlay{align-items:flex-end!important;}
 }
 
-  <title>Auth Test</title>
-  
-.logout-btn{
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background: transparent;
-  border: none;
-  color: #4a7fa5;
-  font-size: 14px;
-  cursor: pointer;
-}
 
-.logout-btn:hover{
-  color: #6aaed6;
-}
-  
 </style>
 </head>
 <body>
-
-  <h3>Checking login...</h3>
 
   <!-- Supabase (ONLY ONCE) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -66,11 +48,11 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       try {
         const { data, error } = await supabaseClient.auth.getSession();
 
-        if (error) {
+       <!-- if (error) {
           console.error("Auth error:", error.message);
           window.location.replace("login.html");
           return;
-        }
+        } -->
 
         const user = data?.session?.user;
 
@@ -88,15 +70,10 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 
     check();
 
-  async function logout() {
-  await supabase.auth.signOut();
-  window.location.href = "login.html";
-}
   </script>
 
 <div id="root"></div>
 <script type="text/babel">
-<button onclick="logout()" class="logout-btn">Log out</button>
 const{useState,useEffect,useRef}=React;
 
 const CONTEXTS=["@anywhere","@computer","@home","@errands","@calls","@waiting"];
@@ -309,6 +286,7 @@ function TimePicker({value,onChange}){
           </div>
         </div>
       )}
+
     </div>
   );
 }
