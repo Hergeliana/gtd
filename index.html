@@ -3,26 +3,41 @@
 <head>
   <title>Auth Test</title>
 </head>
+
 <body>
   <h3>Checking login...</h3>
 
+  <!-- Supabase (ONLY ONCE) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    const supabase = window.supabase.createClient(
+    // IMPORTANT: ensure no duplicate "supabase" declaration anywhere else
+    const supabaseClient = window.supabase.createClient(
       "https://fnwmaaoatjbjuteehdjm.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZud21hYW9hdGpianV0ZWVoZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDcxNjksImV4cCI6MjA5MDg4MzE2OX0.fw9LyyK5X-f3UABSU5D_oAvkPquH85q171TGjIvXSu0"
     );
 
     async function check() {
-      const { data } = await supabase.auth.getSession();
+      try {
+        const { data, error } = await supabaseClient.auth.getSession();
 
-      const user = data?.session?.user;
+        if (error) {
+          console.error("Auth error:", error.message);
+          window.location.replace("login.html");
+          return;
+        }
 
-      if (!user) {
+        const user = data?.session?.user;
+
+        if (!user) {
+          window.location.replace("login.html");
+        } else {
+          window.location.replace("app.html");
+        }
+
+      } catch (err) {
+        console.error("Unexpected error:", err);
         window.location.replace("login.html");
-      } else {
-        window.location.replace("app.html");
       }
     }
 
