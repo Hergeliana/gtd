@@ -37,9 +37,11 @@ async function checkAuth() {
 
   if (!user) {
     window.location.href = "login.html";
-  } else {
-    renderApp();
+    return;
   }
+
+  renderApp();
+}
 }
 
 function renderApp() {
