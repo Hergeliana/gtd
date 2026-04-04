@@ -2,25 +2,30 @@
 <html>
 <head>
   <title>Index</title>
+
+  <style>
+    .logout-btn {
+      background-color: #f44336;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: sans-serif;
+    }
+
+    .logout-btn:hover {
+      background-color: #d32f2f;
+    }
+  </style>
 </head>
 
 <body>
 
   <h2>Welcome</h2>
 
-  <button onclick="logout()" style="
-    font-size: 40px;
-    padding: 20px 40px;
-    background-color: red;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-  ">
-    LOGOUT
-  </button>
-
-  <p id="msg"></p>
+  <!-- Logout Button -->
+  <button class="logout-btn" onclick="logout()">Logout</button>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -30,6 +35,7 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZud21hYW9hdGpianV0ZWVoZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDcxNjksImV4cCI6MjA5MDg4MzE2OX0.fw9LyyK5X-f3UABSU5D_oAvkPquH85q171TGjIvXSu0"
     );
 
+    // Protect page
     async function check() {
       const { data } = await sb.auth.getSession();
       const user = data?.session?.user;
@@ -41,6 +47,7 @@
 
     check();
 
+    // Logout function
     async function logout() {
       await sb.auth.signOut();
       window.location.replace("login.html");
