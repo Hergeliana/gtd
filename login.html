@@ -57,6 +57,20 @@
         document.getElementById("msg").innerText = "Check email / account created";
       }
     }
+
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+  const page = window.location.pathname;
+
+  // If NOT logged in and NOT already on login page → go to login
+  if (!session && !page.includes("login.html")) {
+    window.location.replace("login.html");
+  }
+
+  // If logged in and currently on login page → go to index
+  if (session && page.includes("login.html")) {
+    window.location.replace("index.html");
+  }
+})
   </script>
 
 </body>
