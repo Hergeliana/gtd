@@ -1,52 +1,3 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-  const supabase = window.supabase.createClient(
-    "https://fnwmaaoatjbjuteehdjm.supabase.co",
-    "sb_publishable_PUSu6S2fKZcFXhe_wnJ0_w_2fwYFUHO"
-  );
-
-  supabase.auth.getUser().then(({ data }) => {
-    if (!data.user) window.location.href = "login.html";
-  });
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-  const supabase = window.supabase.createClient(
-    "https://fnwmaaoatjbjuteehdjm.supabase.co",
-    "sb_publishable_PUSu6S2fKZcFXhe_wnJ0_w_2fwYFUHO"
-  );
-
-  async function initApp() {
-    const { data, error } = await supabase.auth.getUser();
-
-    if (error || !data.user) {
-      window.location.replace("login.html");
-      return;
-    }
-
-    startApp(data.user);
-  }
-
-  function startApp(user) {
-    // 🚀 ALL your real app code goes here
-
-    console.log("User logged in:", user.email);
-
-    document.body.innerHTML = `
-      <h2>Welcome ${user.email}</h2>
-      <button onclick="logout()">Logout</button>
-    `;
-  }
-
-  async function logout() {
-    await supabase.auth.signOut();
-    window.location.replace("login.html");
-  }
-
-  initApp();
-</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,6 +19,42 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 </head>
 <body>
 <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const supabase = window.supabase.createClient(
+  "https://fnwmaaoatjbjuteehdjm.supabase.co",
+  "sb_publishable_PUSu6S2fKZcFXhe_wnJ0_w_2fwYFUHO"
+);
+
+async function initApp() {
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error || !data.user) {
+    window.location.replace("login.html");
+    return;
+  }
+
+  startApp(data.user);
+}
+
+function startApp(user) {
+  console.log("User logged in:", user.email);
+
+  document.getElementById("root").innerHTML = `
+    <h2>Welcome ${user.email}</h2>
+    <button onclick="logout()">Logout</button>
+  `;
+}
+
+async function logout() {
+  await supabase.auth.signOut();
+  window.location.replace("login.html");
+}
+
+initApp();
+</script>
+  
 <script type="text/babel">
 const{useState,useEffect,useRef}=React;
 
