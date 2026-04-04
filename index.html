@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<html>
 <head>
-  <title>Auth Test</title>
-  <meta charset="UTF-8"/>
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>GTD v3 - Getting Things Done</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#e8e8e4;color:#1e2430;}
@@ -16,61 +18,45 @@ input,select,button{font-family:inherit;}
 ::-webkit-scrollbar{width:6px;}
 ::-webkit-scrollbar-track{background:#e8e8e4;}
 ::-webkit-scrollbar-thumb{background:#4a7fa5;border-radius:3px;}
-input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
-.mobile-topbar{display:none;}
-.drawer-overlay{display:none;}
-@media(max-width:640px){
-  .mobile-topbar{display:flex;align-items:center;justify-content:flex-end;padding:10px 14px;background:#1e2430;position:sticky;top:0;z-index:40;}
-  .mobile-topbar button{background:none;border:none;color:#fff;cursor:pointer;padding:4px;display:flex;align-items:center;}
-  .app-wrapper{display:block!important;}
-  .sidebar{display:none!important;}
-  .sidebar.drawer-open{display:flex!important;flex-direction:column!important;width:260px!important;position:fixed!important;top:0!important;left:0!important;height:100vh!important;z-index:60!important;overflow-y:auto!important;}
-  .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:55;display:block;}
-  .main{padding:16px!important;padding-bottom:32px!important;max-width:100%!important;width:100%!important;}
-  .modal-box{width:100%!important;max-width:100%!important;max-height:92vh!important;border-radius:16px 16px 0 0!important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;margin:0!important;}
-  .modal-overlay{align-items:flex-end!important;}
-}
 </style>
 </head>
+
 <body>
-  <h3>Checking login...</h3>
 
-  <!-- Supabase (ONLY ONCE) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<div id="root"></div>
 
-  <script>
-    // IMPORTANT: ensure no duplicate "supabase" declaration anywhere else
-    const supabaseClient = window.supabase.createClient(
-      "https://fnwmaaoatjbjuteehdjm.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZud21hYW9hdGpianV0ZWVoZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDcxNjksImV4cCI6MjA5MDg4MzE2OX0.fw9LyyK5X-f3UABSU5D_oAvkPquH85q171TGjIvXSu0"
-    );
+<script>
+const supabase = window.supabase.createClient(
+  "https://fnwmaaoatjbjuteehdjm.supabase.co",
+  "YOUR_ANON_KEY"
+);
 
-    async function check() {
-      try {
-        const { data, error } = await supabaseClient.auth.getSession();
+async function checkAuth() {
+  const { data } = await supabase.auth.getSession();
+  const user = data?.session?.user;
 
-        if (error) {
-          console.error("Auth error:", error.message);
-          window.location.replace("login.html");
-          return;
-        }
+  if (!user) {
+    window.location.href = "login.html";
+  } else {
+    renderApp();
+  }
+}
 
-        const user = data?.session?.user;
+function renderApp() {
+  const root = document.getElementById("root");
 
-        if (!user) {
-          window.location.replace("login.html");
-        } else {
-          window.location.replace("app.html");
-        }
+  root.innerHTML = `
+    <h1>GTD App Loaded</h1>
+    <p>User is logged in</p>
+  `;
 
-      } catch (err) {
-        console.error("Unexpected error:", err);
-        window.location.replace("login.html");
-      }
-    }
+  // HERE you will later mount your React app
+  // ReactDOM.render(...) or createRoot(...)
+}
 
-    check();
-  </script>
+checkAuth();
+</script>
+
   <div id="root"></div>
 <script type="text/babel">
 const{useState,useEffect,useRef}=React;
