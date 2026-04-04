@@ -33,16 +33,16 @@ const supabase = window.supabase.createClient(
 );
 
 async function initApp() {
-  const { data, error } = await supabase.auth.getSession();
+  const { data } = await supabase.auth.getSession();
 
-  const session = data?.session;
+  const user = data?.session?.user;
 
-  if (error || !session || !session.user) {
+  if (!user) {
     window.location.replace("login.html");
     return;
   }
 
-  startApp(session.user);
+  startApp(user);
 }
 
 function startApp(user) {
