@@ -40,7 +40,19 @@
         window.location.replace("login.html");
       }
     }
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    const page = window.location.pathname;
+
+    if (!session && !page.includes("login.html")) {
+      window.location.replace("login.html");
+    }
+
+    if (session && page.includes("login.html")) {
+      window.location.replace("index.html");
+    }
+  })
     check();
   </script>
 </body>
