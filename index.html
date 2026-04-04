@@ -1,3 +1,21 @@
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const supabase = window.supabase.createClient(
+    "https://fnwmaaoatjbjuteehdjm.supabase.co",
+    "sb_publishable_PUSu6S2fKZcFXhe_wnJ0_w_2fwYFUHO"
+  );
+
+  async function checkLogin() {
+    const { data } = await supabase.auth.getUser();
+
+    if (!data.user) {
+      window.location.href = "login.html";
+    }
+  }
+
+  checkLogin();
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
