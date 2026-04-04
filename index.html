@@ -1,52 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Auth Test</title>
+  <title>Index</title>
 </head>
-
 <body>
-  <h3>Checking login...</h3>
 
-  <!-- Supabase -->
+  <h2>Welcome</h2>
+
+  <button onclick="logout()">Logout</button>
+
+  <p id="msg"></p>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    const supabaseClient = window.supabase.createClient(
+    const sb = window.supabase.createClient(
       "https://fnwmaaoatjbjuteehdjm.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZud21hYW9hdGpianV0ZWVoZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDcxNjksImV4cCI6MjA5MDg4MzE2OX0.fw9LyyK5X-f3UABSU5D_oAvkPquH85q171TGjIvXSu0"
     );
 
+    // 🔐 Protect page: if not logged in → send to login
     async function check() {
-      try {
-        const { data, error } = await supabaseClient.auth.getSession();
-        const currentPage = window.location.pathname;
-        const user = data?.session?.user;
+      const { data } = await sb.auth.getSession();
+      const user = data?.session?.user;
 
-        if (error) {
-          console.error("Auth error:", error.message);
-          if (!currentPage.includes("login.html")) {
-            window.location.replace("login.html");
-          }
-          return;
-        }
-
-        // Not logged in → go to login (only if not already there)
-        if (!user && !currentPage.includes("login.html")) {
-          window.location.replace("login.html");
-        }
-
-        // Logged in → go to index (only if not already there)
-        if (user && !currentPage.includes("index.html")) {
-          window.location.replace("index.html");
-        }
-
-      } catch (err) {
-        console.error("Unexpected error:", err);
+      if (!user) {
         window.location.replace("login.html");
       }
     }
 
     check();
+
+    // 🚪 Logout function
+    async function logout() {
+      await sb.auth.signOut();
+      window.location.replace("login.html");
+    }
   </script>
+
 </body>
 </html>
