@@ -1,11 +1,15 @@
-const supabase = window.supabase.createClient(
-  "https://fnwmaaoatjbjuteehdjm.supabase.co",
-  "sb_publishable_PUSu6S2fKZcFXhe_wnJ0_w_2fwYFUHO"
-);
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-supabase.auth.getUser().then(({ data }) => {
-  if (!data.user) window.location.href = "login.html";
-});
+<script>
+  const supabase = window.supabase.createClient(
+    "https://fnwmaaoatjbjuteehdjm.supabase.co",
+    "sb_publishable_PUSu6S2fKZcFXhe_wnJ0_w_2fwYFUHO"
+  );
+
+  supabase.auth.getUser().then(({ data }) => {
+    if (!data.user) window.location.href = "login.html";
+  });
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
