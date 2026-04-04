@@ -4,9 +4,11 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>GTD - Getting Things Done</title>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#e8e8e4;color:#1e2430;}
@@ -17,9 +19,12 @@ input,select,button{font-family:inherit;}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
 </style>
 </head>
+
 <body>
+
 <div id="root"></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 const supabase = window.supabase.createClient(
@@ -28,14 +33,16 @@ const supabase = window.supabase.createClient(
 );
 
 async function initApp() {
-  const { data, error } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getSession();
 
-  if (error || !data.user) {
+  const session = data?.session;
+
+  if (error || !session || !session.user) {
     window.location.replace("login.html");
     return;
   }
 
-  startApp(data.user);
+  startApp(session.user);
 }
 
 function startApp(user) {
