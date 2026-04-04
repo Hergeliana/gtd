@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
+
+  <h2>Login</h2>
+
+  <input id="email" placeholder="Email" />
+  <br><br>
+
+  <input id="password" type="password" placeholder="Password" />
+  <br><br>
+
+  <button onclick="login()">Login</button>
+  <button onclick="signup()">Sign Up</button>
+
+  <p id="msg"></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const sb = window.supabase.createClient(
+      "https://fnwmaaoatjbjuteehdjm.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZud21hYW9hdGpianV0ZWVoZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDcxNjksImV4cCI6MjA5MDg4MzE2OX0.fw9LyyK5X-f3UABSU5D_oAvkPquH85q171TGjIvXSu0"
+    );
+
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const { error } = await sb.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        document.getElementById("msg").innerText = error.message;
+      } else {
+        window.location.href = "index.html";
+      }
+    }
+
+    async function signup() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const { error } = await sb.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        document.getElementById("msg").innerText = error.message;
+      } else {
+        document.getElementById("msg").innerText = "Check email / account created";
+      }
+    }
+  </script>
+
+</body>
+</html>
