@@ -3,11 +3,22 @@
 <head>
   <title>Index</title>
 </head>
+
 <body>
 
   <h2>Welcome</h2>
 
-  <button onclick="logout()">Logout</button>
+  <button onclick="logout()" style="
+    font-size: 40px;
+    padding: 20px 40px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  ">
+    LOGOUT
+  </button>
 
   <p id="msg"></p>
 
@@ -19,7 +30,6 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZud21hYW9hdGpianV0ZWVoZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDcxNjksImV4cCI6MjA5MDg4MzE2OX0.fw9LyyK5X-f3UABSU5D_oAvkPquH85q171TGjIvXSu0"
     );
 
-    // 🔐 Protect page: if not logged in → send to login
     async function check() {
       const { data } = await sb.auth.getSession();
       const user = data?.session?.user;
@@ -31,7 +41,6 @@
 
     check();
 
-    // 🚪 Logout function
     async function logout() {
       await sb.auth.signOut();
       window.location.replace("login.html");
