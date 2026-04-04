@@ -48,12 +48,11 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       try {
         const { data, error } = await supabaseClient.auth.getSession();
 
-       <!-- if (error) {
+        if (error) {
           console.error("Auth error:", error.message);
           window.location.replace("login.html");
           return;
-        } -->
-
+   
         const user = data?.session?.user;
 
         if (!user) {
