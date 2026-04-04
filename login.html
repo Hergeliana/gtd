@@ -26,6 +26,18 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZud21hYW9hdGpianV0ZWVoZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDcxNjksImV4cCI6MjA5MDg4MzE2OX0.fw9LyyK5X-f3UABSU5D_oAvkPquH85q171TGjIvXSu0"
     );
 
+    // ✅ Check on load: if already logged in → go to index
+    async function check() {
+      const { data } = await sb.auth.getSession();
+      const user = data?.session?.user;
+
+      if (user) {
+        window.location.replace("index.html");
+      }
+    }
+
+    check();
+
     async function login() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
@@ -38,7 +50,7 @@
       if (error) {
         document.getElementById("msg").innerText = error.message;
       } else {
-        window.location.href = "index.html";
+        window.location.replace("index.html");
       }
     }
 
@@ -57,20 +69,6 @@
         document.getElementById("msg").innerText = "Check email / account created";
       }
     }
-
-  supabaseClient.auth.onAuthStateChange((event, session) => {
-  const page = window.location.pathname;
-
-  // If NOT logged in and NOT already on login page → go to login
-  if (!session && !page.includes("login.html")) {
-    window.location.replace("login.html");
-  }
-
-  // If logged in and currently on login page → go to index
-  if (session && page.includes("login.html")) {
-    window.location.replace("index.html");
-  }
-})
   </script>
 
 </body>
