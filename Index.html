@@ -34,46 +34,6 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 </style>
 </head>
 <body>
-
-  <h3>Checking login...</h3>
-
-  <!-- Supabase (ONLY ONCE) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-    // IMPORTANT: ensure no duplicate "supabase" declaration anywhere else
-    const supabaseClient = window.supabase.createClient(
-      "https://fnwmaaoatjbjuteehdjm.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZud21hYW9hdGpianV0ZWVoZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDcxNjksImV4cCI6MjA5MDg4MzE2OX0.fw9LyyK5X-f3UABSU5D_oAvkPquH85q171TGjIvXSu0"
-    );
-
-    async function check() {
-      try {
-        const { data, error } = await supabaseClient.auth.getSession();
-
-        if (error) {
-          console.error("Auth error:", error.message);
-          window.location.replace("login.html");
-          return;
-        }
-
-        const user = data?.session?.user;
-
-        if (!user) {
-          window.location.replace("login.html");
-        } else {
-          window.location.replace("index.html");
-        }
-
-      } catch (err) {
-        console.error("Unexpected error:", err);
-        window.location.replace("login.html");
-      }
-    }
-
-    check();
-  </script>
-
 <div id="root"></div>
 <script type="text/babel">
 const{useState,useEffect,useRef}=React;
