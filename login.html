@@ -215,6 +215,13 @@
       accent-color:var(--blue);
       cursor:pointer;
     }
+    .remember.disabled{
+      opacity:.45;
+      cursor:default;
+    }
+    .remember.disabled input{
+      cursor:not-allowed;
+    }
     .btn{
       width:100%;
       height:52px;
@@ -311,7 +318,7 @@
         </div>
 
         <div class="row">
-          <label class="remember">
+          <label id="rememberLabel" class="remember">
             <input id="remember" type="checkbox" />
             <span>Remember my credentials</span>
           </label>
@@ -338,6 +345,7 @@
     const emailEl = document.getElementById("email");
     const passwordEl = document.getElementById("password");
     const rememberEl = document.getElementById("remember");
+    const rememberLabelEl = document.getElementById("rememberLabel");
     const msgEl = document.getElementById("msg");
     const submitBtn = document.getElementById("submitBtn");
     const loginTab = document.getElementById("loginTab");
@@ -357,6 +365,30 @@
       msgEl.className = "msg" + (type ? " " + type : "");
     }
 
+    function clearFields() {
+      emailEl.value = "";
+      passwordEl.value = "";
+      rememberEl.checked = false;
+      passwordEl.type = "password";
+      togglePassBtn.textContent = "Show";
+    }
+
+    function applyRememberedCredentials() {
+      try {
+        const raw = localStorage.getItem(REMEMBER_KEY);
+        if (!raw) {
+          clearFields();
+          return;
+        }
+        const saved = JSON.parse(raw);
+        emailEl.value = saved.email || "";
+        passwordEl.value = saved.password || "";
+        rememberEl.checked = !!saved.remember;
+      } catch (_) {
+        clearFields();
+      }
+    }
+
     function setMode(nextMode) {
       mode = nextMode;
       const isLogin = mode === "login";
@@ -371,30 +403,28 @@
       switchModeBtn.textContent = isLogin ? "Create one" : "Log in";
       modeHintEl.textContent = isLogin ? "Login mode" : "Signup mode";
       passwordEl.autocomplete = isLogin ? "current-password" : "new-password";
+      rememberEl.disabled = !isLogin;
+      rememberLabelEl.classList.toggle("disabled", !isLogin);
+
+      if (isLogin) {
+        applyRememberedCredentials();
+      } else {
+        clearFields();
+      }
+
       setMessage("");
     }
 
     function saveRememberedCredentials() {
-      if (rememberEl.checked) {
-        localStorage.setItem(REMEMBER_KEY, JSON.stringify({
-          remember: true,
-          email: emailEl.value,
-          password: passwordEl.value
-        }));
-      } else {
+      if (!rememberEl.checked) {
         localStorage.removeItem(REMEMBER_KEY);
+        return;
       }
-    }
-
-    function loadRememberedCredentials() {
-      try {
-        const raw = localStorage.getItem(REMEMBER_KEY);
-        if (!raw) return;
-        const saved = JSON.parse(raw);
-        rememberEl.checked = !!saved.remember;
-        emailEl.value = saved.email || "";
-        passwordEl.value = saved.password || "";
-      } catch (_) {}
+      localStorage.setItem(REMEMBER_KEY, JSON.stringify({
+        remember: true,
+        email: emailEl.value.trim(),
+        password: passwordEl.value
+      }));
     }
 
     async function check() {
@@ -428,16 +458,28 @@
       setMessage("");
       submitBtn.disabled = true;
 
-      const { error } = await sb.auth.signUp({ email, password });
+      const { data, error } = await sb.auth.signUp({ email, password });
 
       submitBtn.disabled = false;
+
       if (error) {
-        setMessage(error.message, "error");
-      } else {
-        saveRememberedCredentials();
-        setMessage("Account created. Please check your email if confirmation is enabled.", "success");
-        setMode("login");
+        const msg = String(error.message || "");
+        if (msg.toLowerCase().includes("already")) {
+          setMessage("User already exists. Please log in.", "error");
+        } else {
+          setMessage(msg, "error");
+        }
+        return;
       }
+
+      const identities = data?.user?.identities;
+      if (Array.isArray(identities) && identities.length === 0) {
+        setMessage("User already exists. Please log in.", "error");
+        return;
+      }
+
+      setMessage("Account created. Please check your email if confirmation is enabled.", "success");
+      setMode("login");
     }
 
     submitBtn.addEventListener("click", () => {
@@ -467,7 +509,6 @@
       togglePassBtn.textContent = isPassword ? "Hide" : "Show";
     });
 
-    loadRememberedCredentials();
     setMode("login");
     check();
   </script>
