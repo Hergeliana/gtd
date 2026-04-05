@@ -395,19 +395,17 @@ function App(){
   const[weekStart,setWeekStart]=useState(()=>{const d=new Date();d.setDate(d.getDate()-d.getDay());return d;});
   const[drawerOpen,setDrawerOpen]=useState(false);
   const [data, setData] = useState({ items: [], projects: [], nextId: 1 });
-  const [loaded, setLoaded] = useState(false);
+const [loaded, setLoaded] = useState(false);
 
 useEffect(() => {
   async function load() {
-    const res = await sb
+    const { data: res } = await sb
       .from("tasks")
-      .select("*")
+      .select("state")
       .eq("id", 1)
       .single();
 
-    if (res?.data?.state) {
-      setData(res.data.state);
-    }
+    if (res?.state) setData(res.state);
 
     setLoaded(true);
   }
@@ -417,17 +415,16 @@ useEffect(() => {
 
 useEffect(() => {
   if (!loaded) return;
-  if (!data || !data.items) return;
 
-  const timeout = setTimeout(async () => {
+  async function save() {
     await sb.from("tasks").upsert({
       id: 1,
       state: data
     });
-  }, 500);
+  }
 
-  return () => clearTimeout(timeout);
-}, [data, loaded]);
+  save();
+}, [loaded, data]);
 
   /* useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
   useEffect(()=>{try{localStorage.setItem("gtd-data4",JSON.stringify(data));}catch{}},[data]);*/
