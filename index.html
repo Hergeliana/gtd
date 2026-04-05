@@ -410,8 +410,27 @@ function App(){
   const[weekStart,setWeekStart]=useState(()=>{const d=new Date();d.setDate(d.getDate()-d.getDay());return d;});
   const[drawerOpen,setDrawerOpen]=useState(false);
 
+// SUPABASE ADD for storage 
   useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
-  useEffect(()=>{try{localStorage.setItem("gtd-data4",JSON.stringify(data));}catch{}},[data]);
+
+useEffect(() => {
+  if (!currentUser) return;
+
+  const saveData = async () => {
+    // delete old data for this user
+    await sb.from("tasks").delete().eq("user_id", currentUser.id);
+
+    // insert fresh data
+    const rows = data.map(item => ({
+      user_id: currentUser.id,
+      content: JSON.stringify(item)
+    }));
+
+    if (rows.length > 0) {
+      await sb.from("tasks").insert(rows);
+    }
+  };
+
 
   const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(null),2500);};
 
@@ -1100,23 +1119,65 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZud21hYW9hdGpianV0ZWVoZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDcxNjksImV4cCI6MjA5MDg4MzE2OX0.fw9LyyK5X-f3UABSU5D_oAvkPquH85q171TGjIvXSu0"
     );
 
-    // Protect page
-    async function check() {
-      const { data } = await sb.auth.getSession();
-      const user = data?.session?.user;
+// 🔐 Protect page + get user
+async function check() {
+  const { data } = await sb.auth.getSession();
+  const user = data?.session?.user;
 
-      if (!user) {
-        window.location.replace("login.html");
-      }
+  if (!user) {
+    window.location.replace("login.html");
+    return;
+  }
+
+  currentUser = user;
+
+  // load tasks when user is confirmed
+  loadTasks();
+}
+
+// ➕ ADD TASK (SAVE TO CLOUD)
+async function addTask() {
+  const input = document.getElementById("taskInput");
+  const text = input.value;
+
+  if (!text) return;
+
+  await sb.from("tasks").insert([
+    {
+      user_id: currentUser.id,
+      content: text
     }
+  ]);
 
-    check();
+  input.value = "";
+  loadTasks(); // refresh list
+}
+
+// 📥 LOAD TASKS FROM CLOUD
+async function loadTasks() {
+  const { data, error } = await sb
+    .from("tasks")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending: false });
+
+  const list = document.getElementById("taskList");
+  list.innerHTML = "";
+
+  data.forEach(task => {
+    const li = document.createElement("li");
+    li.textContent = task.content;
+    list.appendChild(li);
+  });
+}
 
     // Logout function
     async function logout() {
       await sb.auth.signOut();
       window.location.replace("login.html");
     }
+
+  check();
   </script>
 
   <!-- Logout Button -->
