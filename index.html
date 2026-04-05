@@ -399,20 +399,13 @@ function App(){
     const isFirstLoad = useRef(true);
 
 useEffect(() => {
-  console.log("🔥 SAVE TRIGGERED");
+  console.log("SAVE TRIGGERED");
 
-  sb.from("tasks")
-    .upsert({
-      id: 1,
-      state: data
-    })
-    .then(res => {
-      console.log("📦 SUPABASE RESPONSE:", res);
-    })
-    .catch(err => {
-      console.log("❌ SUPABASE ERROR:", err);
-    });
-}, [data]);
+  sb.from("tasks").upsert({
+    id: 1,
+    state: JSON.parse(JSON.stringify(data))
+  });
+}, [JSON.stringify(data)]);
 
   /* useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
   useEffect(()=>{try{localStorage.setItem("gtd-data4",JSON.stringify(data));}catch{}},[data]);*/
