@@ -394,27 +394,37 @@ function App(){
   const[calMode,setCalMode]=useState("month");
   const[weekStart,setWeekStart]=useState(()=>{const d=new Date();d.setDate(d.getDate()-d.getDay());return d;});
   const[drawerOpen,setDrawerOpen]=useState(false);
- const EMPTY = { items: [], projects: [], nextId: 1 };
-   const [data, setData] = useState(EMPTY);
+    const EMPTY = { items: [], projects: [], nextId: 1 };
+    const [data, setData] = useState(EMPTY);
+    const isFirstLoad = useRef(true);
 
 useEffect(() => {
   async function load() {
-    try {
-      const { data: row } = await sb
-        .from("tasks")
-        .select("state")
-        .eq("id", 1)
-        .maybeSingle();
+    const { data: row } = await sb
+      .from("tasks")
+      .select("state")
+      .eq("id", 1)
+      .maybeSingle();
 
-      setData(row?.state || EMPTY);
-    } catch {
-      setData(EMPTY);
+    if (row?.state && Object.keys(row.state).length > 0) {
+      setData(row.state);
     }
   }
 
   load();
 }, []);
-  /* useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
+
+useEffect(() => {
+  if (isFirstLoad.current) {
+    isFirstLoad.current = false;
+    return;
+  }
+
+  sb.from("tasks").upsert({
+    id: 1,
+    state: data
+  });
+}, [data]);  /* useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
   useEffect(()=>{try{localStorage.setItem("gtd-data4",JSON.stringify(data));}catch{}},[data]);*/
 
   const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(null),2500);};
