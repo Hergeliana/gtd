@@ -28,28 +28,13 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   .main{padding:16px!important;padding-bottom:32px!important;max-width:100%!important;width:100%!important;}
   .modal-box{width:100%!important;max-width:100%!important;max-height:92vh!important;border-radius:16px 16px 0 0!important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;margin:0!important;}
   .modal-overlay{align-items:flex-end!important;}
-}
-    .logout-btn {
-      background: #2e3a50;
-      color: #7a8aaa;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-family: sans-serif;
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-}
-    }
-
-    .logout-btn:hover {
-      background-color: #2e3a50;
-    }
+}}
   </style>
 </head>
-
+<body>
 <div id="root"></div>
 <script type="text/babel">
+
 const{useState,useEffect,useRef}=React;
 
 const CONTEXTS=["@anywhere","@computer","@home","@errands","@calls","@waiting"];
@@ -410,27 +395,33 @@ function App(){
   const[weekStart,setWeekStart]=useState(()=>{const d=new Date();d.setDate(d.getDate()-d.getDay());return d;});
   const[drawerOpen,setDrawerOpen]=useState(false);
 
-// SUPABASE ADD for storage 
-  useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
+useEffect(() => {
+  async function load() {
+    const { data } = await sb
+      .from("tasks")
+      .select("*")
+      .eq("id", 1)
+      .single();
+
+    if (data) setData(data.state);
+  }
+
+  load();
+}, []);
 
 useEffect(() => {
-  if (!currentUser) return;
+  async function save() {
+    await sb.from("tasks").upsert({
+      id: 1,
+      state: data
+    });
+  }
 
-  const saveData = async () => {
-    // delete old data for this user
-    await sb.from("tasks").delete().eq("user_id", currentUser.id);
+  save();
+}, [data]);
 
-    // insert fresh data
-    const rows = data.map(item => ({
-      user_id: currentUser.id,
-      content: JSON.stringify(item)
-    }));
-
-    if (rows.length > 0) {
-      await sb.from("tasks").insert(rows);
-    }
-  };
-
+  /* useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
+  useEffect(()=>{try{localStorage.setItem("gtd-data4",JSON.stringify(data));}catch{}},[data]);*/
 
   const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(null),2500);};
 
@@ -656,6 +647,20 @@ useEffect(() => {
           </div>
           <div style={{fontSize:11,color:"#7a8aaa",marginTop:5,fontFamily:"sans-serif"}}>{totalDone} done / {totalActive} active</div>
         </div>
+  <button
+    onClick={logout}
+style={{
+  background: "none",
+  border: "none",
+  padding: 0,
+  color: "#7a8aaa",
+  fontSize: 12,
+  fontFamily: "sans-serif",
+  cursor: "pointer"
+}}
+  >
+    Logout
+  </button>
       </div>
 
       {/* Main */}
@@ -1112,64 +1117,22 @@ useEffect(() => {
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
-
-    const sb = window.supabase.createClient(
+const sb = window.supabase.createClient(
       "https://fnwmaaoatjbjuteehdjm.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZud21hYW9hdGpianV0ZWVoZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDcxNjksImV4cCI6MjA5MDg4MzE2OX0.fw9LyyK5X-f3UABSU5D_oAvkPquH85q171TGjIvXSu0"
     );
 
-// 🔐 Protect page + get user
-async function check() {
-  const { data } = await sb.auth.getSession();
-  const user = data?.session?.user;
+    // Protect page
+    async function check() {
+      const { data } = await sb.auth.getSession();
+      const user = data?.session?.user;
 
-  if (!user) {
-    window.location.replace("login.html");
-    return;
-  }
-
-  currentUser = user;
-
-  // load tasks when user is confirmed
-  loadTasks();
-}
-
-// ➕ ADD TASK (SAVE TO CLOUD)
-async function addTask() {
-  const input = document.getElementById("taskInput");
-  const text = input.value;
-
-  if (!text) return;
-
-  await sb.from("tasks").insert([
-    {
-      user_id: currentUser.id,
-      content: text
+      if (!user) {
+        window.location.replace("login.html");
+      }
     }
-  ]);
 
-  input.value = "";
-  loadTasks(); // refresh list
-}
-
-// 📥 LOAD TASKS FROM CLOUD
-async function loadTasks() {
-  const { data, error } = await sb
-    .from("tasks")
-    .select("*")
-    .eq("user_id", currentUser.id)
-    .order("created_at", { ascending: false });
-
-  const list = document.getElementById("taskList");
-  list.innerHTML = "";
-
-  data.forEach(task => {
-    const li = document.createElement("li");
-    li.textContent = task.content;
-    list.appendChild(li);
-  });
-}
+    check();
 
     // Logout function
     async function logout() {
@@ -1177,13 +1140,8 @@ async function loadTasks() {
       window.location.replace("login.html");
     }
 
-  check();
-  </script>
-
-  <!-- Logout Button -->
-  <button class="logout-btn" onclick="logout()">Logout</button>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+ </script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>
