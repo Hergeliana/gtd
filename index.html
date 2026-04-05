@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<html>
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -27,12 +28,11 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   .main{padding:16px!important;padding-bottom:32px!important;max-width:100%!important;width:100%!important;}
   .modal-box{width:100%!important;max-width:100%!important;max-height:92vh!important;border-radius:16px 16px 0 0!important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;margin:0!important;}
   .modal-overlay{align-items:flex-end!important;}
-}
+}}
   </style>
 </head>
 <body>
 <div id="root"></div>
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="text/babel">
 
 const{useState,useEffect,useRef}=React;
@@ -375,9 +375,8 @@ function EditFields({form,setForm,showSection,projects,showChecklist}){
 }
 
 function App(){
-  const DEFAULT_DATA={items:[],projects:[],nextId:1};
   const[view,setView]=useState("inbox");
-  const[data,setData]=useState(DEFAULT_DATA);
+  const[data,setData]=useState({items:[],projects:[],nextId:1});
   const[input,setInput]=useState("");
   const[clarifyItem,setClarifyItem]=useState(null);
   const[clarify,setClarify]=useState({});
@@ -395,91 +394,9 @@ function App(){
   const[calMode,setCalMode]=useState("month");
   const[weekStart,setWeekStart]=useState(()=>{const d=new Date();d.setDate(d.getDate()-d.getDay());return d;});
   const[drawerOpen,setDrawerOpen]=useState(false);
-  const[cloudReady,setCloudReady]=useState(false);
-  const[cloudUserId,setCloudUserId]=useState(null);
-  const saveTimerRef=useRef(null);
-  const skipNextSaveRef=useRef(false);
 
-  async function loadCloudData(){
-    try{
-      const { data: sessionData, error: sessionError } = await sb.auth.getSession();
-      if(sessionError) throw sessionError;
-      const user=sessionData?.session?.user;
-      if(!user){
-        setCloudReady(true);
-        return;
-      }
-
-      setCloudUserId(user.id);
-
-      const { data: row, error } = await sb
-        .from("gtd_state")
-        .select("state")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if(error) throw error;
-
-      if(row?.state && typeof row.state === "object" && row.state.items && row.state.projects && typeof row.state.nextId === "number"){
-        skipNextSaveRef.current=true;
-        setData(row.state);
-      }else{
-        const starterData=DEFAULT_DATA;
-        skipNextSaveRef.current=true;
-        setData(starterData);
-        const { error: insertError } = await sb
-          .from("gtd_state")
-          .upsert({
-            user_id:user.id,
-            contect:"",
-            state:starterData
-          },{onConflict:"user_id"});
-        if(insertError) throw insertError;
-      }
-    }catch(err){
-      console.error("Cloud load error:",err);
-      showToast("Cloud load failed.");
-    }finally{
-      setCloudReady(true);
-    }
-  }
-
-  async function saveCloudData(nextData){
-    try{
-      const { data: sessionData, error: sessionError } = await sb.auth.getSession();
-      if(sessionError) throw sessionError;
-      const user=sessionData?.session?.user;
-      if(!user) return;
-      setCloudUserId(user.id);
-
-      const { error } = await sb
-        .from("gtd_state")
-        .upsert({
-          user_id:user.id,
-          contect:"",
-          state:nextData
-        },{onConflict:"user_id"});
-
-      if(error) throw error;
-    }catch(err){
-      console.error("Cloud save error:",err);
-    }
-  }
-
-  useEffect(()=>{loadCloudData();},[]);
-
-  useEffect(()=>{
-    if(!cloudReady) return;
-    if(skipNextSaveRef.current){
-      skipNextSaveRef.current=false;
-      return;
-    }
-    if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current=setTimeout(()=>{saveCloudData(data);},500);
-    return ()=>{
-      if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    };
-  },[data,cloudReady]);
+  useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
+  useEffect(()=>{try{localStorage.setItem("gtd-data4",JSON.stringify(data));}catch{}},[data]);
 
   const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(null),2500);};
 
@@ -1200,5 +1117,6 @@ const sb = window.supabase.createClient(
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
  </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>
