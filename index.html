@@ -7,6 +7,7 @@
 <title>GTD v3 - Getting Things Done</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -394,9 +395,78 @@ function App(){
   const[calMode,setCalMode]=useState("month");
   const[weekStart,setWeekStart]=useState(()=>{const d=new Date();d.setDate(d.getDate()-d.getDay());return d;});
   const[drawerOpen,setDrawerOpen]=useState(false);
+  const[cloudReady,setCloudReady]=useState(false);
+  const[cloudUserId,setCloudUserId]=useState(null);
+  const saveTimerRef=useRef(null);
+  const skipNextSaveRef=useRef(false);
+  const DEFAULT_DATA={items:[],projects:[],nextId:1};
 
-  useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
-  useEffect(()=>{try{localStorage.setItem("gtd-data4",JSON.stringify(data));}catch{}},[data]);
+  useEffect(()=>{
+    let alive=true;
+    (async()=>{
+      try{
+        const { data: sessionData, error: sessionError } = await sb.auth.getSession();
+        if(sessionError) throw sessionError;
+        const user=sessionData?.session?.user;
+        if(!user){
+          if(alive) setCloudReady(true);
+          return;
+        }
+        if(alive) setCloudUserId(user.id);
+
+        const { data: row, error } = await sb
+          .from("gtd_state")
+          .select("state")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if(error) throw error;
+
+        if(row?.state && typeof row.state==="object" && Array.isArray(row.state.items) && Array.isArray(row.state.projects) && typeof row.state.nextId==="number"){
+          skipNextSaveRef.current=true;
+          if(alive) setData(row.state);
+        }else{
+          const starterData={items:[],projects:[],nextId:1};
+          skipNextSaveRef.current=true;
+          if(alive) setData(starterData);
+          const { error: insertError } = await sb
+            .from("gtd_state")
+            .upsert({
+              user_id:user.id,
+              content:"",
+              state:starterData
+            }, { onConflict:"user_id" });
+          if(insertError) throw insertError;
+        }
+      }catch(err){
+        console.error("Cloud load failed:", err);
+      }finally{
+        if(alive) setCloudReady(true);
+      }
+    })();
+    return()=>{alive=false; if(saveTimerRef.current) clearTimeout(saveTimerRef.current);};
+  },[]);
+
+  useEffect(()=>{
+    if(!cloudReady || !cloudUserId) return;
+    if(skipNextSaveRef.current){ skipNextSaveRef.current=false; return; }
+    if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current=setTimeout(async()=>{
+      try{
+        const { error } = await sb
+          .from("gtd_state")
+          .upsert({
+            user_id:cloudUserId,
+            content:"",
+            state:data
+          }, { onConflict:"user_id" });
+        if(error) throw error;
+      }catch(err){
+        console.error("Cloud save failed:", err);
+      }
+    },250);
+    return()=>{ if(saveTimerRef.current) clearTimeout(saveTimerRef.current); };
+  },[data,cloudReady,cloudUserId]);
 
   const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(null),2500);};
 
@@ -1117,6 +1187,5 @@ const sb = window.supabase.createClient(
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
  </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>
