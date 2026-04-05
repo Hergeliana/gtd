@@ -394,6 +394,8 @@ function App(){
   const[calMode,setCalMode]=useState("month");
   const[weekStart,setWeekStart]=useState(()=>{const d=new Date();d.setDate(d.getDate()-d.getDay());return d;});
   const[drawerOpen,setDrawerOpen]=useState(false);
+  const [data, setData] = useState({ items: [], projects: [], nextId: 1 });
+  const [loaded, setLoaded] = useState(false);
 
 useEffect(() => {
   async function load() {
@@ -403,13 +405,19 @@ useEffect(() => {
       .eq("id", 1)
       .single();
 
-    if (data) setData(data.state);
+    if (data?.state) {
+      setData(data.state);
+    }
+
+    setLoaded(true);
   }
 
   load();
 }, []);
 
 useEffect(() => {
+  if (!loaded) return;
+
   async function save() {
     await sb.from("tasks").upsert({
       id: 1,
@@ -418,7 +426,7 @@ useEffect(() => {
   }
 
   save();
-}, [data]);
+}, [data, loaded]);
 
   /* useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
   useEffect(()=>{try{localStorage.setItem("gtd-data4",JSON.stringify(data));}catch{}},[data]);*/
