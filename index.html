@@ -376,7 +376,7 @@ function EditFields({form,setForm,showSection,projects,showChecklist}){
 
 function App(){
   const[view,setView]=useState("inbox");
-  const[data,setData]=useState({items:[],projects:[],nextId:1});
+  /*const[data,setData]=useState({items:[],projects:[],nextId:1});*/
   const[input,setInput]=useState("");
   const[clarifyItem,setClarifyItem]=useState(null);
   const[clarify,setClarify]=useState({});
@@ -394,38 +394,26 @@ function App(){
   const[calMode,setCalMode]=useState("month");
   const[weekStart,setWeekStart]=useState(()=>{const d=new Date();d.setDate(d.getDate()-d.getDay());return d;});
   const[drawerOpen,setDrawerOpen]=useState(false);
-  const [data, setData] = useState({ items: [], projects: [], nextId: 1 });
-const [loaded, setLoaded] = useState(false);
+ const EMPTY = { items: [], projects: [], nextId: 1 };
+   const [data, setData] = useState(EMPTY);
 
 useEffect(() => {
   async function load() {
-    const { data: res } = await sb
-      .from("tasks")
-      .select("state")
-      .eq("id", 1)
-      .single();
+    try {
+      const { data: row } = await sb
+        .from("tasks")
+        .select("state")
+        .eq("id", 1)
+        .maybeSingle();
 
-    if (res?.state) setData(res.state);
-
-    setLoaded(true);
+      setData(row?.state || EMPTY);
+    } catch {
+      setData(EMPTY);
+    }
   }
 
   load();
 }, []);
-
-useEffect(() => {
-  if (!loaded) return;
-
-  async function save() {
-    await sb.from("tasks").upsert({
-      id: 1,
-      state: data
-    });
-  }
-
-  save();
-}, [loaded, data]);
-
   /* useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
   useEffect(()=>{try{localStorage.setItem("gtd-data4",JSON.stringify(data));}catch{}},[data]);*/
 
