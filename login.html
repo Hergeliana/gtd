@@ -263,6 +263,16 @@
       font:inherit;
       font-weight:700;
     }
+    .forgot-row{
+      margin-top:-6px;
+      margin-bottom:14px;
+      text-align:right;
+      font-family:sans-serif;
+      font-size:13px;
+    }
+    .forgot-row.hidden,.field.hidden,.row.hidden{
+      display:none;
+    }
     @media (max-width: 860px){
       .shell{grid-template-columns:1fr}
       .hero{display:none}
@@ -317,7 +327,18 @@
           </div>
         </div>
 
-        <div class="row">
+        <div id="confirmField" class="field hidden">
+          <label class="label" for="confirmPassword">Confirm password</label>
+          <div class="input-wrap">
+            <input id="confirmPassword" class="input password" type="password" placeholder="Confirm password" autocomplete="new-password" />
+          </div>
+        </div>
+
+        <div id="forgotRow" class="forgot-row">
+          <button id="forgotBtn" class="link-btn" type="button">Forgot password?</button>
+        </div>
+
+        <div id="rememberRow" class="row">
           <label id="rememberLabel" class="remember">
             <input id="remember" type="checkbox" />
             <span>Remember my credentials</span>
@@ -344,8 +365,13 @@
 
     const emailEl = document.getElementById("email");
     const passwordEl = document.getElementById("password");
+    const confirmPasswordEl = document.getElementById("confirmPassword");
+    const confirmFieldEl = document.getElementById("confirmField");
     const rememberEl = document.getElementById("remember");
     const rememberLabelEl = document.getElementById("rememberLabel");
+    const rememberRowEl = document.getElementById("rememberRow");
+    const forgotRowEl = document.getElementById("forgotRow");
+    const forgotBtn = document.getElementById("forgotBtn");
     const msgEl = document.getElementById("msg");
     const submitBtn = document.getElementById("submitBtn");
     const loginTab = document.getElementById("loginTab");
@@ -368,6 +394,7 @@
     function clearFields() {
       emailEl.value = "";
       passwordEl.value = "";
+      confirmPasswordEl.value = "";
       rememberEl.checked = false;
       passwordEl.type = "password";
       togglePassBtn.textContent = "Show";
@@ -383,6 +410,7 @@
         const saved = JSON.parse(raw);
         emailEl.value = saved.email || "";
         passwordEl.value = saved.password || "";
+        confirmPasswordEl.value = "";
         rememberEl.checked = !!saved.remember;
       } catch (_) {
         clearFields();
@@ -403,8 +431,12 @@
       switchModeBtn.textContent = isLogin ? "Create one" : "Log in";
       modeHintEl.textContent = isLogin ? "Login mode" : "Signup mode";
       passwordEl.autocomplete = isLogin ? "current-password" : "new-password";
+      confirmPasswordEl.autocomplete = "new-password";
       rememberEl.disabled = !isLogin;
       rememberLabelEl.classList.toggle("disabled", !isLogin);
+      confirmFieldEl.classList.toggle("hidden", isLogin);
+      forgotRowEl.classList.toggle("hidden", !isLogin);
+      rememberRowEl.classList.toggle("hidden", !isLogin);
 
       if (isLogin) {
         applyRememberedCredentials();
@@ -455,6 +487,13 @@
     async function signup() {
       const email = emailEl.value.trim();
       const password = passwordEl.value;
+      const confirmPassword = confirmPasswordEl.value;
+
+      if (password !== confirmPassword) {
+        setMessage("Passwords do not match.", "error");
+        return;
+      }
+
       setMessage("");
       submitBtn.disabled = true;
 
@@ -482,12 +521,41 @@
       setMode("login");
     }
 
+    async function recoverPassword() {
+      const email = emailEl.value.trim();
+      if (!email) {
+        setMessage("Enter your email first.", "error");
+        return;
+      }
+
+      setMessage("");
+      forgotBtn.disabled = true;
+
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + window.location.pathname.replace(/[^/]+$/, "login.html")
+      });
+
+      forgotBtn.disabled = false;
+
+      if (error) {
+        setMessage(error.message, "error");
+      } else {
+        setMessage("Password reset email sent.", "success");
+      }
+    }
+
     submitBtn.addEventListener("click", () => {
       if (mode === "login") login();
       else signup();
     });
 
+    forgotBtn.addEventListener("click", recoverPassword);
+
     passwordEl.addEventListener("keydown", e => {
+      if (e.key === "Enter") submitBtn.click();
+    });
+
+    confirmPasswordEl.addEventListener("keydown", e => {
       if (e.key === "Enter") submitBtn.click();
     });
 
