@@ -399,14 +399,14 @@ function App(){
 
 useEffect(() => {
   async function load() {
-    const { data } = await sb
+    const res = await sb
       .from("tasks")
       .select("*")
       .eq("id", 1)
       .single();
 
-    if (data?.state) {
-      setData(data.state);
+    if (res?.data?.state) {
+      setData(res.data.state);
     }
 
     setLoaded(true);
@@ -417,15 +417,16 @@ useEffect(() => {
 
 useEffect(() => {
   if (!loaded) return;
+  if (!data || !data.items) return;
 
-  async function save() {
+  const timeout = setTimeout(async () => {
     await sb.from("tasks").upsert({
       id: 1,
       state: data
     });
-  }
+  }, 500);
 
-  save();
+  return () => clearTimeout(timeout);
 }, [data, loaded]);
 
   /* useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
