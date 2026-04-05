@@ -399,32 +399,22 @@ function App(){
     const isFirstLoad = useRef(true);
 
 useEffect(() => {
-  async function load() {
-    const { data: row } = await sb
-      .from("tasks")
-      .select("state")
-      .eq("id", 1)
-      .maybeSingle();
+  console.log("🔥 SAVE TRIGGERED");
 
-    if (row?.state && Object.keys(row.state).length > 0) {
-      setData(row.state);
-    }
-  }
+  sb.from("tasks")
+    .upsert({
+      id: 1,
+      state: data
+    })
+    .then(res => {
+      console.log("📦 SUPABASE RESPONSE:", res);
+    })
+    .catch(err => {
+      console.log("❌ SUPABASE ERROR:", err);
+    });
+}, [data]);
 
-  load();
-}, []);
-
-useEffect(() => {
-  if (isFirstLoad.current) {
-    isFirstLoad.current = false;
-    return;
-  }
-
-  sb.from("tasks").upsert({
-    id: 1,
-    state: data
-  });
-}, [data]);  /* useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
+  /* useEffect(()=>{try{const s=localStorage.getItem("gtd-data4");if(s)setData(JSON.parse(s));}catch{}},[]);
   useEffect(()=>{try{localStorage.setItem("gtd-data4",JSON.stringify(data));}catch{}},[data]);*/
 
   const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(null),2500);};
