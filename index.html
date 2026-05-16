@@ -55,6 +55,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   .main{padding:16px!important;padding-bottom:32px!important;max-width:100%!important;width:100%!important;}
   .modal-box{width:100%!important;max-width:100%!important;max-height:92vh!important;border-radius:16px 16px 0 0!important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;margin:0!important;}
   .modal-overlay{align-items:flex-end!important;}
+  .capture-bar{position:fixed!important;left:0!important;right:0!important;bottom:0!important;margin:0!important;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px))!important;background:#f4f4ef!important;border-top:1px solid #e6e8ed!important;box-shadow:0 -4px 16px rgba(20,30,55,0.08)!important;z-index:50!important;gap:8!important;}
+  .main{padding-bottom:110px!important;}
 }}
   </style>
 </head>
@@ -723,7 +725,7 @@ style={{
 
       {/* Main */}
       <div className="main" style={{flex:1,padding:"32px 40px",maxWidth:900,overflowY:"auto",background:"transparent"}}>
-        <div style={{display:"flex",gap:10,marginBottom:32,alignItems:"flex-start"}}>
+        <div className="capture-bar" style={{display:"flex",gap:10,marginBottom:32,alignItems:"flex-start"}}>
           <textarea ref={inputRef} className="capture-input" value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();addToInbox();}}} placeholder="Capture a thought, task, or idea..." rows={1}
             style={{flex:1,padding:"13px 16px",fontSize:15,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"#1a1f2c",resize:"none",overflow:"hidden",lineHeight:"1.4",minHeight:48,boxSizing:"border-box"}}/>
           <button className="btn-3d" onClick={addToInbox} style={mkBtn("#1e2430",null,{padding:"12px 22px",fontSize:14})}>Capture</button>
