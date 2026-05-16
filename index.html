@@ -11,10 +11,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:Georgia,serif;background:#e8e8e4;color:#1e2430;}
+body{font-family:Arial,sans-serif;background:#93a8b5;color:#1e2430;}
 input,select,button{font-family:inherit;}
 ::-webkit-scrollbar{width:6px;}
-::-webkit-scrollbar-track{background:#e8e8e4;}
+::-webkit-scrollbar-track{background:#93a8b5;}
 ::-webkit-scrollbar-thumb{background:#4a7fa5;border-radius:3px;}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
 .mobile-topbar{display:none;}
@@ -53,6 +53,7 @@ const IC={
   projects:{bg:"#2a9d5c", light:"#e5f7ed", text:"#0e4d2a"},
   someday: {bg:"#b5860d", light:"#fdf6e3", text:"#6b4e00"},
   reference:{bg:"#2a7d6e",light:"#e5f5f3", text:"#0d3d35"},
+  archive: {bg:"#5a7a8a", light:"#eaeff2", text:"#2a3a45"},
   trash:   {bg:"#d13030", light:"#fce8e8", text:"#6b0000"},
   calendar:{bg:"#2979c8", light:"#e8f0fc", text:"#0d3a6b"},
   review:  {bg:"#2a9d5c", light:"#e5f7ed", text:"#0e4d2a"},
@@ -103,6 +104,11 @@ const Icons={
       <path d="M9 3h6l1 2H8L9 3zM3 7h18l-1.5 14A2 2 0 0117.5 23h-11A2 2 0 014.5 21L3 7zm7 3a1 1 0 00-1 1v6a1 1 0 002 0v-6a1 1 0 00-1-1zm4 0a1 1 0 00-1 1v6a1 1 0 002 0v-6a1 1 0 00-1-1z"/>
     </svg>
   ),
+  archive:({size=16,color="currentColor"})=>(
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke="none">
+      <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm1 6h16v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-9zm5 2a1 1 0 100 2h6a1 1 0 100-2H9z"/>
+    </svg>
+  ),
   calendar:({size=16,color="currentColor"})=>(
     <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke="none">
       <path fillRule="evenodd" clipRule="evenodd" d="M8 2a1 1 0 011 1v1h6V3a1 1 0 112 0v1h1a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h1V3a1 1 0 011-1zm-3 9v8a1 1 0 001 1h12a1 1 0 001-1v-8H5z"/>
@@ -120,7 +126,7 @@ const Icons={
   ),
 };
 
-const sectionIcons={inbox:Icons.inbox,twomin:Icons.twomin,defer:Icons.defer,delegate:Icons.delegate,projects:Icons.projects,someday:Icons.someday,reference:Icons.reference,trash:Icons.trash,calendar:Icons.calendar,review:Icons.review};
+const sectionIcons={inbox:Icons.inbox,twomin:Icons.twomin,defer:Icons.defer,delegate:Icons.delegate,projects:Icons.projects,someday:Icons.someday,reference:Icons.reference,archive:Icons.archive,trash:Icons.trash,calendar:Icons.calendar,review:Icons.review};
 
 function getDaysInMonth(y,m){return new Date(y,m+1,0).getDate();}
 function toDateStr(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;}
@@ -302,10 +308,10 @@ function ChecklistEditor({checklist,onChange}){
     <div style={{marginBottom:12}}>
       <label style={labelStyle}>Checklist</label>
       {checklist.map(c=>(
-        <div key={c.id} style={{display:"flex",alignItems:"center",gap:7,marginBottom:5}}>
-          <input type="checkbox" checked={c.done} onChange={()=>toggleItem(c.id)} style={{width:14,height:14,cursor:"pointer",accentColor:IC.projects.bg,flexShrink:0}}/>
+        <div key={c.id} style={{display:"flex",alignItems:"center",gap:10,marginBottom:7}}>
+          <input type="checkbox" checked={c.done} onChange={()=>toggleItem(c.id)} style={{width:21,height:21,cursor:"pointer",accentColor:IC.projects.bg,flexShrink:0}}/>
           <input value={c.text} onChange={e=>updateText(c.id,e.target.value)}
-            style={{...fieldStyle,padding:"5px 8px",fontSize:12,textDecoration:c.done?"line-through":"none",color:c.done?"#9aa0ae":"#1e2430",flex:1}}/>
+            style={{...fieldStyle,padding:"8px 12px",fontSize:18,textDecoration:c.done?"line-through":"none",color:c.done?"#9aa0ae":"#1e2430",flex:1}}/>
           <button type="button" onClick={()=>deleteItem(c.id)}
             style={{background:"none",border:"none",cursor:"pointer",color:"#9aa0ae",fontSize:16,padding:"0 2px",lineHeight:1,flexShrink:0}}>×</button>
         </div>
@@ -325,7 +331,10 @@ function EditFields({form,setForm,showSection,projects,showChecklist}){
     <React.Fragment>
       <div style={{marginBottom:12}}>
         <label style={labelStyle}>Task name</label>
-        <input value={form.text} onChange={e=>setForm(f=>({...f,text:e.target.value}))} style={{...fieldStyle,fontFamily:"Georgia,serif",fontSize:14,padding:"10px 12px"}}/>
+        <textarea value={form.text} rows={1}
+          ref={el=>{if(el){el.style.height="auto";el.style.height=el.scrollHeight+"px";}}}
+          onChange={e=>{setForm(f=>({...f,text:e.target.value}));e.target.style.height="auto";e.target.style.height=e.target.scrollHeight+"px";}}
+          style={{...fieldStyle,fontFamily:"Arial,sans-serif",fontSize:14,padding:"10px 12px",resize:"none",overflow:"hidden",lineHeight:1.4,boxSizing:"border-box"}}/>
       </div>
       {showSection&&(
         <div style={{marginBottom:12}}>
@@ -389,6 +398,7 @@ function App(){
   const[taskForm,setTaskForm]=useState({text:"",section:"defer",context:"@anywhere",project:"",due:"",time:"",checklist:[]});
   const[captureModal,setCaptureModal]=useState(null);
   const[captureForm,setCaptureForm]=useState({text:"",section:"defer",context:"@anywhere",project:"",due:"",time:"",checklist:[]});
+  const[archiveExpanded,setArchiveExpanded]=useState({});
   const inputRef=useRef(null);
   useEffect(()=>{if(inputRef.current){inputRef.current.style.height="auto";inputRef.current.style.height=inputRef.current.scrollHeight+"px";}},[input]);
   const[toast,setToast]=useState(null);
@@ -559,12 +569,14 @@ function App(){
   };
 
   const isOverdue=due=>due&&new Date(due)<new Date(new Date().toDateString());
-  const isDueSoon=due=>{if(!due)return false;const d=new Date(due),now=new Date();return d>=new Date(now.toDateString())&&d<=new Date(now.getTime()+2*86400000);};
-  const sortByTime=arr=>[...arr].sort((a,b)=>{if(!!a.done!==!!b.done)return a.done?1:-1;if(a.time&&b.time)return a.time.localeCompare(b.time);if(a.time)return -1;if(b.time)return 1;return 0;});
+  const isDueSoon=due=>{if(!due)return false;const d=new Date(due),today=new Date(new Date().toDateString());return d>=today&&d<new Date(today.getTime()+7*86400000);};
+  const sortByTime=arr=>[...arr].sort((a,b)=>{if(!!a.done!==!!b.done)return a.done?1:-1;if(a.due&&b.due){const c=a.due.localeCompare(b.due);if(c)return c;}else if(a.due)return -1;else if(b.due)return 1;if(a.time&&b.time)return a.time.localeCompare(b.time);if(a.time)return -1;if(b.time)return 1;return 0;});
   const itemsForDay=ds=>sortByTime(data.items.filter(i=>i.due===ds&&i.section!=="trash"));
 
   const inboxItems=data.items.filter(i=>i.section==="inbox");
-  const viewItems=["projects","calendar"].includes(view)?[]:sortByTime(data.items.filter(i=>i.section===view));
+  const hideDoneInView=TASK_SECTIONS.includes(view);
+  const viewItems=["projects","calendar"].includes(view)?[]:sortByTime(data.items.filter(i=>i.section===view&&!(hideDoneInView&&i.done)));
+  const archivedItems=hideDoneInView?sortByTime(data.items.filter(i=>i.section===view&&i.done)):[];
   const totalDone=data.items.filter(i=>i.done&&!excludedSections.includes(i.section)).length;
   const totalActive=data.items.filter(i=>!i.done&&!excludedSections.includes(i.section)).length;
   const progress=totalActive+totalDone>0?Math.round((totalDone/(totalActive+totalDone))*100):0;
@@ -590,11 +602,11 @@ function App(){
   function MetaRow({item,conflict,hideProject}){
     const hasDate=item.due||item.time;
     return(
-      <div style={{fontSize:11,color:"#6b7280",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+      <div style={{fontSize:12,color:"#6b7280",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
         {item.context&&item.context!=="@anywhere"&&<span>{item.context}</span>}
-        {!hideProject&&item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3}}><Icons.folder size={10} color="#6b7280"/>{item.project}</span>}
+        {!hideProject&&item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3,color:IC.projects.bg}}><Icons.folder size={10} color={IC.projects.bg}/>{item.project}</span>}
         {hasDate&&(
-          <span style={{display:"inline-flex",alignItems:"center",gap:3,color:conflict?"#d04020":isOverdue(item.due)?"#d13030":isDueSoon(item.due)?"#b5860d":"#6b7280",fontWeight:conflict?"bold":"normal"}}>
+          <span style={{display:"inline-flex",alignItems:"center",gap:3,color:item.done?"#6b7280":conflict?"#d04020":isOverdue(item.due)?"#d13030":isDueSoon(item.due)?"#b5860d":"#6b7280",fontWeight:!item.done&&conflict?"bold":"normal"}}>
             {conflict&&<span>⚠</span>}
             {item.due&&<span>{item.due}</span>}
             {item.time&&<span style={{background:conflict?"#fce8e8":"#dde0e6",borderRadius:4,padding:"1px 5px",color:conflict?"#d04020":"#3a4460"}}>{fmt12(item.time)}</span>}
@@ -612,11 +624,11 @@ function App(){
       <div style={{marginTop:7,paddingTop:7,borderTop:"1px solid #eceef2"}}>
         {cl.map(c=>(
           <div key={c.id} onClick={e=>{e.stopPropagation();toggleChecklistItem(item.id,c.id);}}
-            style={{display:"flex",alignItems:"center",gap:6,marginBottom:3,cursor:"pointer"}}>
-            <div style={{width:13,height:13,borderRadius:3,border:`2px solid ${c.done?IC.projects.bg:"#cdd0d6"}`,background:c.done?IC.projects.bg:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.15s"}}>
-              {c.done&&<svg width="8" height="8" viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
+            style={{display:"flex",alignItems:"center",gap:9,marginBottom:5,cursor:"pointer"}}>
+            <div style={{width:20,height:20,borderRadius:5,border:`2px solid ${c.done?IC.projects.bg:"#cdd0d6"}`,background:c.done?IC.projects.bg:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.15s"}}>
+              {c.done&&<svg width="12" height="12" viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
             </div>
-            <span style={{fontSize:11,fontFamily:"sans-serif",color:c.done?"#9aa0ae":"#3a4460",textDecoration:c.done?"line-through":"none"}}>{c.text}</span>
+            <span style={{fontSize:13,fontFamily:"Arial,sans-serif",color:c.done?"#9aa0ae":"#3a4460",textDecoration:c.done?"line-through":"none"}}>{c.text}</span>
           </div>
         ))}
       </div>
@@ -627,13 +639,12 @@ function App(){
     const cl=item.checklist||[];
     const clDone=cl.filter(c=>c.done).length;
     return(
-      <div style={{background:item.done?"#eceef2":conflict?"#fdf0f0":"#ffffff",border:"1px solid "+(conflict?"#d13030":isOverdue(item.due)?"#d13030":isDueSoon(item.due)?"#4a7fa5":"#cdd0d6"),borderRadius:8,padding:"11px 14px",marginBottom:8,opacity:item.done?0.65:1}}>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          {showCheck&&<input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:17,height:17,cursor:"pointer",accentColor:"#1e2430",flexShrink:0}}/>}
+      <div style={{background:item.done?"#eceef2":conflict?"#fdf0f0":"#ffffff",border:"2px solid "+(item.done?"#cdd0d6":conflict?"#d13030":isOverdue(item.due)?"#6e2323":isDueSoon(item.due)?"#d97706":"#5a9a5a"),borderRadius:8,padding:"11px 14px",marginBottom:8,opacity:item.done?0.65:1}}>
+        <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
+          {showCheck&&<input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:17,height:17,cursor:"pointer",accentColor:"#1e2430",flexShrink:0,marginTop:3}}/>}
           <div style={{flex:1,minWidth:0}}>
-            <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:6}}>
-              {item.twoMin&&<span style={{fontSize:10,background:IC.twomin.bg,color:"#fff",borderRadius:3,padding:"1px 5px",flexShrink:0,fontFamily:"sans-serif"}}>2MIN</span>}
-              <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.text}</span>
+            <div style={{fontSize:15,textDecoration:item.done?"line-through":"none",display:"flex",alignItems:"flex-start",gap:6,flexWrap:"wrap"}}>
+              <span style={{wordBreak:"break-word",overflowWrap:"anywhere",lineHeight:"1.35",flex:"1 1 auto",minWidth:0}}>{item.text}</span>
               {cl.length>0&&<span style={{fontSize:10,fontFamily:"sans-serif",background:clDone===cl.length?IC.projects.light:"#f0f1f3",color:clDone===cl.length?IC.projects.text:"#6b7280",borderRadius:10,padding:"1px 7px",flexShrink:0,border:`1px solid ${clDone===cl.length?IC.projects.bg+"40":"#dde0e6"}`}}>✓ {clDone}/{cl.length}</span>}
             </div>
             <MetaRow item={item} conflict={conflict} hideProject={hideProject}/>
@@ -652,7 +663,7 @@ function App(){
   const navSections=[...SECTIONS,"calendar","review"];
 
   return(
-    <div className="app-wrapper" style={{display:"flex",minHeight:"100vh",fontFamily:"Georgia,serif",background:"#e8e8e4",color:"#1e2430"}}>
+    <div className="app-wrapper" style={{display:"flex",minHeight:"100vh",fontFamily:"Arial,sans-serif",background:"#93a8b5",color:"#1e2430"}}>
       {/* Mobile top bar */}
       <div className="mobile-topbar">
         <button onClick={()=>setDrawerOpen(true)}>
@@ -728,11 +739,11 @@ style={{
       <div className="main" style={{flex:1,padding:"32px 40px",maxWidth:900,overflowY:"auto"}}>
         <div style={{display:"flex",gap:10,marginBottom:32,alignItems:"flex-start"}}>
           <textarea ref={inputRef} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();addToInbox();}}} placeholder="Capture a thought, task, or idea..." rows={1}
-            style={{flex:1,padding:"12px 16px",borderRadius:8,border:"2px solid #cdd0d6",background:"#ffffff",fontSize:15,fontFamily:"Georgia,serif",outline:"none",color:"#1e2430",resize:"none",overflow:"hidden",lineHeight:"1.4",minHeight:46,boxSizing:"border-box"}}/>
+            style={{flex:1,padding:"12px 16px",borderRadius:8,border:"2px solid #cdd0d6",background:"#ffffff",fontSize:15,fontFamily:"Arial,sans-serif",outline:"none",color:"#1e2430",resize:"none",overflow:"hidden",lineHeight:"1.4",minHeight:46,boxSizing:"border-box"}}/>
           <button onClick={addToInbox} style={mkBtn("#1e2430",null,{padding:"12px 22px",fontSize:14})}>Capture</button>
         </div>
 
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20,borderBottom:"2px solid #cdd0d6",paddingBottom:10}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20,borderBottom:"2px solid "+(navIconColor[view]||"#cdd0d6"),paddingBottom:10}}>
           <h2 style={{margin:0,fontSize:22,fontWeight:"normal",display:"flex",alignItems:"center",gap:10,color:"#1e2430"}}>
             {sectionIcons[view]&&React.createElement(sectionIcons[view],{size:20,color:navIconColor[view]||"#4a7fa5"})}
             {sectionLabels[view]}
@@ -741,7 +752,7 @@ style={{
             <div style={{display:"flex",gap:6}}>
               {["month","week"].map(md=>(
                 <button key={md} onClick={()=>setCalMode(md)}
-                  style={{padding:"5px 14px",border:"2px solid "+(calMode===md?"#1e2430":"#cdd0d6"),borderRadius:6,background:calMode===md?"#1e2430":"#e8e8e4",color:calMode===md?"#ffffff":"#1e2430",cursor:"pointer",fontSize:12,fontFamily:"sans-serif"}}>
+                  style={{padding:"5px 14px",border:"2px solid "+(calMode===md?"#1e2430":"#cdd0d6"),borderRadius:6,background:calMode===md?"#1e2430":"#93a8b5",color:calMode===md?"#ffffff":"#1e2430",cursor:"pointer",fontSize:12,fontFamily:"sans-serif"}}>
                   {md==="month"?"Month":"Week"}
                 </button>
               ))}
@@ -771,6 +782,20 @@ style={{
           <div>
             {viewItems.length===0&&<p style={{color:"#6b7280",fontStyle:"italic"}}>Nothing here yet.</p>}
             {viewItems.map(item=><ItemCard key={item.id} item={item} showCheck={["twomin","defer","delegate"].includes(view)} conflict={allConflictIds.has(item.id)}/>)}
+            {archivedItems.length>0&&(
+              <div style={{marginTop:28}}>
+                <button onClick={()=>setArchiveExpanded(a=>({...a,[view]:!a[view]}))}
+                  style={{display:"flex",alignItems:"center",gap:8,background:"none",border:"none",padding:"6px 0",cursor:"pointer",color:IC.archive.bg,fontSize:13,fontFamily:"sans-serif",fontWeight:"bold"}}>
+                  <Icons.archive size={14} color={IC.archive.bg}/>
+                  Archive ({archivedItems.length}) <span style={{fontSize:11}}>{archiveExpanded[view]?"▾":"▸"}</span>
+                </button>
+                {archiveExpanded[view]&&(
+                  <div style={{borderTop:`1px dashed ${IC.archive.bg}`,paddingTop:10,marginTop:4}}>
+                    {archivedItems.map(item=><ItemCard key={item.id} item={item} showCheck={true} conflict={false}/>)}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -779,7 +804,7 @@ style={{
           <div>
             <div style={{display:"flex",gap:10,marginBottom:24}}>
               <input value={newProject} onChange={e=>setNewProject(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addProject()} placeholder="New project name..."
-                style={{flex:1,padding:"10px 14px",borderRadius:7,border:"1px solid #cdd0d6",background:"#ffffff",fontSize:14,fontFamily:"Georgia,serif",outline:"none",color:"#1e2430"}}/>
+                style={{flex:1,padding:"10px 14px",borderRadius:7,border:"1px solid #cdd0d6",background:"#ffffff",fontSize:14,fontFamily:"Arial,sans-serif",outline:"none",color:"#1e2430"}}/>
               <button onClick={addProject} style={mkBtn("#1e2430",null,{padding:"10px 18px",display:"flex",alignItems:"center",gap:6})}>
                 <Icons.projects size={14} color="#ffffff"/>
                 Add Project
@@ -823,7 +848,6 @@ style={{
                                   <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:15,height:15,cursor:"pointer",accentColor:"#1e2430",flexShrink:0}}/>
                                   <div style={{flex:1,minWidth:0}}>
                                     <div style={{fontSize:13,textDecoration:item.done?"line-through":"none",opacity:item.done?0.5:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:"#1e2430",display:"flex",alignItems:"center",gap:5}}>
-                                      {item.twoMin&&<span style={{fontSize:10,background:IC.twomin.bg,color:"#fff",borderRadius:3,padding:"1px 4px",flexShrink:0,fontFamily:"sans-serif"}}>2MIN</span>}
                                       <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.text}</span>
                                       {cl.length>0&&<span style={{fontSize:10,fontFamily:"sans-serif",background:clDone===cl.length?IC.projects.light:"#eceef2",color:clDone===cl.length?IC.projects.text:"#6b7280",borderRadius:10,padding:"1px 6px",flexShrink:0,border:`1px solid ${clDone===cl.length?IC.projects.bg+"40":"#dde0e6"}`}}>✓ {clDone}/{cl.length}</span>}
                                     </div>
@@ -914,7 +938,7 @@ style={{
                       <div style={{fontFamily:"sans-serif",fontSize:13,color:"#4a7fa5",fontWeight:"bold",minWidth:20}}>{idx+1}.</div>
                       <div style={{flex:1}}>
                         <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",opacity:item.done?0.6:1,color:"#1e2430"}}>{item.text}</div>
-                        <div style={{fontSize:11,color:"#6b7280",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+                        <div style={{fontSize:12,color:"#6b7280",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
                           <span style={{background:"#dde0e6",borderRadius:3,padding:"1px 5px",color:"#3a4460"}}>{sectionLabels[item.section]}</span>
                           {item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3}}><Icons.folder size={10} color="#6b7280"/>{item.project}</span>}
                           {item.time&&<span style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"#dde0e6",borderRadius:4,padding:"1px 5px",color:selectedDayConflicts.has(item.id)?IC.trash.text:"#3a4460",fontWeight:selectedDayConflicts.has(item.id)?"bold":"normal"}}>{(selectedDayConflicts.has(item.id)?"⚠ ":"")+fmt12(item.time)}</span>}
@@ -1045,7 +1069,10 @@ style={{
               <Icons.inbox size={18} color={IC.inbox.bg}/>
               Clarify Item
             </h3>
-            <input value={clarify.text} onChange={e=>setClarify(c=>({...c,text:e.target.value}))} style={{...fieldStyle,fontFamily:"Georgia,serif",fontSize:14,padding:"10px 12px",marginBottom:16}}/>
+            <textarea value={clarify.text} rows={1}
+              ref={el=>{if(el){el.style.height="auto";el.style.height=el.scrollHeight+"px";}}}
+              onChange={e=>{setClarify(c=>({...c,text:e.target.value}));e.target.style.height="auto";e.target.style.height=e.target.scrollHeight+"px";}}
+              style={{...fieldStyle,fontFamily:"Arial,sans-serif",fontSize:14,padding:"10px 12px",marginBottom:16,resize:"none",overflow:"hidden",lineHeight:1.4,boxSizing:"border-box"}}/>
             <div style={{marginBottom:14}}>
               <div style={{fontSize:13,fontFamily:"sans-serif",color:"#3a4460",marginBottom:8,fontWeight:"bold"}}>Is it actionable?</div>
               <div style={{display:"flex",gap:10}}>
