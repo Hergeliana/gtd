@@ -715,6 +715,7 @@ function App(){
         <button onClick={()=>setDrawerOpen(true)}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
+        <span style={{color:"#fff",fontSize:16,fontFamily:"Arial,sans-serif",fontWeight:"bold",marginLeft:12}}>Getting Things Done</span>
       </div>
       {/* Drawer overlay */}
       {drawerOpen&&<div className="drawer-overlay" onClick={()=>setDrawerOpen(false)}/>}
