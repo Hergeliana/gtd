@@ -299,7 +299,10 @@ function EditFields({form,setForm,showSection,projects,showChecklist}){
         </div>
         <div style={{flex:1}}>
           <label style={labelStyle}>Project</label>
-          <ProjectDropdown value={form.project||""} onChange={v=>setForm(f=>({...f,project:v}))} projects={projects}/>
+          <select value={form.project||""} onChange={e=>setForm(f=>({...f,project:e.target.value}))} style={fieldStyle}>
+            <option value="">— None —</option>
+            {projects.map(p=><option key={p.id} value={p.name}>{p.name}</option>)}
+          </select>
         </div>
       </div>
       <div style={{display:"flex",gap:12,marginBottom:12}}>
@@ -1173,7 +1176,10 @@ style={{
                   </div>
                   <div style={{flex:1}}>
                     <label style={labelStyle}>Project (optional)</label>
-                    <ProjectDropdown value={clarify.project||""} onChange={v=>setClarify(c=>({...c,project:v}))} projects={data.projects}/>
+                    <select value={clarify.project||""} onChange={e=>setClarify(c=>({...c,project:e.target.value}))} style={fieldStyle}>
+                      <option value="">— None —</option>
+                      {data.projects.map(p=><option key={p.id} value={p.name}>{p.name}</option>)}
+                    </select>
                   </div>
                 </div>
                 <div style={{display:"flex",gap:12,marginBottom:16}}>
