@@ -681,7 +681,7 @@ function App(){
     const cl=item.checklist||[];
     const clDone=cl.filter(c=>c.done).length;
     return(
-      <div style={{background:item.done?"#eceef2":conflict?"#fdf0f0":"#ffffff",border:"2px solid "+(item.done?"#cdd0d6":conflict?"#d13030":isOverdue(item.due)?"#6e2323":isDueSoon(item.due)?"#d97706":"#5a9a5a"),borderRadius:8,padding:"11px 14px",marginBottom:8,opacity:item.done?0.65:1}}>
+      <div style={{background:item.done?"#eceef2":conflict?"#fdf0f0":"#ffffff",border:"2px solid "+(item.done?"#cdd0d6":conflict?"#d13030":isOverdue(item.due)?"#a82d2d":isDueSoon(item.due)?"#d97706":"#5a9a5a"),borderRadius:8,padding:"11px 14px",marginBottom:8,opacity:item.done?0.65:1}}>
         <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
           {showCheck&&<input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:17,height:17,cursor:"pointer",accentColor:"#1e2430",flexShrink:0,marginTop:3}}/>}
           <div style={{flex:1,minWidth:0}}>
