@@ -387,6 +387,8 @@ function App(){
   const[expandedProject,setExpandedProject]=useState(null);
   const[addTaskModal,setAddTaskModal]=useState(null);
   const[taskForm,setTaskForm]=useState({text:"",section:"defer",context:"@anywhere",project:"",due:"",time:"",checklist:[]});
+  const[captureModal,setCaptureModal]=useState(null);
+  const[captureForm,setCaptureForm]=useState({text:"",section:"defer",context:"@anywhere",project:"",due:"",time:"",checklist:[]});
   const[toast,setToast]=useState(null);
   const today=new Date();
   const[calYear,setCalYear]=useState(today.getFullYear());
@@ -496,9 +498,21 @@ function App(){
 
   const addToInbox=()=>{
     if(!input.trim())return;
+    if(TASK_SECTIONS.includes(view)){
+      setCaptureForm({text:input.trim(),section:view,context:"@anywhere",project:"",due:"",time:"",checklist:[]});
+      setCaptureModal(view);
+      setInput("");
+      return;
+    }
     const id=data.nextId;
     setData(d=>({...d,nextId:d.nextId+1,items:[...d.items,{id,text:input.trim(),section:"inbox",context:"@anywhere",project:null,due:null,time:null,twoMin:false,checklist:[],done:false,created:Date.now()}]}));
     setInput("");showToast("Captured to In Basket!");
+  };
+  const applyCapture=()=>{
+    if(!captureForm.text.trim())return;
+    const id=data.nextId;
+    setData(d=>({...d,nextId:d.nextId+1,items:[...d.items,{id,text:captureForm.text.trim(),section:captureForm.section,context:captureForm.context,project:captureForm.project||null,due:captureForm.due||null,time:captureForm.time||null,twoMin:captureForm.section==="twomin",checklist:captureForm.checklist||[],done:false,created:Date.now()}]}));
+    setCaptureModal(null);showToast("Captured to "+sectionLabels[captureForm.section]);
   };
 
   const openClarify=item=>{setClarifyItem(item);setClarify({actionable:null,twoMin:false,context:item.context||"@anywhere",project:item.project||"",due:item.due||"",time:item.time||"",destination:"defer",text:item.text,naSection:"reference"});};
@@ -1135,6 +1149,23 @@ style={{
             <div style={{display:"flex",gap:10,marginTop:8}}>
               <button onClick={()=>setEditItem(null)} style={mkBtn("#dde0e6","#1e2430")}>Cancel</button>
               <button onClick={applyEdit} style={{...mkBtn("#1e2430"),flex:2}}>Save Changes</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CAPTURE TO SECTION MODAL */}
+      {captureModal&&(
+        <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
+          <div className="modal-box" style={{background:"#ffffff",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.18)",maxHeight:"90vh",overflowY:"auto"}}>
+            <h3 style={{margin:"0 0 16px",fontSize:18,display:"flex",alignItems:"center",gap:8,color:"#1e2430"}}>
+              {sectionIcons[captureModal]&&React.createElement(sectionIcons[captureModal],{size:18,color:navIconColor[captureModal]||"#4a7fa5"})}
+              Capture to {sectionLabels[captureModal]}
+            </h3>
+            <EditFields form={captureForm} setForm={setCaptureForm} showSection={true} projects={data.projects} showChecklist={true}/>
+            <div style={{display:"flex",gap:10,marginTop:8}}>
+              <button onClick={()=>setCaptureModal(null)} style={mkBtn("#dde0e6","#1e2430")}>Cancel</button>
+              <button onClick={applyCapture} style={{...mkBtn("#1e2430"),flex:2}}>Capture</button>
             </div>
           </div>
         </div>
