@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GTD — Design Enhancement Preview</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    /* Refined palette */
+    --bg:#f4f4ef;
+    --surface:#ffffff;
+    --surface-2:#fafbfd;
+    --ink:#1a1f2c;
+    --ink-2:#3a4153;
+    --muted:#6b7280;
+    --muted-2:#9aa0ae;
+    --border:#e6e8ed;
+    --border-2:#cfd2da;
+    --sidebar:#161b25;
+    --sidebar-ink:#e8ecf2;
+    --sidebar-muted:#7a8497;
+    --accent:#3b82f6;
+
+    /* Section accents (slightly desaturated) */
+    --c-inbox:#d59025;
+    --c-twomin:#cf5a14;
+    --c-defer:#3070c1;
+    --c-delegate:#7e3ab2;
+    --c-projects:#2c8d57;
+    --c-someday:#a87a18;
+    --c-reference:#2a7a6d;
+    --c-trash:#c43030;
+
+    /* Urgency */
+    --u-ok:#5a9a5a;
+    --u-soon:#d97706;
+    --u-late:#a82d2d;
+
+    /* Elevation */
+    --shadow-sm:0 1px 2px rgba(20,30,55,0.05), 0 1px 0 rgba(20,30,55,0.03);
+    --shadow-md:0 2px 4px rgba(20,30,55,0.06), 0 4px 12px rgba(20,30,55,0.05);
+    --shadow-lg:0 8px 28px rgba(20,30,55,0.10);
+
+    /* Motion */
+    --t:150ms cubic-bezier(.2,.6,.2,1);
+
+    /* Radii */
+    --r-sm:8px;
+    --r-md:10px;
+    --r-lg:14px;
+    --r-pill:999px;
+  }
+
+  html,body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:14px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  /* Layout */
+  .frame{
+    display:grid;
+    grid-template-columns:240px 1fr 320px;
+    min-height:100vh;
+  }
+  @media (max-width:1100px){.frame{grid-template-columns:240px 1fr;}.notes{display:none;}}
+  @media (max-width:760px){.frame{grid-template-columns:1fr;}.sidebar{display:none;}}
+
+  /* Sidebar */
+  .sidebar{
+    background:var(--sidebar);
+    color:var(--sidebar-ink);
+    padding:28px 0 16px;
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+    position:sticky;
+    top:0;
+  }
+  .brand{
+    padding:0 22px 22px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    margin-bottom:14px;
+  }
+  .brand h1{
+    font-size:18px;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .brand .badge{
+    width:26px;height:26px;
+    background:var(--u-ok);
+    border-radius:6px;
+    display:grid;place-items:center;
+    color:#fff;font-weight:700;font-size:12px;
+  }
+  .brand .sub{font-size:11px;color:var(--sidebar-muted);margin-top:4px;letter-spacing:.04em;text-transform:uppercase;}
+  .navsec{padding:8px 0;}
+  .navsec h6{
+    font-size:10px;
+    color:var(--sidebar-muted);
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    padding:8px 22px 6px;
+  }
+  .nav a{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:9px 22px;
+    color:#cdd5e2;
+    text-decoration:none;
+    font-size:13.5px;
+    border-left:3px solid transparent;
+    transition:background var(--t),color var(--t),border-color var(--t);
+    position:relative;
+  }
+  .nav a:hover{background:rgba(255,255,255,0.04);color:#fff;}
+  .nav a.active{
+    background:linear-gradient(90deg,rgba(207,90,20,0.16),rgba(207,90,20,0));
+    color:#fff;
+    border-left-color:var(--c-twomin);
+  }
+  .nav a .count{
+    margin-left:auto;
+    font-size:11px;
+    background:rgba(255,255,255,0.08);
+    padding:1px 8px;
+    border-radius:var(--r-pill);
+    color:#cdd5e2;
+  }
+  .nav a.active .count{background:rgba(207,90,20,0.4);color:#fff;}
+  .nav .dot{
+    width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.55;
+  }
+
+  /* Main */
+  .main{
+    padding:30px 36px 48px;
+    overflow-y:auto;
+  }
+  .pageheader{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    margin-bottom:22px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--border);
+    position:relative;
+  }
+  .pageheader::after{
+    content:"";
+    position:absolute;
+    left:0;bottom:-1px;
+    width:72px;height:3px;
+    background:var(--c-twomin);
+    border-radius:3px;
+  }
+  .pageheader h2{
+    font-size:22px;
+    font-weight:600;
+    letter-spacing:-0.015em;
+    display:flex;align-items:center;gap:10px;
+  }
+  .pageheader h2 .icon{
+    width:28px;height:28px;
+    background:rgba(207,90,20,0.12);
+    border-radius:8px;
+    color:var(--c-twomin);
+    display:grid;place-items:center;
+  }
+  .pageheader .meta{font-size:12px;color:var(--muted);}
+
+  /* Capture */
+  .capture{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--r-md);
+    padding:6px 6px 6px 14px;
+    display:flex;gap:8px;align-items:center;
+    box-shadow:var(--shadow-sm);
+    margin-bottom:24px;
+    transition:box-shadow var(--t),border-color var(--t);
+  }
+  .capture:focus-within{
+    border-color:#bcd0ec;
+    box-shadow:0 0 0 4px rgba(59,130,246,0.10),var(--shadow-sm);
+  }
+  .capture input{
+    flex:1;border:none;outline:none;background:transparent;
+    font:inherit;font-size:14px;padding:10px 4px;color:var(--ink);
+  }
+  .capture button{
+    padding:9px 16px;
+    background:var(--ink);color:#fff;
+    border:none;border-radius:var(--r-sm);
+    cursor:pointer;font:inherit;font-size:13px;font-weight:500;
+    transition:background var(--t),transform var(--t);
+  }
+  .capture button:hover{background:#0d1320;}
+  .capture button:active{transform:translateY(1px);}
+
+  /* Task card */
+  .tasklist{display:flex;flex-direction:column;gap:8px;}
+  .task{
+    background:var(--surface);
+    border-radius:var(--r-md);
+    padding:14px 16px;
+    box-shadow:var(--shadow-sm);
+    position:relative;
+    cursor:pointer;
+    transition:box-shadow var(--t),transform var(--t);
+    overflow:hidden;
+  }
+  .task:hover{box-shadow:var(--shadow-md);}
+  .task::before{
+    content:"";
+    position:absolute;
+    left:0;top:0;bottom:0;
+    width:4px;
+    background:var(--u-ok);
+  }
+  .task.soon::before{background:var(--u-soon);}
+  .task.late::before{background:var(--u-late);}
+  .task.done::before{background:var(--muted-2);}
+  .task.done{opacity:.7;background:#f4f5f7;}
+
+  .task .row{display:flex;align-items:flex-start;gap:12px;}
+  .task .check{
+    appearance:none;
+    width:18px;height:18px;
+    margin-top:2px;
+    border:1.5px solid var(--border-2);
+    border-radius:5px;
+    cursor:pointer;
+    flex-shrink:0;
+    background:#fff;
+    transition:border-color var(--t),background var(--t);
+    display:grid;place-items:center;
+  }
+  .task .check:hover{border-color:var(--muted);}
+  .task .check:checked{
+    background:var(--u-ok);border-color:var(--u-ok);
+  }
+  .task .check:checked::after{
+    content:"";
+    width:9px;height:5px;
+    border-left:2px solid #fff;
+    border-bottom:2px solid #fff;
+    transform:rotate(-45deg) translate(1px,-1px);
+  }
+  .task .body{flex:1;min-width:0;}
+  .task .title{
+    font-size:14.5px;
+    line-height:1.4;
+    color:var(--ink);
+    margin-bottom:5px;
+  }
+  .task.done .title{text-decoration:line-through;color:var(--muted);}
+  .task .meta{
+    display:flex;align-items:center;gap:10px;
+    font-size:12px;color:var(--muted);flex-wrap:wrap;
+  }
+  .task .meta .pill{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:1px 8px;border-radius:var(--r-pill);
+    background:#eef0f4;color:var(--ink-2);
+    font-size:11.5px;
+  }
+  .task .meta .pill.project{background:rgba(44,141,87,0.10);color:#1f6b40;}
+  .task .meta .pill.time{background:#eef0f4;color:var(--ink-2);}
+  .task .meta .pill.soon{background:rgba(217,119,6,0.12);color:#a86407;}
+  .task .meta .pill.late{background:rgba(168,45,45,0.10);color:var(--u-late);}
+  .task .meta .pill.cl{background:rgba(44,141,87,0.10);color:#1f6b40;}
+
+  .task .checklist{
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px dashed var(--border);
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .task .checklist .cl-row{
+    display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);
+  }
+  .task .checklist .cl-box{
+    width:14px;height:14px;border:1.5px solid var(--border-2);border-radius:4px;flex-shrink:0;
+    display:grid;place-items:center;cursor:pointer;
+    transition:border-color var(--t),background var(--t);
+  }
+  .task .checklist .cl-box.done{background:var(--c-projects);border-color:var(--c-projects);}
+  .task .checklist .cl-box.done::after{
+    content:"";width:7px;height:4px;border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;
+    transform:rotate(-45deg) translate(1px,-1px);
+  }
+  .task .checklist .cl-row.done .cl-text{text-decoration:line-through;color:var(--muted-2);}
+  .task .checklist .cl-toggle{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12px;color:var(--muted);background:none;border:none;padding:0;cursor:pointer;
+  }
+  .task .checklist .cl-add{
+    background:rgba(59,130,246,0.12);color:#1d4ed8;
+    border:none;padding:3px 10px;border-radius:6px;
+    font-size:12px;font-weight:600;cursor:pointer;
+    transition:background var(--t);
+  }
+  .task .checklist .cl-add:hover{background:rgba(59,130,246,0.18);}
+
+  /* Expanded action row */
+  .task.expanded .actions{display:flex;}
+  .task .actions{
+    display:none;
+    gap:6px;
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px dashed var(--border);
+  }
+  .task .actions button{
+    flex:1;
+    padding:8px 10px;
+    border:none;border-radius:7px;
+    font:inherit;font-size:12.5px;font-weight:500;cursor:pointer;
+    transition:background var(--t),transform var(--t);
+  }
+  .task .actions .b-edit{background:rgba(44,141,87,0.14);color:#1f6b40;}
+  .task .actions .b-edit:hover{background:rgba(44,141,87,0.22);}
+  .task .actions .b-del{background:rgba(196,48,48,0.12);color:#8a2020;}
+  .task .actions .b-del:hover{background:rgba(196,48,48,0.18);}
+  .task .actions .b-cl{background:rgba(59,130,246,0.14);color:#1d4ed8;}
+  .task .actions .b-cl:hover{background:rgba(59,130,246,0.22);}
+
+  /* Empty state */
+  .empty{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--muted);
+    font-size:13.5px;
+  }
+  .empty .icon{
+    width:48px;height:48px;
+    margin:0 auto 12px;
+    border-radius:50%;
+    background:rgba(207,90,20,0.10);
+    color:var(--c-twomin);
+    display:grid;place-items:center;
+    font-size:22px;
+  }
+
+  /* Right notes panel */
+  .notes{
+    background:#0e1320;
+    color:#cdd5e2;
+    padding:28px 24px;
+    height:100vh;
+    position:sticky;top:0;
+    overflow-y:auto;
+    font-size:13px;
+    line-height:1.55;
+  }
+  .notes h3{font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+  .notes h4{font-size:12.5px;color:#fff;margin:18px 0 6px;}
+  .notes p, .notes li{color:#9aa3b8;}
+  .notes ul{list-style:none;padding:0;}
+  .notes li{padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+  .notes code{
+    background:rgba(255,255,255,0.07);
+    padding:1px 5px;border-radius:4px;
+    font-family:ui-monospace,Consolas,monospace;font-size:11.5px;
+    color:#e8ecf2;
+  }
+  .swatch{
+    display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:middle;
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <h1><span class="badge">GTD</span> Getting Things Done</h1>
+      <div class="sub">Design Preview</div>
+    </div>
+
+    <nav class="navsec nav">
+      <h6>Workflow</h6>
+      <a href="#"><span class="dot" style="color:var(--c-inbox)"></span> In Basket <span class="count">3</span></a>
+      <a href="#" class="active"><span class="dot" style="color:var(--c-twomin)"></span> Less than 2min <span class="count">4</span></a>
+      <a href="#"><span class="dot" style="color:var(--c-defer)"></span> Defer <span class="count">7</span></a>
+      <a href="#"><span class="dot" style="color:var(--c-delegate)"></span> Delegate <span class="count">2</span></a>
+      <a href="#"><span class="dot" style="color:var(--c-projects)"></span> Projects</a>
+    </nav>
+
+    <nav class="navsec nav">
+      <h6>Reference</h6>
+      <a href="#"><span class="dot" style="color:var(--c-someday)"></span> Someday / Maybe</a>
+      <a href="#"><span class="dot" style="color:var(--c-reference)"></span> Reference</a>
+      <a href="#"><span class="dot" style="color:var(--c-trash)"></span> Trash</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="pageheader">
+      <h2><span class="icon">⚡</span> Less than 2min</h2>
+      <span class="meta">4 active · 2 archived</span>
+    </div>
+
+    <div class="capture">
+      <input placeholder="Capture a thought, task, or idea…" />
+      <button>Capture</button>
+    </div>
+
+    <div class="tasklist">
+
+      <!-- Overdue task -->
+      <article class="task late">
+        <div class="row">
+          <input type="checkbox" class="check" />
+          <div class="body">
+            <div class="title">Renew the apartment insurance before the auto-charge kicks in</div>
+            <div class="meta">
+              <span class="pill late">⚠ Overdue · 2026-05-12</span>
+              <span class="pill time">9:00 AM</span>
+              <span class="pill project">🗂 House</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Due soon -->
+      <article class="task soon expanded">
+        <div class="row">
+          <input type="checkbox" class="check" />
+          <div class="body">
+            <div class="title">Reply to Sarah about the Tuesday meeting</div>
+            <div class="meta">
+              <span class="pill soon">Due in 3 days</span>
+              <span class="pill">@calls</span>
+              <span class="pill cl">✓ 1/3</span>
+            </div>
+            <div class="checklist">
+              <div class="cl-row">
+                <div class="cl-box done"></div>
+                <span class="cl-text" style="text-decoration:line-through;color:var(--muted-2)">Check calendar conflicts</span>
+              </div>
+              <div class="cl-row">
+                <div class="cl-box"></div>
+                <span class="cl-text">Propose a new time slot</span>
+              </div>
+              <div class="cl-row">
+                <div class="cl-box"></div>
+                <span class="cl-text">CC the design team</span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
+                <button class="cl-toggle">Checklist (1/3) ▾</button>
+                <button class="cl-add">ADD</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="b-edit">Edit</button>
+          <button class="b-del">Del</button>
+          <button class="b-cl">Add Checklist</button>
+        </div>
+      </article>
+
+      <!-- OK task -->
+      <article class="task">
+        <div class="row">
+          <input type="checkbox" class="check" />
+          <div class="body">
+            <div class="title">Empty the dishwasher</div>
+            <div class="meta">
+              <span class="pill">@home</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Done task -->
+      <article class="task done">
+        <div class="row">
+          <input type="checkbox" class="check" checked />
+          <div class="body">
+            <div class="title">Pay the electricity bill</div>
+            <div class="meta">
+              <span class="pill">2026-05-14</span>
+              <span class="pill project">🗂 Finance</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <!-- NOTES PANEL -->
+  <aside class="notes">
+    <h3>What changed</h3>
+
+    <h4>Typography</h4>
+    <p>System UI stack instead of Arial — sharper on every OS. Tighter <code>letter-spacing</code> on headings, comfortable line heights (1.4–1.55). Anti-aliasing on.</p>
+
+    <h4>Elevation, not borders</h4>
+    <p>Cards use layered soft shadows (<code>shadow-sm</code>, <code>-md</code>, <code>-lg</code>) instead of 2px colored borders. Status shows as a 4px left-accent bar — visible but quiet.</p>
+
+    <h4>Refined palette</h4>
+    <ul>
+      <li><span class="swatch" style="background:var(--c-twomin)"></span>2min — slightly desaturated orange</li>
+      <li><span class="swatch" style="background:var(--c-defer)"></span>Defer — modern blue</li>
+      <li><span class="swatch" style="background:var(--c-projects)"></span>Projects — forest green</li>
+      <li><span class="swatch" style="background:var(--u-late)"></span>Overdue — muted red</li>
+    </ul>
+
+    <h4>Sidebar polish</h4>
+    <p>Section headers (Workflow / Reference), colored dots, hover backgrounds, and a left accent bar on the active tab. Count pills sit on the right.</p>
+
+    <h4>Motion</h4>
+    <p>150ms transitions on hover, focus, and active states. Cards lift gently on hover; buttons darken; capture input shows a focus glow.</p>
+
+    <h4>Spacing on a 4px grid</h4>
+    <p>4 / 8 / 12 / 16 / 24 / 32 — no more arbitrary 7px or 13px gaps. Predictable rhythm.</p>
+
+    <h4>Inputs</h4>
+    <p>The capture box gets a soft border and a 4px focus ring at 10% opacity — accessible and modern.</p>
+
+    <h4>Pills, not text</h4>
+    <p>Due dates, contexts, projects, and checklist counts shown as pill badges, color-keyed to their meaning.</p>
+
+    <h4>Empty states</h4>
+    <p>Friendly icon + short message instead of italic "Nothing here yet."</p>
+
+    <h4>Accessibility</h4>
+    <p>Visible focus rings (2px / 30% accent), proper contrast on muted text, larger touch targets (44px min on mobile).</p>
+
+    <h4>Performance ideas</h4>
+    <ul>
+      <li>Inline critical CSS, defer the rest</li>
+      <li>Replace inline Babel transform with a pre-compiled bundle</li>
+      <li>Use <code>content-visibility:auto</code> on long lists</li>
+    </ul>
+  </aside>
+</div>
+</body>
+</html>
