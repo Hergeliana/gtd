@@ -45,7 +45,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .capture-input:focus{border-color:#bcd0ec!important;box-shadow:0 0 0 4px rgba(59,130,246,0.10),var(--shadow-sm);}
 .mobile-topbar{display:none;}
 .drawer-overlay{display:none;}
-@media(max-width:640px){
+@media(max-width:640px) and (orientation:portrait){
   .mobile-topbar{display:flex;align-items:center;justify-content:center;padding:12px 14px;background:#2c3245;position:sticky;top:0;z-index:40;position:relative;}
   .mobile-topbar button{background:none;border:none;color:#fff;cursor:pointer;padding:4px;display:flex;align-items:center;}
   .app-wrapper{display:block!important;}
@@ -662,7 +662,7 @@ function App(){
           const Icon=sectionIcons[s];
           const isActive=view===s;
           const color=navIconColor[s]||"#4a7fa5";
-          const shortLabel=s==="twomin"?"2min":s==="someday"?"Someday":s==="reference"?"Ref":s==="calendar"?"Cal":s==="review"?"Review":s==="inbox"?"Inbox":s==="projects"?"Projects":s==="delegate"?"Delegate":s==="defer"?"Defer":s==="trash"?"Trash":s;
+          const shortLabel=s==="twomin"?"2min":s==="someday"?"Someday":s==="reference"?"Ref":s==="calendar"?"Cal":s==="review"?"Review":s==="inbox"?"In Basket":s==="projects"?"Projects":s==="delegate"?"Delegate":s==="defer"?"Defer":s==="trash"?"Trash":s;
           return(
             <button key={s} className={isActive?"active":""} onClick={()=>{setView(s);setDrawerOpen(false);}}
               style={{borderTopColor:isActive?color:"transparent"}}>
@@ -774,7 +774,7 @@ style={{
         {/* IN BASKET */}
         {view==="inbox"&&(
           <div>
-            {inboxItems.length===0&&<p style={{color:"#6b7280",fontStyle:"italic"}}>Your basket is empty. Capture something above!</p>}
+            {inboxItems.length===0&&<p style={{color:"#6b7280",fontStyle:"italic"}}>Capture something</p>}
             {inboxItems.map(item=>{
               const isExpanded=expandedTaskId===item.id;
               return(
