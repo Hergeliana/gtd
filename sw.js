@@ -1,4 +1,4 @@
-const CACHE = "gtd-v8";
+const CACHE = "gtd-v9";
 const APP_SHELL = [
   "./",
   "./index.html",
