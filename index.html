@@ -11,10 +11,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:Georgia,serif;background:#e8e8e4;color:#1e2430;}
+body{font-family:Arial,sans-serif;background:#f5f5f0;color:#1e2430;}
 input,select,button{font-family:inherit;}
 ::-webkit-scrollbar{width:6px;}
-::-webkit-scrollbar-track{background:#e8e8e4;}
+::-webkit-scrollbar-track{background:#f5f5f0;}
 ::-webkit-scrollbar-thumb{background:#4a7fa5;border-radius:3px;}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
 .mobile-topbar{display:none;}
@@ -53,6 +53,7 @@ const IC={
   projects:{bg:"#2a9d5c", light:"#e5f7ed", text:"#0e4d2a"},
   someday: {bg:"#b5860d", light:"#fdf6e3", text:"#6b4e00"},
   reference:{bg:"#2a7d6e",light:"#e5f5f3", text:"#0d3d35"},
+  archive: {bg:"#5a7a8a", light:"#eaeff2", text:"#2a3a45"},
   trash:   {bg:"#d13030", light:"#fce8e8", text:"#6b0000"},
   calendar:{bg:"#2979c8", light:"#e8f0fc", text:"#0d3a6b"},
   review:  {bg:"#2a9d5c", light:"#e5f7ed", text:"#0e4d2a"},
@@ -103,6 +104,11 @@ const Icons={
       <path d="M9 3h6l1 2H8L9 3zM3 7h18l-1.5 14A2 2 0 0117.5 23h-11A2 2 0 014.5 21L3 7zm7 3a1 1 0 00-1 1v6a1 1 0 002 0v-6a1 1 0 00-1-1zm4 0a1 1 0 00-1 1v6a1 1 0 002 0v-6a1 1 0 00-1-1z"/>
     </svg>
   ),
+  archive:({size=16,color="currentColor"})=>(
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke="none">
+      <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm1 6h16v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-9zm5 2a1 1 0 100 2h6a1 1 0 100-2H9z"/>
+    </svg>
+  ),
   calendar:({size=16,color="currentColor"})=>(
     <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke="none">
       <path fillRule="evenodd" clipRule="evenodd" d="M8 2a1 1 0 011 1v1h6V3a1 1 0 112 0v1h1a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h1V3a1 1 0 011-1zm-3 9v8a1 1 0 001 1h12a1 1 0 001-1v-8H5z"/>
@@ -120,7 +126,7 @@ const Icons={
   ),
 };
 
-const sectionIcons={inbox:Icons.inbox,twomin:Icons.twomin,defer:Icons.defer,delegate:Icons.delegate,projects:Icons.projects,someday:Icons.someday,reference:Icons.reference,trash:Icons.trash,calendar:Icons.calendar,review:Icons.review};
+const sectionIcons={inbox:Icons.inbox,twomin:Icons.twomin,defer:Icons.defer,delegate:Icons.delegate,projects:Icons.projects,someday:Icons.someday,reference:Icons.reference,archive:Icons.archive,trash:Icons.trash,calendar:Icons.calendar,review:Icons.review};
 
 function getDaysInMonth(y,m){return new Date(y,m+1,0).getDate();}
 function toDateStr(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;}
@@ -302,19 +308,19 @@ function ChecklistEditor({checklist,onChange}){
     <div style={{marginBottom:12}}>
       <label style={labelStyle}>Checklist</label>
       {checklist.map(c=>(
-        <div key={c.id} style={{display:"flex",alignItems:"center",gap:7,marginBottom:5}}>
-          <input type="checkbox" checked={c.done} onChange={()=>toggleItem(c.id)} style={{width:14,height:14,cursor:"pointer",accentColor:IC.projects.bg,flexShrink:0}}/>
+        <div key={c.id} style={{display:"flex",alignItems:"center",gap:10,marginBottom:7}}>
+          <input type="checkbox" checked={c.done} onChange={()=>toggleItem(c.id)} style={{width:21,height:21,cursor:"pointer",accentColor:IC.projects.bg,flexShrink:0}}/>
           <input value={c.text} onChange={e=>updateText(c.id,e.target.value)}
-            style={{...fieldStyle,padding:"5px 8px",fontSize:12,textDecoration:c.done?"line-through":"none",color:c.done?"#9aa0ae":"#1e2430",flex:1}}/>
+            style={{...fieldStyle,padding:"8px 12px",fontSize:18,textDecoration:c.done?"line-through":"none",color:c.done?"#9aa0ae":"#1e2430",flex:1}}/>
           <button type="button" onClick={()=>deleteItem(c.id)}
             style={{background:"none",border:"none",cursor:"pointer",color:"#9aa0ae",fontSize:16,padding:"0 2px",lineHeight:1,flexShrink:0}}>×</button>
         </div>
       ))}
-      <div style={{display:"flex",gap:6,marginTop:4}}>
+      <div style={{display:"flex",gap:10,marginTop:6}}>
         <input value={newItem} onChange={e=>setNewItem(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addItem()}
-          placeholder="Add checklist item..." style={{...fieldStyle,padding:"6px 10px",fontSize:12,flex:1}}/>
+          placeholder="Add checklist item..." style={{...fieldStyle,padding:"8px 12px",fontSize:18,flex:1}}/>
         <button type="button" onClick={addItem}
-          style={{padding:"6px 12px",background:IC.projects.bg,color:"#fff",border:"none",borderRadius:6,cursor:"pointer",fontSize:12,fontFamily:"sans-serif",flexShrink:0}}>+ Add</button>
+          style={{padding:"8px 16px",background:IC.projects.bg,color:"#fff",border:"none",borderRadius:6,cursor:"pointer",fontSize:16,fontFamily:"sans-serif",flexShrink:0}}>+ Add</button>
       </div>
     </div>
   );
@@ -325,7 +331,10 @@ function EditFields({form,setForm,showSection,projects,showChecklist}){
     <React.Fragment>
       <div style={{marginBottom:12}}>
         <label style={labelStyle}>Task name</label>
-        <input value={form.text} onChange={e=>setForm(f=>({...f,text:e.target.value}))} style={{...fieldStyle,fontFamily:"Georgia,serif",fontSize:14,padding:"10px 12px"}}/>
+        <textarea value={form.text} rows={1}
+          ref={el=>{if(el){el.style.height="auto";el.style.height=el.scrollHeight+"px";}}}
+          onChange={e=>{setForm(f=>({...f,text:e.target.value}));e.target.style.height="auto";e.target.style.height=e.target.scrollHeight+"px";}}
+          style={{...fieldStyle,fontFamily:"Arial,sans-serif",fontSize:14,padding:"10px 12px",resize:"none",overflow:"hidden",lineHeight:1.4,boxSizing:"border-box"}}/>
       </div>
       {showSection&&(
         <div style={{marginBottom:12}}>
@@ -387,6 +396,21 @@ function App(){
   const[expandedProject,setExpandedProject]=useState(null);
   const[addTaskModal,setAddTaskModal]=useState(null);
   const[taskForm,setTaskForm]=useState({text:"",section:"defer",context:"@anywhere",project:"",due:"",time:"",checklist:[]});
+  const[captureModal,setCaptureModal]=useState(null);
+  const[captureForm,setCaptureForm]=useState({text:"",section:"defer",context:"@anywhere",project:"",due:"",time:"",checklist:[]});
+  const[archiveExpanded,setArchiveExpanded]=useState({});
+  const[openChecklists,setOpenChecklists]=useState({});
+  const toggleChecklistOpen=id=>setOpenChecklists(o=>({...o,[id]:!o[id]}));
+  const addChecklistLine=itemId=>{
+    const newId=Date.now()+Math.random();
+    setData(d=>({...d,items:d.items.map(i=>i.id===itemId?{...i,checklist:[...(i.checklist||[]),{id:newId,text:"",done:false}]}:i)}));
+    setOpenChecklists(o=>({...o,[itemId]:true}));
+    setTimeout(()=>{const el=document.querySelector(`[data-cl-id="${newId}"]`);if(el)el.focus();},0);
+  };
+  const updateChecklistText=(itemId,clId,text)=>setData(d=>({...d,items:d.items.map(i=>i.id===itemId?{...i,checklist:(i.checklist||[]).map(c=>c.id===clId?{...c,text}:c)}:i)}));
+  const deleteChecklistLine=(itemId,clId)=>setData(d=>({...d,items:d.items.map(i=>i.id===itemId?{...i,checklist:(i.checklist||[]).filter(c=>c.id!==clId)}:i)}));
+  const inputRef=useRef(null);
+  useEffect(()=>{if(inputRef.current){inputRef.current.style.height="auto";inputRef.current.style.height=inputRef.current.scrollHeight+"px";}},[input]);
   const[toast,setToast]=useState(null);
   const today=new Date();
   const[calYear,setCalYear]=useState(today.getFullYear());
@@ -496,9 +520,21 @@ function App(){
 
   const addToInbox=()=>{
     if(!input.trim())return;
+    if(TASK_SECTIONS.includes(view)){
+      setCaptureForm({text:input.trim(),section:view,context:"@anywhere",project:"",due:"",time:"",checklist:[]});
+      setCaptureModal(view);
+      setInput("");
+      return;
+    }
     const id=data.nextId;
     setData(d=>({...d,nextId:d.nextId+1,items:[...d.items,{id,text:input.trim(),section:"inbox",context:"@anywhere",project:null,due:null,time:null,twoMin:false,checklist:[],done:false,created:Date.now()}]}));
     setInput("");showToast("Captured to In Basket!");
+  };
+  const applyCapture=()=>{
+    if(!captureForm.text.trim())return;
+    const id=data.nextId;
+    setData(d=>({...d,nextId:d.nextId+1,items:[...d.items,{id,text:captureForm.text.trim(),section:captureForm.section,context:captureForm.context,project:captureForm.project||null,due:captureForm.due||null,time:captureForm.time||null,twoMin:captureForm.section==="twomin",checklist:captureForm.checklist||[],done:false,created:Date.now()}]}));
+    setCaptureModal(null);showToast("Captured to "+sectionLabels[captureForm.section]);
   };
 
   const openClarify=item=>{setClarifyItem(item);setClarify({actionable:null,twoMin:false,context:item.context||"@anywhere",project:item.project||"",due:item.due||"",time:item.time||"",destination:"defer",text:item.text,naSection:"reference"});};
@@ -517,6 +553,8 @@ function App(){
   };
 
   const moveItem=(id,section)=>setData(d=>({...d,items:d.items.map(i=>i.id===id?{...i,section}:i)}));
+  const trashItem=id=>setData(d=>({...d,items:d.items.map(i=>i.id===id?{...i,section:"trash",trashedFrom:i.section}:i)}));
+  const restoreItem=id=>setData(d=>({...d,items:d.items.map(i=>i.id===id?{...i,section:i.trashedFrom||"inbox",trashedFrom:null}:i)}));
   const toggleDone=id=>setData(d=>({...d,items:d.items.map(i=>i.id===id?{...i,done:!i.done}:i)}));
   const deleteItem=id=>setData(d=>({...d,items:d.items.filter(i=>i.id!==id)}));
 
@@ -530,6 +568,8 @@ function App(){
     const pname=data.projects.find(p=>p.id===pid)?.name;
     setData(d=>({...d,projects:d.projects.filter(p=>p.id!==pid),items:d.items.map(i=>i.project===pname?{...i,project:null}:i)}));
   };
+  const archiveProject=pid=>setData(d=>({...d,projects:d.projects.map(p=>p.id===pid?{...p,archived:true}:p)}));
+  const restoreProject=pid=>setData(d=>({...d,projects:d.projects.map(p=>p.id===pid?{...p,archived:false}:p)}));
   const openAddTask=pid=>{
     const proj=data.projects.find(p=>p.id===pid);
     setAddTaskModal(pid);setTaskForm({text:"",section:"defer",context:"@anywhere",project:proj?.name||"",due:"",time:"",checklist:[]});
@@ -543,12 +583,14 @@ function App(){
   };
 
   const isOverdue=due=>due&&new Date(due)<new Date(new Date().toDateString());
-  const isDueSoon=due=>{if(!due)return false;const d=new Date(due),now=new Date();return d>=new Date(now.toDateString())&&d<=new Date(now.getTime()+2*86400000);};
-  const sortByTime=arr=>[...arr].sort((a,b)=>{if(a.time&&b.time)return a.time.localeCompare(b.time);if(a.time)return -1;if(b.time)return 1;return 0;});
+  const isDueSoon=due=>{if(!due)return false;const d=new Date(due),today=new Date(new Date().toDateString());return d>=today&&d<new Date(today.getTime()+7*86400000);};
+  const sortByTime=arr=>[...arr].sort((a,b)=>{if(!!a.done!==!!b.done)return a.done?1:-1;if(a.due&&b.due){const c=a.due.localeCompare(b.due);if(c)return c;}else if(a.due)return -1;else if(b.due)return 1;if(a.time&&b.time)return a.time.localeCompare(b.time);if(a.time)return -1;if(b.time)return 1;return 0;});
   const itemsForDay=ds=>sortByTime(data.items.filter(i=>i.due===ds&&i.section!=="trash"));
 
   const inboxItems=data.items.filter(i=>i.section==="inbox");
-  const viewItems=["projects","calendar"].includes(view)?[]:sortByTime(data.items.filter(i=>i.section===view));
+  const hideDoneInView=TASK_SECTIONS.includes(view);
+  const viewItems=["projects","calendar"].includes(view)?[]:sortByTime(data.items.filter(i=>i.section===view&&!(hideDoneInView&&i.done)));
+  const archivedItems=hideDoneInView?sortByTime(data.items.filter(i=>i.section===view&&i.done)):[];
   const totalDone=data.items.filter(i=>i.done&&!excludedSections.includes(i.section)).length;
   const totalActive=data.items.filter(i=>!i.done&&!excludedSections.includes(i.section)).length;
   const progress=totalActive+totalDone>0?Math.round((totalDone/(totalActive+totalDone))*100):0;
@@ -574,11 +616,11 @@ function App(){
   function MetaRow({item,conflict,hideProject}){
     const hasDate=item.due||item.time;
     return(
-      <div style={{fontSize:11,color:"#6b7280",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+      <div style={{fontSize:12,color:"#6b7280",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
         {item.context&&item.context!=="@anywhere"&&<span>{item.context}</span>}
-        {!hideProject&&item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3}}><Icons.folder size={10} color="#6b7280"/>{item.project}</span>}
+        {!hideProject&&item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3,color:IC.projects.bg}}><Icons.folder size={10} color={IC.projects.bg}/>{item.project}</span>}
         {hasDate&&(
-          <span style={{display:"inline-flex",alignItems:"center",gap:3,color:conflict?"#d04020":isOverdue(item.due)?"#d13030":isDueSoon(item.due)?"#b5860d":"#6b7280",fontWeight:conflict?"bold":"normal"}}>
+          <span style={{display:"inline-flex",alignItems:"center",gap:3,color:item.done?"#6b7280":conflict?"#d04020":isOverdue(item.due)?"#d13030":isDueSoon(item.due)?"#b5860d":"#6b7280",fontWeight:!item.done&&conflict?"bold":"normal"}}>
             {conflict&&<span>⚠</span>}
             {item.due&&<span>{item.due}</span>}
             {item.time&&<span style={{background:conflict?"#fce8e8":"#dde0e6",borderRadius:4,padding:"1px 5px",color:conflict?"#d04020":"#3a4460"}}>{fmt12(item.time)}</span>}
@@ -590,19 +632,40 @@ function App(){
 
   function InlineChecklist({item}){
     const cl=item.checklist||[];
-    if(cl.length===0)return null;
     const doneCt=cl.filter(c=>c.done).length;
+    const open=!!openChecklists[item.id];
     return(
-      <div style={{marginTop:7,paddingTop:7,borderTop:"1px solid #eceef2"}}>
-        {cl.map(c=>(
-          <div key={c.id} onClick={e=>{e.stopPropagation();toggleChecklistItem(item.id,c.id);}}
-            style={{display:"flex",alignItems:"center",gap:6,marginBottom:3,cursor:"pointer"}}>
-            <div style={{width:13,height:13,borderRadius:3,border:`2px solid ${c.done?IC.projects.bg:"#cdd0d6"}`,background:c.done?IC.projects.bg:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.15s"}}>
-              {c.done&&<svg width="8" height="8" viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
-            </div>
-            <span style={{fontSize:11,fontFamily:"sans-serif",color:c.done?"#9aa0ae":"#3a4460",textDecoration:c.done?"line-through":"none"}}>{c.text}</span>
+      <div style={{marginTop:7,paddingTop:6,borderTop:"1px dashed #eceef2"}}>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <button onClick={e=>{e.stopPropagation();toggleChecklistOpen(item.id);}}
+            style={{background:"none",border:"none",cursor:"pointer",padding:"2px 4px",fontSize:13,fontFamily:"Arial,sans-serif",color:"#6b7280",display:"flex",alignItems:"center",gap:5}}>
+            {cl.length>0?`Checklist (${doneCt}/${cl.length})`:"Checklist"}
+            <span style={{fontSize:11}}>{open?"▾":"▸"}</span>
+          </button>
+          <button onClick={e=>{e.stopPropagation();addChecklistLine(item.id);}}
+            title="Add checklist item"
+            style={{background:"rgba(74,127,165,0.18)",color:"#2d4a6a",border:"none",borderRadius:7,cursor:"pointer",padding:"3px 10px",fontSize:12,fontFamily:"sans-serif",fontWeight:"bold",lineHeight:1.3}}>ADD</button>
+        </div>
+        {open&&cl.length>0&&(
+          <div style={{marginTop:6,paddingLeft:4}}>
+            {cl.map(c=>(
+              <div key={c.id} style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                <div onClick={e=>{e.stopPropagation();toggleChecklistItem(item.id,c.id);}}
+                  style={{width:16,height:16,borderRadius:4,border:`2px solid ${c.done?IC.projects.bg:"#cdd0d6"}`,background:c.done?IC.projects.bg:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,cursor:"pointer"}}>
+                  {c.done&&<svg width="10" height="10" viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
+                </div>
+                <input defaultValue={c.text} key={c.id+"|"+c.text} data-cl-id={c.id}
+                  onBlur={e=>{const v=e.target.value;if(!v.trim())deleteChecklistLine(item.id,c.id);else if(v!==c.text)updateChecklistText(item.id,c.id,v);}}
+                  onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();e.target.blur();}}}
+                  onClick={e=>e.stopPropagation()}
+                  placeholder="…"
+                  style={{flex:1,fontSize:13,fontFamily:"Arial,sans-serif",border:"1px solid #eceef2",borderRadius:4,padding:"3px 7px",background:"#fafbfd",color:c.done?"#9aa0ae":"#3a4460",textDecoration:c.done?"line-through":"none",outline:"none"}}/>
+                <button onClick={e=>{e.stopPropagation();deleteChecklistLine(item.id,c.id);}}
+                  style={{background:"none",border:"none",cursor:"pointer",color:"#9aa0ae",fontSize:15,padding:"0 4px",lineHeight:1,flexShrink:0}}>×</button>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
     );
   }
@@ -611,24 +674,27 @@ function App(){
     const cl=item.checklist||[];
     const clDone=cl.filter(c=>c.done).length;
     return(
-      <div style={{background:item.done?"#eceef2":conflict?"#fdf0f0":"#ffffff",border:"1px solid "+(conflict?"#d13030":isOverdue(item.due)?"#d13030":isDueSoon(item.due)?"#4a7fa5":"#cdd0d6"),borderRadius:8,padding:"11px 14px",marginBottom:8,opacity:item.done?0.65:1}}>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          {showCheck&&<input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:17,height:17,cursor:"pointer",accentColor:"#1e2430",flexShrink:0}}/>}
+      <div style={{background:item.done?"#eceef2":conflict?"#fdf0f0":"#ffffff",border:"2px solid "+(item.done?"#cdd0d6":conflict?"#d13030":isOverdue(item.due)?"#6e2323":isDueSoon(item.due)?"#d97706":"#5a9a5a"),borderRadius:8,padding:"11px 14px",marginBottom:8,opacity:item.done?0.65:1}}>
+        <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
+          {showCheck&&<input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:17,height:17,cursor:"pointer",accentColor:"#1e2430",flexShrink:0,marginTop:3}}/>}
           <div style={{flex:1,minWidth:0}}>
-            <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:6}}>
-              {item.twoMin&&<span style={{fontSize:10,background:IC.twomin.bg,color:"#fff",borderRadius:3,padding:"1px 5px",flexShrink:0,fontFamily:"sans-serif"}}>2MIN</span>}
-              <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.text}</span>
+            <div style={{fontSize:15,textDecoration:item.done?"line-through":"none",display:"flex",alignItems:"flex-start",gap:6,flexWrap:"wrap"}}>
+              <span style={{wordBreak:"break-word",overflowWrap:"anywhere",lineHeight:"1.35",flex:"1 1 auto",minWidth:0}}>{item.text}</span>
               {cl.length>0&&<span style={{fontSize:10,fontFamily:"sans-serif",background:clDone===cl.length?IC.projects.light:"#f0f1f3",color:clDone===cl.length?IC.projects.text:"#6b7280",borderRadius:10,padding:"1px 7px",flexShrink:0,border:`1px solid ${clDone===cl.length?IC.projects.bg+"40":"#dde0e6"}`}}>✓ {clDone}/{cl.length}</span>}
             </div>
             <MetaRow item={item} conflict={conflict} hideProject={hideProject}/>
           </div>
-          <div style={{display:"flex",gap:5,flexShrink:0}}>
-            <button onClick={()=>openEdit(item)} style={mkBtn("#dde0e6","#1e2430",{padding:"5px 10px",fontSize:12})}>Edit</button>
-            {view!=="trash"&&<button onClick={()=>moveItem(item.id,"trash")} style={mkBtn("#dde0e6","#1e2430",{padding:"5px 10px",fontSize:12})}>Del</button>}
-            {view==="trash"&&<button onClick={()=>deleteItem(item.id)} style={mkBtn("#d13030",null,{padding:"5px 10px",fontSize:12})}>Delete</button>}
+          <div style={{display:"flex",flexDirection:"column",gap:4,flexShrink:0,alignItems:"stretch"}}>
+            <div style={{display:"flex",gap:4}}>
+              <button onClick={()=>openEdit(item)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d",flex:1}}>Edit</button>
+              {view!=="trash"&&<button onClick={()=>trashItem(item.id)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.15)",color:"#8a2020",flex:1}}>Del</button>}
+              {view==="trash"&&<button onClick={()=>restoreItem(item.id)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d",flex:1}}>Restore</button>}
+              {view==="trash"&&<button onClick={()=>deleteItem(item.id)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.22)",color:"#8a2020",flex:1}}>Delete</button>}
+            </div>
+            {view!=="trash"&&!item.done&&(item.checklist||[]).length===0&&<button onClick={()=>addChecklistLine(item.id)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(74,127,165,0.18)",color:"#2d4a6a"}}>Add Checklist</button>}
           </div>
         </div>
-        {cl.length>0&&!item.done&&<InlineChecklist item={item}/>}
+        {!item.done&&cl.length>0&&<InlineChecklist item={item}/>}
       </div>
     );
   }
@@ -636,7 +702,7 @@ function App(){
   const navSections=[...SECTIONS,"calendar","review"];
 
   return(
-    <div className="app-wrapper" style={{display:"flex",minHeight:"100vh",fontFamily:"Georgia,serif",background:"#e8e8e4",color:"#1e2430"}}>
+    <div className="app-wrapper" style={{display:"flex",minHeight:"100vh",fontFamily:"Arial,sans-serif",background:IC[view]?IC[view].bg+"1A":"#f5f5f0",color:"#1e2430"}}>
       {/* Mobile top bar */}
       <div className="mobile-topbar">
         <button onClick={()=>setDrawerOpen(true)}>
@@ -709,14 +775,14 @@ style={{
       </div>
 
       {/* Main */}
-      <div className="main" style={{flex:1,padding:"32px 40px",maxWidth:900,overflowY:"auto"}}>
-        <div style={{display:"flex",gap:10,marginBottom:32}}>
-          <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addToInbox()} placeholder="Capture a thought, task, or idea..."
-            style={{flex:1,padding:"12px 16px",borderRadius:8,border:"2px solid #cdd0d6",background:"#ffffff",fontSize:15,fontFamily:"Georgia,serif",outline:"none",color:"#1e2430"}}/>
+      <div className="main" style={{flex:1,padding:"32px 40px",maxWidth:900,overflowY:"auto",background:"transparent"}}>
+        <div style={{display:"flex",gap:10,marginBottom:32,alignItems:"flex-start"}}>
+          <textarea ref={inputRef} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();addToInbox();}}} placeholder="Capture a thought, task, or idea..." rows={1}
+            style={{flex:1,padding:"12px 16px",borderRadius:8,border:"2px solid #cdd0d6",background:"#ffffff",fontSize:15,fontFamily:"Arial,sans-serif",outline:"none",color:"#1e2430",resize:"none",overflow:"hidden",lineHeight:"1.4",minHeight:46,boxSizing:"border-box"}}/>
           <button onClick={addToInbox} style={mkBtn("#1e2430",null,{padding:"12px 22px",fontSize:14})}>Capture</button>
         </div>
 
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20,borderBottom:"2px solid #cdd0d6",paddingBottom:10}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20,borderBottom:"2px solid "+(navIconColor[view]||"#cdd0d6"),paddingBottom:10}}>
           <h2 style={{margin:0,fontSize:22,fontWeight:"normal",display:"flex",alignItems:"center",gap:10,color:"#1e2430"}}>
             {sectionIcons[view]&&React.createElement(sectionIcons[view],{size:20,color:navIconColor[view]||"#4a7fa5"})}
             {sectionLabels[view]}
@@ -725,7 +791,7 @@ style={{
             <div style={{display:"flex",gap:6}}>
               {["month","week"].map(md=>(
                 <button key={md} onClick={()=>setCalMode(md)}
-                  style={{padding:"5px 14px",border:"2px solid "+(calMode===md?"#1e2430":"#cdd0d6"),borderRadius:6,background:calMode===md?"#1e2430":"#e8e8e4",color:calMode===md?"#ffffff":"#1e2430",cursor:"pointer",fontSize:12,fontFamily:"sans-serif"}}>
+                  style={{padding:"5px 14px",border:"2px solid "+(calMode===md?"#1e2430":"#cdd0d6"),borderRadius:6,background:calMode===md?"#1e2430":"#f5f5f0",color:calMode===md?"#ffffff":"#1e2430",cursor:"pointer",fontSize:12,fontFamily:"sans-serif"}}>
                   {md==="month"?"Month":"Week"}
                 </button>
               ))}
@@ -743,7 +809,7 @@ style={{
                 <div style={{display:"flex",gap:8}}>
                   <button onClick={()=>openClarify(item)} style={mkBtn("#4a7fa5","#fff")}>Clarify</button>
                   <button onClick={()=>openEdit(item)} style={mkBtn("#dde0e6","#1e2430")}>Edit</button>
-                  <button onClick={()=>moveItem(item.id,"trash")} style={mkBtn("#dde0e6","#1e2430")}>Del</button>
+                  <button onClick={()=>trashItem(item.id)} style={mkBtn("#dde0e6","#1e2430")}>Del</button>
                 </div>
               </div>
             ))}
@@ -751,10 +817,50 @@ style={{
         )}
 
         {/* LIST VIEWS */}
-        {["twomin","defer","delegate","someday","reference","trash"].includes(view)&&(
+        {["twomin","defer","delegate","someday","reference"].includes(view)&&(
           <div>
             {viewItems.length===0&&<p style={{color:"#6b7280",fontStyle:"italic"}}>Nothing here yet.</p>}
             {viewItems.map(item=><ItemCard key={item.id} item={item} showCheck={["twomin","defer","delegate"].includes(view)} conflict={allConflictIds.has(item.id)}/>)}
+            {archivedItems.length>0&&(
+              <div style={{marginTop:28}}>
+                <button onClick={()=>setArchiveExpanded(a=>({...a,[view]:!a[view]}))}
+                  style={{display:"flex",alignItems:"center",gap:8,background:"none",border:"none",padding:"6px 0",cursor:"pointer",color:IC.archive.bg,fontSize:13,fontFamily:"sans-serif",fontWeight:"bold"}}>
+                  <Icons.archive size={14} color={IC.archive.bg}/>
+                  Archive ({archivedItems.length}) <span style={{fontSize:11}}>{archiveExpanded[view]?"▾":"▸"}</span>
+                </button>
+                {archiveExpanded[view]&&(
+                  <div style={{borderTop:`1px dashed ${IC.archive.bg}`,paddingTop:10,marginTop:4}}>
+                    {archivedItems.map(item=><ItemCard key={item.id} item={item} showCheck={true} conflict={false}/>)}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TRASH (grouped by original section) */}
+        {view==="trash"&&(
+          <div>
+            {viewItems.length===0&&<p style={{color:"#6b7280",fontStyle:"italic"}}>Trash is empty.</p>}
+            {(()=>{
+              const order=["inbox","twomin","defer","delegate","someday","reference","unknown"];
+              const groups={};
+              viewItems.forEach(it=>{const k=it.trashedFrom&&sectionLabels[it.trashedFrom]?it.trashedFrom:"unknown";if(!groups[k])groups[k]=[];groups[k].push(it);});
+              return order.filter(k=>groups[k]).map(k=>{
+                const Icon=sectionIcons[k];
+                const color=navIconColor[k]||"#6b7280";
+                const label=k==="unknown"?"Other":sectionLabels[k];
+                return(
+                  <div key={k} style={{marginBottom:22}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10,paddingBottom:6,borderBottom:`1px solid ${color}55`,color,fontSize:13,fontFamily:"sans-serif",fontWeight:"bold",textTransform:"uppercase",letterSpacing:0.5}}>
+                      {Icon&&<Icon size={14} color={color}/>}
+                      {label} <span style={{fontWeight:"normal",opacity:0.7}}>({groups[k].length})</span>
+                    </div>
+                    {groups[k].map(item=><ItemCard key={item.id} item={item} showCheck={false} conflict={false}/>)}
+                  </div>
+                );
+              });
+            })()}
           </div>
         )}
 
@@ -763,14 +869,14 @@ style={{
           <div>
             <div style={{display:"flex",gap:10,marginBottom:24}}>
               <input value={newProject} onChange={e=>setNewProject(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addProject()} placeholder="New project name..."
-                style={{flex:1,padding:"10px 14px",borderRadius:7,border:"1px solid #cdd0d6",background:"#ffffff",fontSize:14,fontFamily:"Georgia,serif",outline:"none",color:"#1e2430"}}/>
+                style={{flex:1,padding:"10px 14px",borderRadius:7,border:"1px solid #cdd0d6",background:"#ffffff",fontSize:14,fontFamily:"Arial,sans-serif",outline:"none",color:"#1e2430"}}/>
               <button onClick={addProject} style={mkBtn("#1e2430",null,{padding:"10px 18px",display:"flex",alignItems:"center",gap:6})}>
                 <Icons.projects size={14} color="#ffffff"/>
                 Add Project
               </button>
             </div>
             {data.projects.length===0&&<p style={{color:"#6b7280",fontStyle:"italic"}}>No projects yet.</p>}
-            {data.projects.map(p=>{
+            {data.projects.filter(p=>!p.archived).map(p=>{
               const tasks=data.items.filter(i=>i.project===p.name&&i.section!=="trash");
               const done=tasks.filter(i=>i.done).length;
               const isOpen=expandedProject===p.id;
@@ -807,14 +913,13 @@ style={{
                                   <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:15,height:15,cursor:"pointer",accentColor:"#1e2430",flexShrink:0}}/>
                                   <div style={{flex:1,minWidth:0}}>
                                     <div style={{fontSize:13,textDecoration:item.done?"line-through":"none",opacity:item.done?0.5:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:"#1e2430",display:"flex",alignItems:"center",gap:5}}>
-                                      {item.twoMin&&<span style={{fontSize:10,background:IC.twomin.bg,color:"#fff",borderRadius:3,padding:"1px 4px",flexShrink:0,fontFamily:"sans-serif"}}>2MIN</span>}
                                       <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.text}</span>
                                       {cl.length>0&&<span style={{fontSize:10,fontFamily:"sans-serif",background:clDone===cl.length?IC.projects.light:"#eceef2",color:clDone===cl.length?IC.projects.text:"#6b7280",borderRadius:10,padding:"1px 6px",flexShrink:0,border:`1px solid ${clDone===cl.length?IC.projects.bg+"40":"#dde0e6"}`}}>✓ {clDone}/{cl.length}</span>}
                                     </div>
                                     <MetaRow item={item} conflict={allConflictIds.has(item.id)} hideProject={true}/>
                                   </div>
                                   <button onClick={()=>openEdit(item)} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Edit</button>
-                                <button onClick={()=>moveItem(item.id,"trash")} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Del</button>
+                                <button onClick={()=>trashItem(item.id)} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Del</button>
                                 </div>
                                 {cl.length>0&&!item.done&&(
                                   <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid #e4e6ea"}}>
@@ -835,10 +940,14 @@ style={{
                           </div>
                         );
                       })}
-                      <div style={{display:"flex",gap:8,marginTop:4}}>
+                      <div style={{display:"flex",gap:8,marginTop:4,flexWrap:"wrap"}}>
                         <button onClick={()=>openAddTask(p.id)} style={mkBtn("#1e2430",null,{padding:"8px 16px",fontSize:13,display:"flex",alignItems:"center",gap:6})}>
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                           Add Task
+                        </button>
+                        <button onClick={()=>archiveProject(p.id)} style={{padding:"8px 14px",fontSize:13,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:IC.archive.bg+"26",color:IC.archive.text,display:"flex",alignItems:"center",gap:6}}>
+                          <Icons.archive size={12} color={IC.archive.bg}/>
+                          Archive Project
                         </button>
                         <button onClick={()=>deleteProject(p.id)} style={mkBtn("#dde0e6","#d13030",{padding:"8px 14px",fontSize:13,display:"flex",alignItems:"center",gap:6})}>
                           <Icons.trash size={12} color="#d13030"/>
@@ -850,6 +959,32 @@ style={{
                 </div>
               );
             })}
+            {(()=>{const archivedProjects=data.projects.filter(p=>p.archived);if(archivedProjects.length===0)return null;const archKey="projects-archive";const open=archiveExpanded[archKey];return(
+              <div style={{marginTop:28}}>
+                <button onClick={()=>setArchiveExpanded(a=>({...a,[archKey]:!a[archKey]}))}
+                  style={{display:"flex",alignItems:"center",gap:8,background:"none",border:"none",padding:"6px 0",cursor:"pointer",color:IC.archive.bg,fontSize:13,fontFamily:"sans-serif",fontWeight:"bold"}}>
+                  <Icons.archive size={14} color={IC.archive.bg}/>
+                  Archive ({archivedProjects.length}) <span style={{fontSize:11}}>{open?"▾":"▸"}</span>
+                </button>
+                {open&&(
+                  <div style={{borderTop:`1px dashed ${IC.archive.bg}`,paddingTop:10,marginTop:4}}>
+                    {archivedProjects.map(p=>{
+                      const ptasks=data.items.filter(i=>i.project===p.name&&i.section!=="trash");
+                      const pdone=ptasks.filter(i=>i.done).length;
+                      return(
+                        <div key={p.id} style={{background:"#eceef2",border:"1px solid #dde0e6",borderRadius:8,padding:"10px 14px",marginBottom:8,display:"flex",alignItems:"center",gap:10,opacity:0.9}}>
+                          <Icons.folder size={15} color="#9aa0ae"/>
+                          <span style={{flex:1,fontSize:14,color:"#3a4460"}}>{p.name}</span>
+                          <span style={{fontSize:11,color:"#6b7280",fontFamily:"sans-serif"}}>{pdone}/{ptasks.length} done</span>
+                          <button onClick={()=>restoreProject(p.id)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d"}}>Restore</button>
+                          <button onClick={()=>deleteProject(p.id)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.18)",color:"#8a2020"}}>Delete</button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );})()}
           </div>
         )}
 
@@ -898,7 +1033,7 @@ style={{
                       <div style={{fontFamily:"sans-serif",fontSize:13,color:"#4a7fa5",fontWeight:"bold",minWidth:20}}>{idx+1}.</div>
                       <div style={{flex:1}}>
                         <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",opacity:item.done?0.6:1,color:"#1e2430"}}>{item.text}</div>
-                        <div style={{fontSize:11,color:"#6b7280",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+                        <div style={{fontSize:12,color:"#6b7280",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
                           <span style={{background:"#dde0e6",borderRadius:3,padding:"1px 5px",color:"#3a4460"}}>{sectionLabels[item.section]}</span>
                           {item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3}}><Icons.folder size={10} color="#6b7280"/>{item.project}</span>}
                           {item.time&&<span style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"#dde0e6",borderRadius:4,padding:"1px 5px",color:selectedDayConflicts.has(item.id)?IC.trash.text:"#3a4460",fontWeight:selectedDayConflicts.has(item.id)?"bold":"normal"}}>{(selectedDayConflicts.has(item.id)?"⚠ ":"")+fmt12(item.time)}</span>}
@@ -1029,7 +1164,10 @@ style={{
               <Icons.inbox size={18} color={IC.inbox.bg}/>
               Clarify Item
             </h3>
-            <input value={clarify.text} onChange={e=>setClarify(c=>({...c,text:e.target.value}))} style={{...fieldStyle,fontFamily:"Georgia,serif",fontSize:14,padding:"10px 12px",marginBottom:16}}/>
+            <textarea value={clarify.text} rows={1}
+              ref={el=>{if(el){el.style.height="auto";el.style.height=el.scrollHeight+"px";}}}
+              onChange={e=>{setClarify(c=>({...c,text:e.target.value}));e.target.style.height="auto";e.target.style.height=e.target.scrollHeight+"px";}}
+              style={{...fieldStyle,fontFamily:"Arial,sans-serif",fontSize:14,padding:"10px 12px",marginBottom:16,resize:"none",overflow:"hidden",lineHeight:1.4,boxSizing:"border-box"}}/>
             <div style={{marginBottom:14}}>
               <div style={{fontSize:13,fontFamily:"sans-serif",color:"#3a4460",marginBottom:8,fontWeight:"bold"}}>Is it actionable?</div>
               <div style={{display:"flex",gap:10}}>
@@ -1123,7 +1261,7 @@ style={{
         <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
           <div className="modal-box" style={{background:"#ffffff",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.18)",maxHeight:"90vh",overflowY:"auto"}}>
             <h3 style={{margin:"0 0 16px",fontSize:18,color:"#1e2430"}}>Edit Item</h3>
-            <EditFields form={editForm} setForm={setEditForm} showSection={editItem.section!=="inbox"} projects={data.projects} showChecklist={true}/>
+            <EditFields form={editForm} setForm={setEditForm} showSection={editItem.section!=="inbox"} projects={data.projects} showChecklist={false}/>
             {["twomin","defer","delegate"].includes(editForm.section)&&(
               <div style={{marginBottom:14}}>
                 <label style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",fontSize:13,fontFamily:"sans-serif",color:"#3a4460"}}>
@@ -1140,6 +1278,23 @@ style={{
         </div>
       )}
 
+      {/* CAPTURE TO SECTION MODAL */}
+      {captureModal&&(
+        <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
+          <div className="modal-box" style={{background:"#ffffff",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.18)",maxHeight:"90vh",overflowY:"auto"}}>
+            <h3 style={{margin:"0 0 16px",fontSize:18,display:"flex",alignItems:"center",gap:8,color:"#1e2430"}}>
+              {sectionIcons[captureModal]&&React.createElement(sectionIcons[captureModal],{size:18,color:navIconColor[captureModal]||"#4a7fa5"})}
+              Capture to {sectionLabels[captureModal]}
+            </h3>
+            <EditFields form={captureForm} setForm={setCaptureForm} showSection={true} projects={data.projects} showChecklist={true}/>
+            <div style={{display:"flex",gap:10,marginTop:8}}>
+              <button onClick={()=>setCaptureModal(null)} style={mkBtn("#dde0e6","#1e2430")}>Cancel</button>
+              <button onClick={applyCapture} style={{...mkBtn("#1e2430"),flex:2}}>Capture</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ADD TASK MODAL */}
       {addTaskModal&&(
         <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
@@ -1148,7 +1303,7 @@ style={{
               <Icons.projects size={18} color={IC.projects.bg}/>
               Add Task to Project
             </h3>
-            <EditFields form={taskForm} setForm={setTaskForm} showSection={true} projects={data.projects} showChecklist={true}/>
+            <EditFields form={taskForm} setForm={setTaskForm} showSection={true} projects={data.projects} showChecklist={false}/>
             <div style={{display:"flex",gap:10,marginTop:8}}>
               <button onClick={()=>setAddTaskModal(null)} style={mkBtn("#dde0e6","#1e2430")}>Cancel</button>
               <button onClick={applyAddTask} style={{...mkBtn("#1e2430"),flex:2}}>Add Task</button>
