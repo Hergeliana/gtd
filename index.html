@@ -796,7 +796,7 @@ style={{
         {["twomin","defer","delegate","someday","reference"].includes(view)&&(
           <div>
             {viewItems.length===0&&<p style={{color:"#6b7280",fontStyle:"italic"}}>Nothing here yet.</p>}
-            {viewItems.map(item=><ItemCard key={item.id} item={item} showCheck={["twomin","defer","delegate"].includes(view)} conflict={allConflictIds.has(item.id)}/>)}
+            {viewItems.map(item=><ItemCard key={item.id} item={item} showCheck={["twomin","defer","delegate","someday"].includes(view)} conflict={allConflictIds.has(item.id)}/>)}
             {archivedItems.length>0&&(
               <div style={{marginTop:28}}>
                 <button onClick={()=>setArchiveExpanded(a=>({...a,[view]:!a[view]}))}
