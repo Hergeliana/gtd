@@ -406,6 +406,7 @@ function App(){
   const[captureModal,setCaptureModal]=useState(null);
   const[captureForm,setCaptureForm]=useState({text:"",section:"defer",context:"@anywhere",project:"",due:"",time:"",checklist:[]});
   const[archiveExpanded,setArchiveExpanded]=useState({});
+  const[expandedTaskId,setExpandedTaskId]=useState(null);
   const[openChecklists,setOpenChecklists]=useState({});
   const toggleChecklistOpen=id=>setOpenChecklists(o=>({...o,[id]:!o[id]}));
   const addChecklistLine=itemId=>{
@@ -680,10 +681,12 @@ function App(){
   function ItemCard({item,showCheck,conflict,hideProject}){
     const cl=item.checklist||[];
     const clDone=cl.filter(c=>c.done).length;
+    const isExpanded=expandedTaskId===item.id;
     return(
-      <div style={{background:item.done?"#eceef2":conflict?"#fdf0f0":"#ffffff",border:"2px solid "+(item.done?"#cdd0d6":conflict?"#d13030":isOverdue(item.due)?"#a82d2d":isDueSoon(item.due)?"#d97706":"#5a9a5a"),borderRadius:8,padding:"11px 14px",marginBottom:8,opacity:item.done?0.65:1}}>
+      <div onClick={()=>setExpandedTaskId(isExpanded?null:item.id)}
+        style={{background:item.done?"#eceef2":conflict?"#fdf0f0":"#ffffff",border:"2px solid "+(item.done?"#cdd0d6":conflict?"#d13030":isOverdue(item.due)?"#a82d2d":isDueSoon(item.due)?"#d97706":"#5a9a5a"),borderRadius:8,padding:"11px 14px",marginBottom:8,opacity:item.done?0.65:1,cursor:"pointer"}}>
         <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
-          {showCheck&&<input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:17,height:17,cursor:"pointer",accentColor:"#1e2430",flexShrink:0,marginTop:3}}/>}
+          {showCheck&&<input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:17,height:17,cursor:"pointer",accentColor:"#1e2430",flexShrink:0,marginTop:3}}/>}
           <div style={{flex:1,minWidth:0}}>
             <div style={{fontSize:15,textDecoration:item.done?"line-through":"none",display:"flex",alignItems:"flex-start",gap:6,flexWrap:"wrap"}}>
               <span style={{wordBreak:"break-word",overflowWrap:"anywhere",lineHeight:"1.35",flex:"1 1 auto",minWidth:0}}>{item.text}</span>
@@ -691,17 +694,17 @@ function App(){
             </div>
             <MetaRow item={item} conflict={conflict} hideProject={hideProject}/>
           </div>
-          <div style={{display:"flex",flexDirection:"column",gap:4,flexShrink:0,alignItems:"stretch"}}>
-            <div style={{display:"flex",gap:4}}>
-              <button onClick={()=>openEdit(item)} style={{padding:"7px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d",flex:1}}>Edit</button>
-              {view!=="trash"&&<button onClick={()=>trashItem(item.id)} style={{padding:"7px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.15)",color:"#8a2020",flex:1}}>Del</button>}
-              {view==="trash"&&<button onClick={()=>restoreItem(item.id)} style={{padding:"7px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d",flex:1}}>Restore</button>}
-              {view==="trash"&&<button onClick={()=>deleteItem(item.id)} style={{padding:"7px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.22)",color:"#8a2020",flex:1}}>Delete</button>}
-            </div>
-            {view!=="trash"&&!item.done&&(item.checklist||[]).length===0&&<button onClick={()=>addChecklistLine(item.id)} style={{padding:"7px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(74,127,165,0.18)",color:"#2d4a6a"}}>Add Checklist</button>}
-          </div>
         </div>
-        {!item.done&&cl.length>0&&<InlineChecklist item={item}/>}
+        {!item.done&&cl.length>0&&<div onClick={e=>e.stopPropagation()}><InlineChecklist item={item}/></div>}
+        {isExpanded&&(
+          <div onClick={e=>e.stopPropagation()} style={{display:"flex",gap:6,marginTop:10,paddingTop:10,borderTop:"1px dashed #cdd0d6"}}>
+            <button onClick={()=>openEdit(item)} style={{padding:"7px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d",flex:1}}>Edit</button>
+            {view!=="trash"&&<button onClick={()=>trashItem(item.id)} style={{padding:"7px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.15)",color:"#8a2020",flex:1}}>Del</button>}
+            {view!=="trash"&&!item.done&&cl.length===0&&<button onClick={()=>{addChecklistLine(item.id);}} style={{padding:"7px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(74,127,165,0.18)",color:"#2d4a6a",flex:1}}>Add Checklist</button>}
+            {view==="trash"&&<button onClick={()=>restoreItem(item.id)} style={{padding:"7px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d",flex:1}}>Restore</button>}
+            {view==="trash"&&<button onClick={()=>deleteItem(item.id)} style={{padding:"7px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.22)",color:"#8a2020",flex:1}}>Delete</button>}
+          </div>
+        )}
       </div>
     );
   }
