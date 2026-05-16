@@ -36,6 +36,9 @@ button:active{transform:translateY(1px);}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
 .task-card{transition:box-shadow var(--t),transform var(--t);}
 .task-card:hover{box-shadow:var(--shadow-md);}
+.btn-3d{box-shadow:0 1px 2px rgba(20,30,55,0.10), inset 0 -1px 0 rgba(20,30,55,0.07), inset 0 1px 0 rgba(255,255,255,0.35);}
+.btn-3d:hover{box-shadow:0 2px 5px rgba(20,30,55,0.14), inset 0 -1px 0 rgba(20,30,55,0.07), inset 0 1px 0 rgba(255,255,255,0.35);transform:translateY(-1px);}
+.btn-3d:active{box-shadow:0 1px 2px rgba(20,30,55,0.10), inset 0 1px 0 rgba(20,30,55,0.10);transform:translateY(0);}
 .nav-item{transition:background var(--t),color var(--t),border-color var(--t);}
 .nav-item:hover{background:rgba(255,255,255,0.04);}
 .capture-input{border:1px solid #e6e8ed!important;background:#ffffff!important;border-radius:10px!important;box-shadow:var(--shadow-sm);transition:border-color var(--t),box-shadow var(--t);}
@@ -182,101 +185,10 @@ function getConflicts(items){
 }
 
 function TimePicker({value,onChange}){
-  const[open,setOpen]=useState(false);
-  const[h,m]=value?value.split(":").map(Number):[9,0];
-  const hasVal=!!value;
-  const setTime=(nh,nm)=>onChange(`${String(((nh%24)+24)%24).padStart(2,"0")}:${String(((nm%60)+60)%60).padStart(2,"0")}`);
-  const displayVal=hasVal?(()=>{const ap=h>=12?"PM":"AM",hh=h%12||12;return `${hh}:${String(m).padStart(2,"0")} ${ap}`;})():"";
-  const hours12=Array(12).fill(null).map((_,i)=>i+1);
-  const minutes=Array(60).fill(null).map((_,i)=>i);
-  const curH12=(h%12)||12;
-  const curAP=h>=12?"PM":"AM";
-
-  function HourList(){
-    const ref=useRef(null);
-    useEffect(()=>{if(ref.current){const idx=hours12.indexOf(curH12);if(idx>=0)ref.current.children[idx].scrollIntoView({block:"center",behavior:"auto"});}},[]);
-    const scroll=dir=>{
-      const idx=hours12.indexOf(curH12);
-      const next=hours12[(idx+dir+12)%12];
-      const newH=curAP==="AM"?(next===12?0:next):(next===12?12:next+12);
-      setTime(newH,m);
-      setTimeout(()=>ref.current&&ref.current.children[hours12.indexOf(next)]&&ref.current.children[hours12.indexOf(next)].scrollIntoView({block:"center",behavior:"smooth"}),0);
-    };
-    return(
-      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
-        <div style={{fontSize:10,fontFamily:"sans-serif",color:"#6b7280",textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}}>Hour</div>
-        <button type="button" onClick={()=>scroll(-1)} style={{width:52,padding:"3px 0",background:"#dde0e6",border:"1px solid #cdd0d6",borderRadius:5,cursor:"pointer",fontSize:12,color:"#1e2430"}}>▲</button>
-        <div ref={ref} style={{height:120,overflowY:"auto",width:52,scrollbarWidth:"thin",border:"1px solid #dde0e6",borderRadius:6,background:"#f4f5f7"}}>
-          {hours12.map(hv=>(
-            <div key={hv} onClick={()=>{const newH=curAP==="AM"?(hv===12?0:hv):(hv===12?12:hv+12);setTime(newH,m);}}
-              style={{padding:"6px 0",textAlign:"center",fontFamily:"sans-serif",fontSize:14,cursor:"pointer",background:curH12===hv?"#1e2430":"transparent",color:curH12===hv?"#ffffff":"#1e2430",fontWeight:curH12===hv?"bold":"normal"}}>
-              {String(hv).padStart(2,"0")}
-            </div>
-          ))}
-        </div>
-        <button type="button" onClick={()=>scroll(1)} style={{width:52,padding:"3px 0",background:"#dde0e6",border:"1px solid #cdd0d6",borderRadius:5,cursor:"pointer",fontSize:12,color:"#1e2430"}}>▼</button>
-      </div>
-    );
-  }
-
-  function MinList(){
-    const ref=useRef(null);
-    useEffect(()=>{if(ref.current){const idx=minutes.indexOf(m%60);if(idx>=0)ref.current.children[idx].scrollIntoView({block:"center",behavior:"auto"});}},[]);
-    const curM=m%60;
-    const scroll=dir=>{
-      const idx=minutes.indexOf(curM);
-      const next=minutes[(idx+dir+60)%60];
-      setTime(h,next);
-      setTimeout(()=>ref.current&&ref.current.children[minutes.indexOf(next)]&&ref.current.children[minutes.indexOf(next)].scrollIntoView({block:"center",behavior:"smooth"}),0);
-    };
-    return(
-      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
-        <div style={{fontSize:10,fontFamily:"sans-serif",color:"#6b7280",textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}}>Min</div>
-        <button type="button" onClick={()=>scroll(-1)} style={{width:52,padding:"3px 0",background:"#dde0e6",border:"1px solid #cdd0d6",borderRadius:5,cursor:"pointer",fontSize:12,color:"#1e2430"}}>▲</button>
-        <div ref={ref} style={{height:120,overflowY:"auto",width:52,scrollbarWidth:"thin",border:"1px solid #dde0e6",borderRadius:6,background:"#f4f5f7"}}>
-          {minutes.map(mv=>(
-            <div key={mv} onClick={()=>setTime(h,mv)}
-              style={{padding:"6px 0",textAlign:"center",fontFamily:"sans-serif",fontSize:14,cursor:"pointer",background:curM===mv?"#1e2430":"transparent",color:curM===mv?"#ffffff":"#1e2430",fontWeight:curM===mv?"bold":"normal"}}>
-              {String(mv).padStart(2,"0")}
-            </div>
-          ))}
-        </div>
-        <button type="button" onClick={()=>scroll(1)} style={{width:52,padding:"3px 0",background:"#dde0e6",border:"1px solid #cdd0d6",borderRadius:5,cursor:"pointer",fontSize:12,color:"#1e2430"}}>▼</button>
-      </div>
-    );
-  }
-
   return(
-    <div style={{position:"relative"}}>
-      <div style={{display:"flex",alignItems:"center",gap:6}}>
-        <div onClick={()=>setOpen(o=>!o)} style={{...fieldStyle,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between",userSelect:"none"}}>
-          <span style={{color:hasVal?"#1e2430":"#9aa0ae"}}>{displayVal||"Select time..."}</span>
-          <Icons.defer size={14} color="#6b7280"/>
-        </div>
-        {hasVal&&<button type="button" onClick={()=>{onChange("");setOpen(false);}} style={{width:26,height:26,background:"#f0f1f3",border:"1px solid #cdd0d6",borderRadius:5,cursor:"pointer",fontSize:13,color:"#6b7280"}}>×</button>}
-      </div>
-      {open&&(
-        <div style={{position:"absolute",zIndex:300,top:"calc(100% + 6px)",left:0,background:"#ffffff",border:"1px solid #cdd0d6",borderRadius:10,boxShadow:"0 6px 24px rgba(0,0,0,0.14)",padding:16,minWidth:200}}>
-          <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
-            <HourList/>
-            <div style={{fontSize:20,fontWeight:"bold",color:"#4a7fa5",paddingTop:52}}>:</div>
-            <MinList/>
-            <div style={{display:"flex",flexDirection:"column",gap:6,paddingTop:30}}>
-              {["AM","PM"].map(ap=>(
-                <button key={ap} type="button" onClick={()=>{
-                  if(!hasVal)setTime(ap==="AM"?9:21,0);
-                  else{let nh=h%12;if(ap==="PM")nh=nh===0?12:nh+12;setTime(nh,m);}
-                }} style={{width:42,padding:"7px 0",border:`2px solid ${curAP===ap?"#1e2430":"#cdd0d6"}`,borderRadius:6,background:curAP===ap?"#1e2430":"#f0f1f3",color:curAP===ap?"#ffffff":"#1e2430",cursor:"pointer",fontSize:13,fontFamily:"sans-serif",fontWeight:"bold"}}>
-                  {ap}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div style={{marginTop:12,display:"flex",justifyContent:"flex-end"}}>
-            <button type="button" onClick={()=>setOpen(false)} style={{padding:"6px 18px",background:"#1e2430",color:"#ffffff",border:"none",borderRadius:6,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}}>Done</button>
-          </div>
-        </div>
-      )}
+    <div style={{display:"flex",alignItems:"center",gap:6}}>
+      <input type="time" value={value||""} onChange={e=>onChange(e.target.value)} style={{...fieldStyle,flex:1}}/>
+      {value&&<button type="button" onClick={()=>onChange("")} style={{width:30,height:30,background:"#f0f1f3",border:"1px solid #cdd0d6",borderRadius:6,cursor:"pointer",fontSize:14,color:"#6b7280",flexShrink:0}}>×</button>}
     </div>
   );
 }
@@ -369,7 +281,7 @@ function EditFields({form,setForm,showSection,projects,showChecklist}){
               const sel=form.section===s;
               return(
                 <button key={s} onClick={()=>setForm(f=>({...f,section:s}))}
-                  style={{padding:"7px 13px",border:`2px solid ${sel?pal.bg:pal.bg+"50"}`,borderRadius:8,background:sel?pal.bg:pal.light,color:sel?"#fff":pal.text,cursor:"pointer",fontSize:12,fontFamily:"sans-serif",display:"flex",alignItems:"center",gap:6,fontWeight:sel?"bold":"normal",boxShadow:sel?`0 2px 8px ${pal.bg}55`:"none",transition:"all 0.15s"}}>
+                  style={{padding:"7px 13px",border:sel?`2px solid ${pal.bg}`:`1px dashed ${pal.bg}66`,borderRadius:8,background:sel?pal.bg:pal.light+"80",color:sel?"#fff":pal.text,cursor:"pointer",fontSize:12,fontFamily:"sans-serif",display:"flex",alignItems:"center",gap:6,fontWeight:sel?"bold":"normal",boxShadow:sel?`0 3px 10px ${pal.bg}66`:"none",transition:"all 0.15s"}}>
                   {Icon&&<Icon size={13} color={sel?"#fff":pal.bg}/>}
                   {sectionLabels[s]}
                 </button>
@@ -564,7 +476,12 @@ function App(){
   const openClarify=item=>{setClarifyItem(item);setClarify({actionable:null,twoMin:false,context:item.context||"@anywhere",project:item.project||"",due:item.due||"",time:item.time||"",destination:"defer",text:item.text,naSection:"reference"});};
   const applyClarify=()=>{
     const{actionable,twoMin,context,project,due,time,destination,text,naSection}=clarify;
-    if(actionable===null)return;
+    if(actionable===null){
+      if(!text.trim()){setClarifyItem(null);return;}
+      setData(d=>({...d,items:d.items.map(i=>i.id===clarifyItem.id?{...i,text:text.trim()}:i)}));
+      setClarifyItem(null);showToast("Updated");
+      return;
+    }
     const section=actionable?(twoMin?"twomin":destination):naSection;
     setData(d=>({...d,items:d.items.map(i=>i.id===clarifyItem.id?{...i,text,section,context,project:project||null,due:due||null,time:time||null,twoMin,done:false}:i)}));
     setClarifyItem(null);showToast("Moved to "+sectionLabels[section]);
@@ -668,7 +585,7 @@ function App(){
           </button>
           <button onClick={e=>{e.stopPropagation();addChecklistLine(item.id);}}
             title="Add checklist item"
-            style={{background:"rgba(74,127,165,0.18)",color:"#2d4a6a",border:"none",borderRadius:7,cursor:"pointer",padding:"3px 10px",fontSize:12,fontFamily:"sans-serif",fontWeight:"bold",lineHeight:1.3}}>ADD</button>
+            style={{background:"rgba(224,90,0,0.16)",color:"#7a2800",border:"none",borderRadius:7,cursor:"pointer",padding:"3px 10px",fontSize:12,fontFamily:"sans-serif",fontWeight:"bold",lineHeight:1.3}}>ADD</button>
         </div>
         {open&&cl.length>0&&(
           <div style={{marginTop:6,paddingLeft:4}}>
@@ -714,11 +631,11 @@ function App(){
         {!item.done&&cl.length>0&&<div onClick={e=>e.stopPropagation()}><InlineChecklist item={item}/></div>}
         {isExpanded&&(
           <div onClick={e=>e.stopPropagation()} style={{display:"flex",gap:6,marginTop:10,paddingTop:10,borderTop:"1px dashed #cdd0d6"}}>
-            <button onClick={()=>openEdit(item)} style={{padding:"9px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d",flex:1}}>Edit</button>
-            {view!=="trash"&&<button onClick={()=>trashItem(item.id)} style={{padding:"9px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.15)",color:"#8a2020",flex:1}}>Del</button>}
-            {view!=="trash"&&!item.done&&cl.length===0&&<button onClick={()=>{addChecklistLine(item.id);}} style={{padding:"9px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(74,127,165,0.18)",color:"#2d4a6a",flex:1}}>Add Checklist</button>}
-            {view==="trash"&&<button onClick={()=>restoreItem(item.id)} style={{padding:"9px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d",flex:1}}>Restore</button>}
-            {view==="trash"&&<button onClick={()=>deleteItem(item.id)} style={{padding:"9px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.22)",color:"#8a2020",flex:1}}>Delete</button>}
+            <button className="btn-3d" onClick={()=>openEdit(item)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(74,127,165,0.18)",color:"#2d4a6a",flex:1}}>Edit</button>
+            {view!=="trash"&&<button className="btn-3d" onClick={()=>trashItem(item.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.15)",color:"#8a2020",flex:1}}>Delete</button>}
+            {view!=="trash"&&!item.done&&cl.length===0&&<button className="btn-3d" onClick={()=>{addChecklistLine(item.id);}} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(224,90,0,0.16)",color:"#7a2800",flex:1}}>Add Checklist</button>}
+            {view==="trash"&&<button className="btn-3d" onClick={()=>restoreItem(item.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d",flex:1}}>Restore</button>}
+            {view==="trash"&&<button className="btn-3d" onClick={()=>deleteItem(item.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.22)",color:"#8a2020",flex:1}}>Delete</button>}
           </div>
         )}
       </div>
@@ -806,7 +723,7 @@ style={{
         <div style={{display:"flex",gap:10,marginBottom:32,alignItems:"flex-start"}}>
           <textarea ref={inputRef} className="capture-input" value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();addToInbox();}}} placeholder="Capture a thought, task, or idea..." rows={1}
             style={{flex:1,padding:"13px 16px",fontSize:15,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"#1a1f2c",resize:"none",overflow:"hidden",lineHeight:"1.4",minHeight:48,boxSizing:"border-box"}}/>
-          <button onClick={addToInbox} style={mkBtn("#1e2430",null,{padding:"12px 22px",fontSize:14})}>Capture</button>
+          <button className="btn-3d" onClick={addToInbox} style={mkBtn("#1e2430",null,{padding:"12px 22px",fontSize:14})}>Capture</button>
         </div>
 
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:22,borderBottom:"1px solid #e6e8ed",paddingBottom:14,position:"relative"}}>
@@ -831,16 +748,20 @@ style={{
         {view==="inbox"&&(
           <div>
             {inboxItems.length===0&&<p style={{color:"#6b7280",fontStyle:"italic"}}>Your basket is empty. Capture something above!</p>}
-            {inboxItems.map(item=>(
-              <div key={item.id} style={{background:"#ffffff",border:"1px solid #cdd0d6",borderRadius:8,padding:"13px 16px",marginBottom:10,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <span style={{fontSize:15,color:"#1e2430"}}>{item.text}</span>
-                <div style={{display:"flex",gap:8}}>
-                  <button onClick={()=>openClarify(item)} style={mkBtn("#4a7fa5","#fff")}>Clarify</button>
-                  <button onClick={()=>openEdit(item)} style={mkBtn("#dde0e6","#1e2430")}>Edit</button>
-                  <button onClick={()=>trashItem(item.id)} style={mkBtn("#dde0e6","#1e2430")}>Del</button>
-                </div>
+            {inboxItems.map(item=>{
+              const isExpanded=expandedTaskId===item.id;
+              return(
+              <div key={item.id} className="task-card" onClick={()=>setExpandedTaskId(isExpanded?null:item.id)}
+                style={{background:"#ffffff",border:"1px solid #e6e8ed",borderLeft:"4px solid "+IC.inbox.bg,borderRadius:10,padding:"13px 16px",marginBottom:8,cursor:"pointer",boxShadow:"var(--shadow-sm)"}}>
+                <div style={{fontSize:15,color:"#1a1f2c",wordBreak:"break-word",overflowWrap:"anywhere",lineHeight:"1.35"}}>{item.text}</div>
+                {isExpanded&&(
+                  <div onClick={e=>e.stopPropagation()} style={{display:"flex",gap:6,marginTop:10,paddingTop:10,borderTop:"1px dashed #cdd0d6"}}>
+                    <button className="btn-3d" onClick={()=>openClarify(item)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(74,127,165,0.18)",color:"#2d4a6a",flex:1}}>Clarify</button>
+                    <button className="btn-3d" onClick={()=>trashItem(item.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.15)",color:"#8a2020",flex:1}}>Delete</button>
+                  </div>
+                )}
               </div>
-            ))}
+            );})}
           </div>
         )}
 
@@ -898,7 +819,7 @@ style={{
             <div style={{display:"flex",gap:10,marginBottom:24}}>
               <input value={newProject} onChange={e=>setNewProject(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addProject()} placeholder="New project name..."
                 style={{flex:1,padding:"10px 14px",borderRadius:7,border:"1px solid #cdd0d6",background:"#ffffff",fontSize:14,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"#1e2430"}}/>
-              <button onClick={addProject} style={mkBtn("#1e2430",null,{padding:"10px 18px",display:"flex",alignItems:"center",gap:6})}>
+              <button className="btn-3d" onClick={addProject} style={mkBtn("#1e2430",null,{padding:"10px 18px",display:"flex",alignItems:"center",gap:6})}>
                 <Icons.projects size={14} color="#ffffff"/>
                 Add Project
               </button>
@@ -947,7 +868,7 @@ style={{
                                     <MetaRow item={item} conflict={allConflictIds.has(item.id)} hideProject={true}/>
                                   </div>
                                   <button onClick={()=>openEdit(item)} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Edit</button>
-                                <button onClick={()=>trashItem(item.id)} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Del</button>
+                                <button onClick={()=>trashItem(item.id)} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Delete</button>
                                 </div>
                                 {cl.length>0&&!item.done&&(
                                   <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid #e4e6ea"}}>
@@ -969,9 +890,9 @@ style={{
                         );
                       })}
                       <div style={{display:"flex",gap:6,marginTop:4}}>
-                        <button onClick={()=>openAddTask(p.id)} style={mkBtn("#1e2430",null,{padding:"8px 8px",fontSize:13,textAlign:"center",flex:1,minWidth:0,whiteSpace:"nowrap"})}>Add Task</button>
-                        <button onClick={()=>archiveProject(p.id)} style={{padding:"8px 8px",fontSize:13,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:IC.archive.bg+"26",color:IC.archive.text,textAlign:"center",flex:1,minWidth:0,whiteSpace:"nowrap"}}>Archive</button>
-                        <button onClick={()=>deleteProject(p.id)} style={mkBtn("#dde0e6","#d13030",{padding:"8px 8px",fontSize:13,textAlign:"center",flex:1,minWidth:0,whiteSpace:"nowrap"})}>Delete</button>
+                        <button className="btn-3d" onClick={()=>openAddTask(p.id)} style={mkBtn("#1e2430",null,{padding:"12px 8px",fontSize:13,textAlign:"center",flex:1,minWidth:0,whiteSpace:"nowrap"})}>Add Task</button>
+                        <button className="btn-3d" onClick={()=>archiveProject(p.id)} style={{padding:"12px 8px",fontSize:13,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:IC.archive.bg+"26",color:IC.archive.text,textAlign:"center",flex:1,minWidth:0,whiteSpace:"nowrap"}}>Archive</button>
+                        <button className="btn-3d" onClick={()=>deleteProject(p.id)} style={mkBtn("#dde0e6","#d13030",{padding:"12px 8px",fontSize:13,textAlign:"center",flex:1,minWidth:0,whiteSpace:"nowrap"})}>Delete</button>
                       </div>
                     </div>
                   )}
@@ -995,8 +916,8 @@ style={{
                           <Icons.folder size={15} color="#9aa0ae"/>
                           <span style={{flex:1,fontSize:14,color:"#3a4460"}}>{p.name}</span>
                           <span style={{fontSize:11,color:"#6b7280",fontFamily:"sans-serif"}}>{pdone}/{ptasks.length} done</span>
-                          <button onClick={()=>restoreProject(p.id)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d"}}>Restore</button>
-                          <button onClick={()=>deleteProject(p.id)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.18)",color:"#8a2020"}}>Delete</button>
+                          <button className="btn-3d" onClick={()=>restoreProject(p.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d"}}>Restore</button>
+                          <button className="btn-3d" onClick={()=>deleteProject(p.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.18)",color:"#8a2020"}}>Delete</button>
                         </div>
                       );
                     })}
@@ -1206,7 +1127,7 @@ style={{
                     const sel=clarify.naSection===s;
                     return(
                       <button key={s} onClick={()=>setClarify(c=>({...c,naSection:s}))}
-                        style={{flex:1,padding:"10px 8px",border:`2px solid ${sel?pal.bg:pal.bg+"50"}`,borderRadius:8,background:sel?pal.bg:pal.light,color:sel?"#fff":pal.text,cursor:"pointer",fontSize:13,fontFamily:"sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:6,fontWeight:sel?"bold":"normal",boxShadow:sel?`0 2px 8px ${pal.bg}55`:"none",transition:"all 0.15s"}}>
+                        style={{flex:1,padding:"10px 8px",border:sel?`2px solid ${pal.bg}`:`1px dashed ${pal.bg}66`,borderRadius:8,background:sel?pal.bg:pal.light+"80",color:sel?"#fff":pal.text,cursor:"pointer",fontSize:13,fontFamily:"sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:6,fontWeight:sel?"bold":"normal",boxShadow:sel?`0 3px 10px ${pal.bg}66`:"none",transition:"all 0.15s"}}>
                         {BtnIcon&&<BtnIcon size={14} color={sel?"#fff":pal.bg}/>}
                         {s==="reference"?"Reference":s==="someday"?"Someday":"Trash"}
                       </button>
@@ -1234,7 +1155,7 @@ style={{
                         const sel=clarify.destination===s;
                         return(
                           <button key={s} onClick={()=>setClarify(c=>({...c,destination:s}))}
-                            style={{flex:1,padding:"12px",border:`2px solid ${sel?pal.bg:pal.bg+"50"}`,borderRadius:8,background:sel?pal.bg:pal.light,color:sel?"#fff":pal.text,cursor:"pointer",fontSize:14,fontFamily:"sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:7,fontWeight:sel?"bold":"normal",boxShadow:sel?`0 2px 10px ${pal.bg}55`:"none",transition:"all 0.15s"}}>
+                            style={{flex:1,padding:"12px",border:sel?`2px solid ${pal.bg}`:`1px dashed ${pal.bg}66`,borderRadius:8,background:sel?pal.bg:pal.light+"80",color:sel?"#fff":pal.text,cursor:"pointer",fontSize:14,fontFamily:"sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:7,fontWeight:sel?"bold":"normal",boxShadow:sel?`0 3px 12px ${pal.bg}66`:"none",transition:"all 0.15s"}}>
                             {BtnIcon&&<BtnIcon size={16} color={sel?"#fff":pal.bg}/>}
                             {s==="defer"?"Defer":"Delegate"}
                           </button>
@@ -1268,8 +1189,8 @@ style={{
               </React.Fragment>
             )}
             <div style={{display:"flex",gap:10}}>
-              <button onClick={()=>setClarifyItem(null)} style={mkBtn("#dde0e6","#1e2430")}>Cancel</button>
-              <button onClick={applyClarify} style={{...mkBtn("#1e2430"),flex:2}}>Confirm</button>
+              <button className="btn-3d" onClick={()=>setClarifyItem(null)} style={mkBtn("#dde0e6","#1e2430",{padding:"12px 16px"})}>Cancel</button>
+              <button className="btn-3d" onClick={applyClarify} style={{...mkBtn("#1e2430",null,{padding:"12px 16px"}),flex:2}}>Confirm</button>
             </div>
           </div>
         </div>
@@ -1290,8 +1211,8 @@ style={{
               </div>
             )}
             <div style={{display:"flex",gap:10,marginTop:8}}>
-              <button onClick={()=>setEditItem(null)} style={mkBtn("#dde0e6","#1e2430",{padding:"12px 16px"})}>Cancel</button>
-              <button onClick={applyEdit} style={{...mkBtn("#1e2430",null,{padding:"12px 16px"}),flex:2}}>Save Changes</button>
+              <button className="btn-3d" onClick={()=>setEditItem(null)} style={mkBtn("#dde0e6","#1e2430",{padding:"12px 16px"})}>Cancel</button>
+              <button className="btn-3d" onClick={applyEdit} style={{...mkBtn("#1e2430",null,{padding:"12px 16px"}),flex:2}}>Save Changes</button>
             </div>
           </div>
         </div>
@@ -1307,8 +1228,8 @@ style={{
             </h3>
             <EditFields form={captureForm} setForm={setCaptureForm} showSection={true} projects={data.projects} showChecklist={true}/>
             <div style={{display:"flex",gap:10,marginTop:8}}>
-              <button onClick={()=>setCaptureModal(null)} style={mkBtn("#dde0e6","#1e2430")}>Cancel</button>
-              <button onClick={applyCapture} style={{...mkBtn("#1e2430"),flex:2}}>Capture</button>
+              <button className="btn-3d" onClick={()=>setCaptureModal(null)} style={mkBtn("#dde0e6","#1e2430",{padding:"12px 16px"})}>Cancel</button>
+              <button className="btn-3d" onClick={applyCapture} style={{...mkBtn("#1e2430",null,{padding:"12px 16px"}),flex:2}}>Capture</button>
             </div>
           </div>
         </div>
@@ -1324,8 +1245,8 @@ style={{
             </h3>
             <EditFields form={taskForm} setForm={setTaskForm} showSection={true} projects={data.projects} showChecklist={false}/>
             <div style={{display:"flex",gap:10,marginTop:8}}>
-              <button onClick={()=>setAddTaskModal(null)} style={mkBtn("#dde0e6","#1e2430")}>Cancel</button>
-              <button onClick={applyAddTask} style={{...mkBtn("#1e2430"),flex:2}}>Add Task</button>
+              <button className="btn-3d" onClick={()=>setAddTaskModal(null)} style={mkBtn("#dde0e6","#1e2430",{padding:"12px 16px"})}>Cancel</button>
+              <button className="btn-3d" onClick={applyAddTask} style={{...mkBtn("#1e2430",null,{padding:"12px 16px"}),flex:2}}>Add Task</button>
             </div>
           </div>
         </div>
