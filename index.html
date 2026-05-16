@@ -11,10 +11,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:Arial,sans-serif;background:#93a8b5;color:#1e2430;}
+body{font-family:Arial,sans-serif;background:#f5f5f0;color:#1e2430;}
 input,select,button{font-family:inherit;}
 ::-webkit-scrollbar{width:6px;}
-::-webkit-scrollbar-track{background:#93a8b5;}
+::-webkit-scrollbar-track{background:#f5f5f0;}
 ::-webkit-scrollbar-thumb{background:#4a7fa5;border-radius:3px;}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
 .mobile-topbar{display:none;}
@@ -316,11 +316,11 @@ function ChecklistEditor({checklist,onChange}){
             style={{background:"none",border:"none",cursor:"pointer",color:"#9aa0ae",fontSize:16,padding:"0 2px",lineHeight:1,flexShrink:0}}>×</button>
         </div>
       ))}
-      <div style={{display:"flex",gap:6,marginTop:4}}>
+      <div style={{display:"flex",gap:10,marginTop:6}}>
         <input value={newItem} onChange={e=>setNewItem(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addItem()}
-          placeholder="Add checklist item..." style={{...fieldStyle,padding:"6px 10px",fontSize:12,flex:1}}/>
+          placeholder="Add checklist item..." style={{...fieldStyle,padding:"8px 12px",fontSize:18,flex:1}}/>
         <button type="button" onClick={addItem}
-          style={{padding:"6px 12px",background:IC.projects.bg,color:"#fff",border:"none",borderRadius:6,cursor:"pointer",fontSize:12,fontFamily:"sans-serif",flexShrink:0}}>+ Add</button>
+          style={{padding:"8px 16px",background:IC.projects.bg,color:"#fff",border:"none",borderRadius:6,cursor:"pointer",fontSize:16,fontFamily:"sans-serif",flexShrink:0}}>+ Add</button>
       </div>
     </div>
   );
@@ -399,6 +399,16 @@ function App(){
   const[captureModal,setCaptureModal]=useState(null);
   const[captureForm,setCaptureForm]=useState({text:"",section:"defer",context:"@anywhere",project:"",due:"",time:"",checklist:[]});
   const[archiveExpanded,setArchiveExpanded]=useState({});
+  const[openChecklists,setOpenChecklists]=useState({});
+  const toggleChecklistOpen=id=>setOpenChecklists(o=>({...o,[id]:!o[id]}));
+  const addChecklistLine=itemId=>{
+    const newId=Date.now()+Math.random();
+    setData(d=>({...d,items:d.items.map(i=>i.id===itemId?{...i,checklist:[...(i.checklist||[]),{id:newId,text:"",done:false}]}:i)}));
+    setOpenChecklists(o=>({...o,[itemId]:true}));
+    setTimeout(()=>{const el=document.querySelector(`[data-cl-id="${newId}"]`);if(el)el.focus();},0);
+  };
+  const updateChecklistText=(itemId,clId,text)=>setData(d=>({...d,items:d.items.map(i=>i.id===itemId?{...i,checklist:(i.checklist||[]).map(c=>c.id===clId?{...c,text}:c)}:i)}));
+  const deleteChecklistLine=(itemId,clId)=>setData(d=>({...d,items:d.items.map(i=>i.id===itemId?{...i,checklist:(i.checklist||[]).filter(c=>c.id!==clId)}:i)}));
   const inputRef=useRef(null);
   useEffect(()=>{if(inputRef.current){inputRef.current.style.height="auto";inputRef.current.style.height=inputRef.current.scrollHeight+"px";}},[input]);
   const[toast,setToast]=useState(null);
@@ -543,6 +553,8 @@ function App(){
   };
 
   const moveItem=(id,section)=>setData(d=>({...d,items:d.items.map(i=>i.id===id?{...i,section}:i)}));
+  const trashItem=id=>setData(d=>({...d,items:d.items.map(i=>i.id===id?{...i,section:"trash",trashedFrom:i.section}:i)}));
+  const restoreItem=id=>setData(d=>({...d,items:d.items.map(i=>i.id===id?{...i,section:i.trashedFrom||"inbox",trashedFrom:null}:i)}));
   const toggleDone=id=>setData(d=>({...d,items:d.items.map(i=>i.id===id?{...i,done:!i.done}:i)}));
   const deleteItem=id=>setData(d=>({...d,items:d.items.filter(i=>i.id!==id)}));
 
@@ -618,19 +630,40 @@ function App(){
 
   function InlineChecklist({item}){
     const cl=item.checklist||[];
-    if(cl.length===0)return null;
     const doneCt=cl.filter(c=>c.done).length;
+    const open=!!openChecklists[item.id];
     return(
-      <div style={{marginTop:7,paddingTop:7,borderTop:"1px solid #eceef2"}}>
-        {cl.map(c=>(
-          <div key={c.id} onClick={e=>{e.stopPropagation();toggleChecklistItem(item.id,c.id);}}
-            style={{display:"flex",alignItems:"center",gap:9,marginBottom:5,cursor:"pointer"}}>
-            <div style={{width:20,height:20,borderRadius:5,border:`2px solid ${c.done?IC.projects.bg:"#cdd0d6"}`,background:c.done?IC.projects.bg:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.15s"}}>
-              {c.done&&<svg width="12" height="12" viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
-            </div>
-            <span style={{fontSize:13,fontFamily:"Arial,sans-serif",color:c.done?"#9aa0ae":"#3a4460",textDecoration:c.done?"line-through":"none"}}>{c.text}</span>
+      <div style={{marginTop:7,paddingTop:6,borderTop:"1px dashed #eceef2"}}>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <button onClick={e=>{e.stopPropagation();toggleChecklistOpen(item.id);}}
+            style={{background:"none",border:"none",cursor:"pointer",padding:"2px 4px",fontSize:13,fontFamily:"Arial,sans-serif",color:"#6b7280",display:"flex",alignItems:"center",gap:5}}>
+            {cl.length>0?`Checklist (${doneCt}/${cl.length})`:"Checklist"}
+            <span style={{fontSize:11}}>{open?"▾":"▸"}</span>
+          </button>
+          <button onClick={e=>{e.stopPropagation();addChecklistLine(item.id);}}
+            title="Add checklist item"
+            style={{background:"rgba(74,127,165,0.18)",color:"#2d4a6a",border:"none",borderRadius:7,cursor:"pointer",padding:"3px 10px",fontSize:12,fontFamily:"sans-serif",fontWeight:"bold",lineHeight:1.3}}>ADD</button>
+        </div>
+        {open&&cl.length>0&&(
+          <div style={{marginTop:6,paddingLeft:4}}>
+            {cl.map(c=>(
+              <div key={c.id} style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                <div onClick={e=>{e.stopPropagation();toggleChecklistItem(item.id,c.id);}}
+                  style={{width:16,height:16,borderRadius:4,border:`2px solid ${c.done?IC.projects.bg:"#cdd0d6"}`,background:c.done?IC.projects.bg:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,cursor:"pointer"}}>
+                  {c.done&&<svg width="10" height="10" viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
+                </div>
+                <input defaultValue={c.text} key={c.id+"|"+c.text} data-cl-id={c.id}
+                  onBlur={e=>{const v=e.target.value;if(!v.trim())deleteChecklistLine(item.id,c.id);else if(v!==c.text)updateChecklistText(item.id,c.id,v);}}
+                  onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();e.target.blur();}}}
+                  onClick={e=>e.stopPropagation()}
+                  placeholder="…"
+                  style={{flex:1,fontSize:13,fontFamily:"Arial,sans-serif",border:"1px solid #eceef2",borderRadius:4,padding:"3px 7px",background:"#fafbfd",color:c.done?"#9aa0ae":"#3a4460",textDecoration:c.done?"line-through":"none",outline:"none"}}/>
+                <button onClick={e=>{e.stopPropagation();deleteChecklistLine(item.id,c.id);}}
+                  style={{background:"none",border:"none",cursor:"pointer",color:"#9aa0ae",fontSize:15,padding:"0 4px",lineHeight:1,flexShrink:0}}>×</button>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
     );
   }
@@ -649,13 +682,17 @@ function App(){
             </div>
             <MetaRow item={item} conflict={conflict} hideProject={hideProject}/>
           </div>
-          <div style={{display:"flex",gap:5,flexShrink:0}}>
-            <button onClick={()=>openEdit(item)} style={mkBtn("#dde0e6","#1e2430",{padding:"5px 10px",fontSize:12})}>Edit</button>
-            {view!=="trash"&&<button onClick={()=>moveItem(item.id,"trash")} style={mkBtn("#dde0e6","#1e2430",{padding:"5px 10px",fontSize:12})}>Del</button>}
-            {view==="trash"&&<button onClick={()=>deleteItem(item.id)} style={mkBtn("#d13030",null,{padding:"5px 10px",fontSize:12})}>Delete</button>}
+          <div style={{display:"flex",flexDirection:"column",gap:4,flexShrink:0,alignItems:"stretch"}}>
+            <div style={{display:"flex",gap:4}}>
+              <button onClick={()=>openEdit(item)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d",flex:1}}>Edit</button>
+              {view!=="trash"&&<button onClick={()=>trashItem(item.id)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.15)",color:"#8a2020",flex:1}}>Del</button>}
+              {view==="trash"&&<button onClick={()=>restoreItem(item.id)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d",flex:1}}>Restore</button>}
+              {view==="trash"&&<button onClick={()=>deleteItem(item.id)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.22)",color:"#8a2020",flex:1}}>Delete</button>}
+            </div>
+            {view!=="trash"&&!item.done&&(item.checklist||[]).length===0&&<button onClick={()=>addChecklistLine(item.id)} style={{padding:"5px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(74,127,165,0.18)",color:"#2d4a6a"}}>Add Checklist</button>}
           </div>
         </div>
-        {cl.length>0&&!item.done&&<InlineChecklist item={item}/>}
+        {!item.done&&cl.length>0&&<InlineChecklist item={item}/>}
       </div>
     );
   }
@@ -663,7 +700,7 @@ function App(){
   const navSections=[...SECTIONS,"calendar","review"];
 
   return(
-    <div className="app-wrapper" style={{display:"flex",minHeight:"100vh",fontFamily:"Arial,sans-serif",background:"#93a8b5",color:"#1e2430"}}>
+    <div className="app-wrapper" style={{display:"flex",minHeight:"100vh",fontFamily:"Arial,sans-serif",background:IC[view]?IC[view].bg+"1A":"#f5f5f0",color:"#1e2430"}}>
       {/* Mobile top bar */}
       <div className="mobile-topbar">
         <button onClick={()=>setDrawerOpen(true)}>
@@ -736,7 +773,7 @@ style={{
       </div>
 
       {/* Main */}
-      <div className="main" style={{flex:1,padding:"32px 40px",maxWidth:900,overflowY:"auto"}}>
+      <div className="main" style={{flex:1,padding:"32px 40px",maxWidth:900,overflowY:"auto",background:"transparent"}}>
         <div style={{display:"flex",gap:10,marginBottom:32,alignItems:"flex-start"}}>
           <textarea ref={inputRef} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();addToInbox();}}} placeholder="Capture a thought, task, or idea..." rows={1}
             style={{flex:1,padding:"12px 16px",borderRadius:8,border:"2px solid #cdd0d6",background:"#ffffff",fontSize:15,fontFamily:"Arial,sans-serif",outline:"none",color:"#1e2430",resize:"none",overflow:"hidden",lineHeight:"1.4",minHeight:46,boxSizing:"border-box"}}/>
@@ -752,7 +789,7 @@ style={{
             <div style={{display:"flex",gap:6}}>
               {["month","week"].map(md=>(
                 <button key={md} onClick={()=>setCalMode(md)}
-                  style={{padding:"5px 14px",border:"2px solid "+(calMode===md?"#1e2430":"#cdd0d6"),borderRadius:6,background:calMode===md?"#1e2430":"#93a8b5",color:calMode===md?"#ffffff":"#1e2430",cursor:"pointer",fontSize:12,fontFamily:"sans-serif"}}>
+                  style={{padding:"5px 14px",border:"2px solid "+(calMode===md?"#1e2430":"#cdd0d6"),borderRadius:6,background:calMode===md?"#1e2430":"#f5f5f0",color:calMode===md?"#ffffff":"#1e2430",cursor:"pointer",fontSize:12,fontFamily:"sans-serif"}}>
                   {md==="month"?"Month":"Week"}
                 </button>
               ))}
@@ -770,7 +807,7 @@ style={{
                 <div style={{display:"flex",gap:8}}>
                   <button onClick={()=>openClarify(item)} style={mkBtn("#4a7fa5","#fff")}>Clarify</button>
                   <button onClick={()=>openEdit(item)} style={mkBtn("#dde0e6","#1e2430")}>Edit</button>
-                  <button onClick={()=>moveItem(item.id,"trash")} style={mkBtn("#dde0e6","#1e2430")}>Del</button>
+                  <button onClick={()=>trashItem(item.id)} style={mkBtn("#dde0e6","#1e2430")}>Del</button>
                 </div>
               </div>
             ))}
@@ -778,7 +815,7 @@ style={{
         )}
 
         {/* LIST VIEWS */}
-        {["twomin","defer","delegate","someday","reference","trash"].includes(view)&&(
+        {["twomin","defer","delegate","someday","reference"].includes(view)&&(
           <div>
             {viewItems.length===0&&<p style={{color:"#6b7280",fontStyle:"italic"}}>Nothing here yet.</p>}
             {viewItems.map(item=><ItemCard key={item.id} item={item} showCheck={["twomin","defer","delegate"].includes(view)} conflict={allConflictIds.has(item.id)}/>)}
@@ -796,6 +833,32 @@ style={{
                 )}
               </div>
             )}
+          </div>
+        )}
+
+        {/* TRASH (grouped by original section) */}
+        {view==="trash"&&(
+          <div>
+            {viewItems.length===0&&<p style={{color:"#6b7280",fontStyle:"italic"}}>Trash is empty.</p>}
+            {(()=>{
+              const order=["inbox","twomin","defer","delegate","someday","reference","unknown"];
+              const groups={};
+              viewItems.forEach(it=>{const k=it.trashedFrom&&sectionLabels[it.trashedFrom]?it.trashedFrom:"unknown";if(!groups[k])groups[k]=[];groups[k].push(it);});
+              return order.filter(k=>groups[k]).map(k=>{
+                const Icon=sectionIcons[k];
+                const color=navIconColor[k]||"#6b7280";
+                const label=k==="unknown"?"Other":sectionLabels[k];
+                return(
+                  <div key={k} style={{marginBottom:22}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10,paddingBottom:6,borderBottom:`1px solid ${color}55`,color,fontSize:13,fontFamily:"sans-serif",fontWeight:"bold",textTransform:"uppercase",letterSpacing:0.5}}>
+                      {Icon&&<Icon size={14} color={color}/>}
+                      {label} <span style={{fontWeight:"normal",opacity:0.7}}>({groups[k].length})</span>
+                    </div>
+                    {groups[k].map(item=><ItemCard key={item.id} item={item} showCheck={false} conflict={false}/>)}
+                  </div>
+                );
+              });
+            })()}
           </div>
         )}
 
@@ -854,7 +917,7 @@ style={{
                                     <MetaRow item={item} conflict={allConflictIds.has(item.id)} hideProject={true}/>
                                   </div>
                                   <button onClick={()=>openEdit(item)} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Edit</button>
-                                <button onClick={()=>moveItem(item.id,"trash")} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Del</button>
+                                <button onClick={()=>trashItem(item.id)} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Del</button>
                                 </div>
                                 {cl.length>0&&!item.done&&(
                                   <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid #e4e6ea"}}>
@@ -1166,7 +1229,7 @@ style={{
         <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
           <div className="modal-box" style={{background:"#ffffff",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.18)",maxHeight:"90vh",overflowY:"auto"}}>
             <h3 style={{margin:"0 0 16px",fontSize:18,color:"#1e2430"}}>Edit Item</h3>
-            <EditFields form={editForm} setForm={setEditForm} showSection={editItem.section!=="inbox"} projects={data.projects} showChecklist={true}/>
+            <EditFields form={editForm} setForm={setEditForm} showSection={editItem.section!=="inbox"} projects={data.projects} showChecklist={false}/>
             {["twomin","defer","delegate"].includes(editForm.section)&&(
               <div style={{marginBottom:14}}>
                 <label style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",fontSize:13,fontFamily:"sans-serif",color:"#3a4460"}}>
