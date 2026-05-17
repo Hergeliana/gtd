@@ -1226,17 +1226,20 @@ style={{
               onChange={e=>{setClarify(c=>({...c,text:e.target.value}));e.target.style.height="auto";e.target.style.height=e.target.scrollHeight+"px";}}
               style={{...fieldStyle,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",fontSize:14,padding:"10px 12px",marginBottom:16,resize:"none",overflow:"hidden",lineHeight:1.4,boxSizing:"border-box"}}/>
             <div style={{marginBottom:14}}>
-              <div style={{fontSize:13,fontFamily:"sans-serif",color:"#3a4460",marginBottom:8,fontWeight:"bold"}}>Is it actionable?</div>
+              <div style={{fontSize:13,fontFamily:"sans-serif",color:"var(--ink-2)",marginBottom:8,fontWeight:"bold"}}>Is it actionable?</div>
               <div style={{display:"flex",gap:10}}>
-                {["Yes","No"].map(v=>(
-                  <button key={v} onClick={()=>setClarify(c=>({...c,actionable:v==="Yes"}))}
-                    style={{flex:1,padding:"9px",border:"2px solid "+(clarify.actionable===(v==="Yes")?"#1e2430":"#cdd0d6"),borderRadius:7,background:clarify.actionable===(v==="Yes")?"#1e2430":"#f0f1f3",color:clarify.actionable===(v==="Yes")?"#ffffff":"#1e2430",cursor:"pointer",fontSize:14,fontFamily:"sans-serif"}}>{v}</button>
-                ))}
+                {["Yes","No"].map(v=>{
+                  const sel=clarify.actionable===(v==="Yes");
+                  return(
+                    <button key={v} onClick={()=>setClarify(c=>({...c,actionable:v==="Yes"}))}
+                      style={{flex:1,padding:"10px",border:"2px solid "+(sel?"var(--primary-bg)":"var(--border)"),borderRadius:7,background:sel?"var(--primary-bg)":"var(--surface-2)",color:sel?"var(--primary-ink)":"var(--muted)",cursor:"pointer",fontSize:14,fontFamily:"sans-serif",fontWeight:sel?"bold":"normal",boxShadow:sel?"0 2px 8px rgba(74,110,163,0.35)":"none",transition:"all 0.15s"}}>{v}</button>
+                  );
+                })}
               </div>
             </div>
             {clarify.actionable===false&&(
               <div style={{marginBottom:14}}>
-                <div style={{fontSize:13,fontFamily:"sans-serif",color:"#3a4460",marginBottom:8,fontWeight:"bold"}}>Send to:</div>
+                <div style={{fontSize:13,fontFamily:"sans-serif",color:"var(--ink-2)",marginBottom:8,fontWeight:"bold"}}>Send to:</div>
                 <div style={{display:"flex",gap:8}}>
                   {["reference","someday","trash"].map(s=>{
                     const BtnIcon=sectionIcons[s];
@@ -1264,7 +1267,7 @@ style={{
                 </div>
                 {!clarify.twoMin&&(
                   <div style={{marginBottom:14}}>
-                    <div style={{fontSize:13,fontFamily:"sans-serif",color:"#3a4460",marginBottom:8,fontWeight:"bold"}}>Send to:</div>
+                    <div style={{fontSize:13,fontFamily:"sans-serif",color:"var(--ink-2)",marginBottom:8,fontWeight:"bold"}}>Send to:</div>
                     <div style={{display:"flex",gap:10}}>
                       {["defer","delegate"].map(s=>{
                         const BtnIcon=sectionIcons[s];
