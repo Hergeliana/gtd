@@ -1184,7 +1184,7 @@ style={{
         {/* REVIEW */}
         {view==="review"&&(
           <div>
-            <p style={{color:"#3a4460",lineHeight:1.7,marginBottom:24}}>Your weekly review keeps the GTD system trustworthy.</p>
+            <p style={{color:"var(--ink-2)",lineHeight:1.7,marginBottom:24}}>Your weekly review keeps the GTD system trustworthy.</p>
             {[
               {title:"1. Collect loose papers & materials",desc:"Gather any physical notes and add them to your In Basket.",icon:Icons.inbox,sec:"inbox"},
               {title:"2. Empty your In Basket",desc:"You have "+stats.inbox+" item(s). Clarify each one.",action:()=>setView("inbox"),label:"Go to In Basket",icon:Icons.inbox,sec:"inbox"},
@@ -1197,13 +1197,13 @@ style={{
               const StepIcon=step.icon;
               const pal=IC[step.sec]||{bg:"#4a7fa5",light:"#e8f0fc"};
               return(
-                <div key={i} style={{background:"#ffffff",border:"1px solid #cdd0d6",borderRadius:8,padding:"16px 20px",marginBottom:12,display:"flex",gap:14,alignItems:"flex-start"}}>
-                  <div style={{marginTop:3,flexShrink:0,background:pal.light,border:`1px solid ${pal.bg}40`,borderRadius:10,width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <div key={i} style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:8,padding:"16px 20px",marginBottom:12,display:"flex",gap:14,alignItems:"flex-start",boxShadow:"var(--shadow-sm)"}}>
+                  <div style={{marginTop:3,flexShrink:0,background:pal.bg+"22",border:`1px solid ${pal.bg}40`,borderRadius:10,width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center"}}>
                     {StepIcon&&<StepIcon size={18} color={pal.bg}/>}
                   </div>
                   <div style={{flex:1}}>
                     <div style={{fontWeight:"bold",fontSize:15,marginBottom:4,color:"var(--ink)"}}>{step.title}</div>
-                    <div style={{fontSize:14,color:"#3a4460",lineHeight:1.6}}>{step.desc}</div>
+                    <div style={{fontSize:14,color:"var(--ink-2)",lineHeight:1.6}}>{step.desc}</div>
                     {step.action&&<button onClick={step.action} style={{...mkBtn(pal.bg,"#fff",{marginTop:10,display:"inline-flex",alignItems:"center",gap:6})}}>{step.label}</button>}
                   </div>
                 </div>
