@@ -958,7 +958,7 @@ style={{
         {/* CALENDAR MONTH */}
         {view==="calendar"&&calMode==="month"&&(
           <div style={{display:"flex",gap:28,flexWrap:"wrap"}}>
-            <div style={{flex:"0 0 310px"}}>
+            <div style={{flex:"1 1 100%",maxWidth:"100%",border:"1px solid #e6e8ed",borderRadius:10,padding:"14px 12px",background:"#ffffff"}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
                 <button onClick={()=>{if(calMonth===0){setCalMonth(11);setCalYear(y=>y-1);}else setCalMonth(m=>m-1);}} style={mkBtn("#dde0e6","#1e2430",{padding:"6px 12px"})}>◀</button>
                 <span style={{fontWeight:"bold",fontSize:16,fontFamily:"sans-serif",color:"#1e2430"}}>{MONTHS[calMonth]+" "+calYear}</span>
@@ -1044,7 +1044,7 @@ style={{
                   const hasConflict=dayConflicts.size>0;
                   return(
                     <div key={ds} onClick={()=>setCalDay(isSel?null:ds)}
-                      style={{background:isSel?"rgba(30,36,48,0.05)":"#ffffff",borderLeft:idx===0?"none":"1px solid #dde0e6",minHeight:140,cursor:"pointer",transition:"background 0.15s",position:"relative"}}>
+                      style={{background:isSel?"rgba(30,36,48,0.05)":"#ffffff",borderLeft:idx===0?"none":"1px solid #dde0e6",minHeight:140,cursor:"pointer",transition:"background 0.15s",position:"relative",minWidth:0,overflow:"hidden"}}>
                       {isSel&&<div style={{position:"absolute",top:0,left:0,right:0,height:3,background:"#1e2430"}}/>}
                       <div style={{padding:"6px 4px",background:isSel?"#1e2430":hasConflict?IC.trash.light:isToday?"rgba(74,127,165,0.12)":"#f4f5f7",borderBottom:"1px solid #dde0e6",textAlign:"center"}}>
                         <div style={{fontSize:10,fontFamily:"sans-serif",color:isSel?"rgba(255,255,255,0.75)":hasConflict?IC.trash.text:"#6b7280",textTransform:"uppercase",letterSpacing:0.4}}>{DAYS[dayObj.getDay()]+(hasConflict?" ⚠":"")}</div>
@@ -1059,7 +1059,7 @@ style={{
                               style={{background:isConflict?IC.trash.light:item.done?"#eceef2":(sectionColor[item.section]||"#4a7fa5")+"18",
                                 borderLeft:"3px solid "+(isConflict?IC.trash.bg:sectionColor[item.section]||"#4a7fa5"),
                                 borderRadius:3,padding:"3px 4px",marginBottom:3,opacity:item.done?0.5:1,pointerEvents:"none"}}>
-                              <div style={{fontSize:10,fontFamily:"sans-serif",lineHeight:1.25,textDecoration:item.done?"line-through":"none",overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",color:"#1e2430",wordBreak:"break-word"}}>
+                              <div style={{fontSize:10,fontFamily:"sans-serif",lineHeight:1.25,textDecoration:item.done?"line-through":"none",overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",color:"#1e2430",wordBreak:"break-all",overflowWrap:"anywhere"}}>
                                 {(isConflict?"⚠ ":"")+item.text}
                               </div>
                             </div>
