@@ -41,6 +41,7 @@
   --topbar-ink:#f4ede2;
   --primary-bg:#1e2430;
   --primary-ink:#ffffff;
+  --check-accent:#1e2430;
   --btn-edit-ink:#2d4a6a;
   --btn-edit-bg:rgba(74,127,165,0.18);
   --btn-del-ink:#8a2020;
@@ -68,6 +69,7 @@
   --topbar-ink:#e8d8b5;
   --primary-bg:#4a6ea3;
   --primary-ink:#ffffff;
+  --check-accent:#5a9a5a;
   --btn-edit-ink:#9bc4e8;
   --btn-edit-bg:rgba(74,127,165,0.30);
   --btn-del-ink:#f0a0a0;
@@ -692,7 +694,7 @@ function App(){
       <div className="task-card" onClick={()=>setExpandedTaskId(isExpanded?null:item.id)}
         style={{background:item.done?"var(--surface-2)":conflict?"#fdf0f0":"var(--surface)",border:"1px solid "+(conflict?"#f0c8c8":"var(--border)"),borderLeft:"4px solid "+(item.done?"var(--muted-2)":conflict?"#d13030":isOverdue(item.due)?"#a82d2d":isDueSoon(item.due)?"#d97706":"#5a9a5a"),borderRadius:10,padding:"13px 16px",marginBottom:8,opacity:item.done?0.72:1,cursor:"pointer",boxShadow:"var(--shadow-sm)",color:"var(--ink)"}}>
         <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
-          {showCheck&&<input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:17,height:17,cursor:"pointer",accentColor:"#1e2430",flexShrink:0,marginTop:3}}/>}
+          {showCheck&&<input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:17,height:17,cursor:"pointer",accentColor:"var(--check-accent)",flexShrink:0,marginTop:3}}/>}
           <div style={{flex:1,minWidth:0}}>
             <div style={{fontSize:15,textDecoration:item.done?"line-through":"none",display:"flex",alignItems:"flex-start",gap:6,flexWrap:"wrap"}}>
               <span style={{wordBreak:"break-word",overflowWrap:"anywhere",lineHeight:"1.35",flex:"1 1 auto",minWidth:0}}>{item.text}</span>
@@ -968,7 +970,7 @@ style={{
                               <div key={item.id} onClick={()=>setExpandedTaskId(isProjExpanded?null:item.id)}
                                 style={{background:item.done?"var(--surface-3)":allConflictIds.has(item.id)?"#fdf0f0":"var(--surface-2)",border:"1px solid "+(allConflictIds.has(item.id)?"#d13030":"var(--border)"),borderRadius:7,padding:"9px 12px",marginBottom:6,cursor:"pointer"}}>
                                 <div style={{display:"flex",alignItems:"center",gap:8}}>
-                                  <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:15,height:15,cursor:"pointer",accentColor:"#1e2430",flexShrink:0}}/>
+                                  <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:15,height:15,cursor:"pointer",accentColor:"var(--check-accent)",flexShrink:0}}/>
                                   <div style={{flex:1,minWidth:0}}>
                                     <div style={{fontSize:13,textDecoration:item.done?"line-through":"none",opacity:item.done?0.5:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:"var(--ink)",display:"flex",alignItems:"center",gap:5}}>
                                       <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.text}</span>
@@ -1076,7 +1078,7 @@ style={{
                     <div key={item.id} onClick={()=>setExpandedTaskId(isCalExp?null:item.id)}
                       style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface)",border:"1px solid "+(selectedDayConflicts.has(item.id)?IC.trash.bg:"var(--border)"),borderRadius:8,padding:"10px 14px",marginBottom:8,cursor:"pointer",boxShadow:"var(--shadow-sm)"}}>
                       <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
-                        <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:16,height:16,cursor:"pointer",accentColor:"#1e2430",flexShrink:0,marginTop:3}}/>
+                        <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:16,height:16,cursor:"pointer",accentColor:"var(--check-accent)",flexShrink:0,marginTop:3}}/>
                         <div style={{fontFamily:"sans-serif",fontSize:13,color:"#4a7fa5",fontWeight:"bold",minWidth:20,marginTop:1}}>{idx+1}.</div>
                         <div style={{flex:1,minWidth:0}}>
                           <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",opacity:item.done?0.6:1,color:"var(--ink)",wordBreak:"break-word"}}>{item.text}</div>
@@ -1164,7 +1166,7 @@ style={{
                     <div key={item.id} onClick={()=>setExpandedTaskId(isCalExp?null:item.id)}
                       style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface)",border:"1px solid "+(selectedDayConflicts.has(item.id)?IC.trash.bg:"var(--border)"),borderRadius:8,padding:"10px 14px",marginBottom:8,cursor:"pointer",boxShadow:"var(--shadow-sm)"}}>
                       <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
-                        <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:16,height:16,cursor:"pointer",accentColor:"#1e2430",flexShrink:0,marginTop:3}}/>
+                        <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:16,height:16,cursor:"pointer",accentColor:"var(--check-accent)",flexShrink:0,marginTop:3}}/>
                         <div style={{fontFamily:"sans-serif",fontSize:13,color:"#4a7fa5",fontWeight:"bold",minWidth:20,marginTop:1}}>{idx+1}.</div>
                         <div style={{flex:1,minWidth:0}}>
                           <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",opacity:item.done?0.6:1,color:"var(--ink)",wordBreak:"break-word"}}>{item.text}</div>
@@ -1351,7 +1353,7 @@ style={{
             {["twomin","defer","delegate"].includes(editForm.section)&&(
               <div style={{marginBottom:14}}>
                 <label style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",fontSize:13,fontFamily:"sans-serif",color:"#3a4460"}}>
-                  <input type="checkbox" checked={editForm.done} onChange={e=>setEditForm(f=>({...f,done:e.target.checked}))} style={{width:15,height:15,accentColor:"#1e2430"}}/>
+                  <input type="checkbox" checked={editForm.done} onChange={e=>setEditForm(f=>({...f,done:e.target.checked}))} style={{width:15,height:15,accentColor:"var(--check-accent)"}}/>
                   Mark as done
                 </label>
               </div>
