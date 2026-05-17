@@ -956,10 +956,12 @@ style={{
                             {sortByTime(secTasks).map(item=>{
                               const cl=item.checklist||[];
                               const clDone=cl.filter(c=>c.done).length;
+                              const isProjExpanded=expandedTaskId===item.id;
                               return(
-                              <div key={item.id} style={{background:item.done?"var(--surface-3)":allConflictIds.has(item.id)?"#fdf0f0":"var(--surface-2)",border:"1px solid "+(allConflictIds.has(item.id)?"#d13030":"var(--border)"),borderRadius:7,padding:"9px 12px",marginBottom:6}}>
+                              <div key={item.id} onClick={()=>setExpandedTaskId(isProjExpanded?null:item.id)}
+                                style={{background:item.done?"var(--surface-3)":allConflictIds.has(item.id)?"#fdf0f0":"var(--surface-2)",border:"1px solid "+(allConflictIds.has(item.id)?"#d13030":"var(--border)"),borderRadius:7,padding:"9px 12px",marginBottom:6,cursor:"pointer"}}>
                                 <div style={{display:"flex",alignItems:"center",gap:8}}>
-                                  <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:15,height:15,cursor:"pointer",accentColor:"#1e2430",flexShrink:0}}/>
+                                  <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:15,height:15,cursor:"pointer",accentColor:"#1e2430",flexShrink:0}}/>
                                   <div style={{flex:1,minWidth:0}}>
                                     <div style={{fontSize:13,textDecoration:item.done?"line-through":"none",opacity:item.done?0.5:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:"var(--ink)",display:"flex",alignItems:"center",gap:5}}>
                                       <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.text}</span>
@@ -967,20 +969,13 @@ style={{
                                     </div>
                                     <MetaRow item={item} conflict={allConflictIds.has(item.id)} hideProject={true}/>
                                   </div>
-                                  <button onClick={()=>openEdit(item)} style={{padding:"4px 8px",fontSize:11,border:"none",borderRadius:6,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-edit-bg)",color:"var(--btn-edit-ink)"}}>Edit</button>
-                                <button onClick={()=>trashItem(item.id)} style={{padding:"4px 8px",fontSize:11,border:"none",borderRadius:6,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-del-bg)",color:"var(--btn-del-ink)"}}>Delete</button>
                                 </div>
-                                {cl.length>0&&!item.done&&(
-                                  <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid #e4e6ea"}}>
-                                    {cl.map(c=>(
-                                      <div key={c.id} onClick={()=>toggleChecklistItem(item.id,c.id)}
-                                        style={{display:"flex",alignItems:"center",gap:5,marginBottom:2,cursor:"pointer"}}>
-                                        <div style={{width:11,height:11,borderRadius:2,border:`2px solid ${c.done?IC.projects.bg:"#cdd0d6"}`,background:c.done?IC.projects.bg:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-                                          {c.done&&<svg width="7" height="7" viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
-                                        </div>
-                                        <span style={{fontSize:10,fontFamily:"sans-serif",color:c.done?"#9aa0ae":"#3a4460",textDecoration:c.done?"line-through":"none"}}>{c.text}</span>
-                                      </div>
-                                    ))}
+                                {!item.done&&cl.length>0&&<div onClick={e=>e.stopPropagation()}><InlineChecklist item={item}/></div>}
+                                {isProjExpanded&&(
+                                  <div onClick={e=>e.stopPropagation()} style={{display:"flex",gap:6,marginTop:10,paddingTop:10,borderTop:"1px dashed var(--border)"}}>
+                                    <button className="btn-3d" onClick={()=>openEdit(item)} style={{padding:"9px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-edit-bg)",color:"var(--btn-edit-ink)",flex:1}}>Edit</button>
+                                    <button className="btn-3d" onClick={()=>trashItem(item.id)} style={{padding:"9px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-del-bg)",color:"var(--btn-del-ink)",flex:1}}>Delete</button>
+                                    {!item.done&&cl.length===0&&<button className="btn-3d" onClick={()=>addChecklistLine(item.id)} style={{padding:"9px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-cl-bg)",color:"var(--btn-cl-ink)",flex:1}}>Add Checklist</button>}
                                   </div>
                                 )}
                               </div>
