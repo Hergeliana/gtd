@@ -23,9 +23,42 @@
   --shadow-md:0 2px 4px rgba(20,30,55,0.06), 0 6px 16px rgba(20,30,55,0.06);
   --shadow-lg:0 10px 32px rgba(20,30,55,0.14);
   --t:160ms cubic-bezier(.2,.6,.2,1);
+  --bg:#f4f4ef;
+  --surface:#ffffff;
+  --surface-2:#f4f5f7;
+  --surface-3:#eceef2;
+  --ink:#1a1f2c;
+  --ink-2:#3a4153;
+  --muted:#6b7280;
+  --muted-2:#9aa0ae;
+  --border:#e6e8ed;
+  --border-strong:#cdd0d6;
+  --field-bg:#f0f1f3;
+  --field-ink:#1a1f2c;
+  --topbar-bg:#2c3245;
+  --topbar-ink:#f4ede2;
+}
+[data-theme="dark"]{
+  --bg:#10141d;
+  --surface:#1a1f2c;
+  --surface-2:#222836;
+  --surface-3:#2a3142;
+  --ink:#e6e8ed;
+  --ink-2:#c0c4cf;
+  --muted:#8a8f9e;
+  --muted-2:#6b7280;
+  --border:#2c3245;
+  --border-strong:#3d4356;
+  --field-bg:#222836;
+  --field-ink:#e6e8ed;
+  --topbar-bg:#070a10;
+  --topbar-ink:#e8d8b5;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.35), 0 1px 0 rgba(0,0,0,0.25);
+  --shadow-md:0 2px 6px rgba(0,0,0,0.45), 0 6px 18px rgba(0,0,0,0.4);
+  --shadow-lg:0 10px 32px rgba(0,0,0,0.55);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--font);background:#f4f4ef;color:#1a1f2c;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
 input,select,button,textarea{font-family:inherit;}
 button{transition:background var(--t),color var(--t),transform var(--t),box-shadow var(--t),border-color var(--t);}
 button:active{transform:translateY(1px);}
@@ -41,12 +74,12 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .btn-3d:active{box-shadow:0 1px 2px rgba(20,30,55,0.10), inset 0 1px 0 rgba(20,30,55,0.10);transform:translateY(0);}
 .nav-item{transition:background var(--t),color var(--t),border-color var(--t);}
 .nav-item:hover{background:rgba(255,255,255,0.04);}
-.capture-input{border:1px solid #e6e8ed!important;background:#ffffff!important;border-radius:10px!important;box-shadow:var(--shadow-sm);transition:border-color var(--t),box-shadow var(--t);}
+.capture-input{border:1px solid var(--border)!important;background:var(--surface)!important;color:var(--ink)!important;border-radius:10px!important;box-shadow:var(--shadow-sm);transition:border-color var(--t),box-shadow var(--t);}
 .capture-input:focus{border-color:#bcd0ec!important;box-shadow:0 0 0 4px rgba(59,130,246,0.10),var(--shadow-sm);}
 .mobile-topbar{display:none;}
 .drawer-overlay{display:none;}
 @media(max-width:640px) and (orientation:portrait){
-  .mobile-topbar{display:flex;align-items:center;justify-content:center;padding:12px 14px;background:#2c3245;position:sticky;top:0;z-index:40;position:relative;}
+  .mobile-topbar{display:flex;align-items:center;justify-content:center;padding:12px 14px;background:var(--topbar-bg);position:sticky;top:0;z-index:40;position:relative;}
   .mobile-topbar button{background:none;border:none;color:#fff;cursor:pointer;padding:4px;display:flex;align-items:center;}
   .app-wrapper{display:block!important;}
   .sidebar{display:none!important;}
@@ -55,11 +88,11 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   .main{padding:16px!important;padding-bottom:32px!important;max-width:100%!important;width:100%!important;}
   .modal-box{width:100%!important;max-width:100%!important;max-height:92vh!important;border-radius:16px 16px 0 0!important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;margin:0!important;}
   .modal-overlay{align-items:flex-end!important;}
-  .capture-bar{position:fixed!important;left:0!important;right:0!important;bottom:calc(54px + env(safe-area-inset-bottom,0px))!important;margin:0!important;padding:10px 12px!important;background:#ffffff!important;border-top:1px solid #e6e8ed!important;box-shadow:0 -4px 16px rgba(20,30,55,0.06)!important;z-index:50!important;gap:8!important;}
-  .bottom-tabs{display:flex!important;position:fixed!important;left:0!important;right:0!important;bottom:0!important;background:#ffffff!important;border-top:none!important;box-shadow:none!important;z-index:49!important;height:calc(54px + env(safe-area-inset-bottom,0px))!important;padding-bottom:env(safe-area-inset-bottom,0px)!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .capture-bar{position:fixed!important;left:0!important;right:0!important;bottom:calc(54px + env(safe-area-inset-bottom,0px))!important;margin:0!important;padding:10px 12px!important;background:var(--surface)!important;border-top:1px solid var(--border)!important;box-shadow:0 -4px 16px rgba(20,30,55,0.06)!important;z-index:50!important;gap:8!important;}
+  .bottom-tabs{display:flex!important;position:fixed!important;left:0!important;right:0!important;bottom:0!important;background:var(--surface)!important;border-top:none!important;box-shadow:none!important;z-index:49!important;height:calc(54px + env(safe-area-inset-bottom,0px))!important;padding-bottom:env(safe-area-inset-bottom,0px)!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
   .bottom-tabs::-webkit-scrollbar{display:none;}
-  .bottom-tabs>button{flex:0 0 auto;min-width:68px;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;font-family:inherit;font-size:10px;color:#9aa0ae;padding:0 8px;border-top:2px solid transparent;}
-  .bottom-tabs>button.active{color:#1a1f2c;font-weight:600;}
+  .bottom-tabs>button{flex:0 0 auto;min-width:68px;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;font-family:inherit;font-size:10px;color:var(--muted-2);padding:0 8px;border-top:2px solid transparent;}
+  .bottom-tabs>button.active{color:var(--ink);font-weight:600;}
   .main{padding-bottom:140px!important;}
 }
 .bottom-tabs{display:none;}
@@ -164,8 +197,8 @@ const sectionIcons={inbox:Icons.inbox,twomin:Icons.twomin,defer:Icons.defer,dele
 function getDaysInMonth(y,m){return new Date(y,m+1,0).getDate();}
 function toDateStr(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;}
 const emptyEdit=()=>({text:"",section:"defer",context:"@anywhere",project:"",due:"",time:"",done:false,checklist:[]});
-const fieldStyle={width:"100%",padding:"8px 10px",borderRadius:6,border:"1px solid #cdd0d6",background:"#f0f1f3",fontSize:13,fontFamily:"sans-serif",outline:"none",boxSizing:"border-box",color:"#1e2430"};
-const labelStyle={fontSize:11,fontFamily:"sans-serif",color:"#6b7280",marginBottom:4,display:"block",textTransform:"uppercase",letterSpacing:0.5};
+const fieldStyle={width:"100%",padding:"8px 10px",borderRadius:6,border:"1px solid var(--border-strong)",background:"var(--field-bg)",fontSize:13,fontFamily:"sans-serif",outline:"none",boxSizing:"border-box",color:"var(--field-ink)"};
+const labelStyle={fontSize:11,fontFamily:"sans-serif",color:"var(--muted)",marginBottom:4,display:"block",textTransform:"uppercase",letterSpacing:0.5};
 const mkBtn=(bg,color,extra)=>({padding:"8px 16px",background:bg,color:color||"#ffffff",border:"none",borderRadius:7,cursor:"pointer",fontSize:13,fontFamily:"sans-serif",...(extra||{})});
 
 function fmt12(t){
@@ -345,6 +378,11 @@ function App(){
   const[captureForm,setCaptureForm]=useState({text:"",section:"defer",context:"@anywhere",project:"",due:"",time:"",checklist:[]});
   const[archiveExpanded,setArchiveExpanded]=useState({});
   const[expandedTaskId,setExpandedTaskId]=useState(null);
+  const[darkMode,setDarkMode]=useState(()=>{try{return localStorage.getItem("gtd-theme")==="dark";}catch{return false;}});
+  useEffect(()=>{
+    document.documentElement.setAttribute("data-theme",darkMode?"dark":"light");
+    try{localStorage.setItem("gtd-theme",darkMode?"dark":"light");}catch{}
+  },[darkMode]);
   const[openChecklists,setOpenChecklists]=useState({});
   const toggleChecklistOpen=id=>setOpenChecklists(o=>({...o,[id]:!o[id]}));
   const addChecklistLine=itemId=>{
@@ -627,7 +665,7 @@ function App(){
     const isExpanded=expandedTaskId===item.id;
     return(
       <div className="task-card" onClick={()=>setExpandedTaskId(isExpanded?null:item.id)}
-        style={{background:item.done?"#f4f5f7":conflict?"#fdf0f0":"#ffffff",border:"1px solid "+(conflict?"#f0c8c8":"#e6e8ed"),borderLeft:"4px solid "+(item.done?"#9aa0ae":conflict?"#d13030":isOverdue(item.due)?"#a82d2d":isDueSoon(item.due)?"#d97706":"#5a9a5a"),borderRadius:10,padding:"13px 16px",marginBottom:8,opacity:item.done?0.72:1,cursor:"pointer",boxShadow:"var(--shadow-sm)"}}>
+        style={{background:item.done?"var(--surface-2)":conflict?"#fdf0f0":"var(--surface)",border:"1px solid "+(conflict?"#f0c8c8":"var(--border)"),borderLeft:"4px solid "+(item.done?"var(--muted-2)":conflict?"#d13030":isOverdue(item.due)?"#a82d2d":isDueSoon(item.due)?"#d97706":"#5a9a5a"),borderRadius:10,padding:"13px 16px",marginBottom:8,opacity:item.done?0.72:1,cursor:"pointer",boxShadow:"var(--shadow-sm)",color:"var(--ink)"}}>
         <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
           {showCheck&&<input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:17,height:17,cursor:"pointer",accentColor:"#1e2430",flexShrink:0,marginTop:3}}/>}
           <div style={{flex:1,minWidth:0}}>
@@ -655,7 +693,7 @@ function App(){
   const navSections=[...SECTIONS,"calendar","review"];
 
   return(
-    <div className="app-wrapper" style={{display:"flex",minHeight:"100vh",fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",background:IC[view]?IC[view].bg+"1A":"#f5f5f0",color:"#1e2430"}}>
+    <div className="app-wrapper" style={{display:"flex",minHeight:"100vh",fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",background:IC[view]?IC[view].bg+(darkMode?"15":"1A"):"var(--bg)",color:"var(--ink)"}}>
       {/* Mobile bottom tab bar (horizontally scrollable) */}
       <div className="bottom-tabs">
         {["inbox","twomin","defer","delegate","projects","someday","reference","trash","calendar","review"].map(s=>{
@@ -685,8 +723,20 @@ function App(){
       {/* Sidebar */}
       <div className={"sidebar"+(drawerOpen?" drawer-open":"")} style={{width:230,background:"#1e2430",color:"#e8ecf2",padding:"24px 0",display:"flex",flexDirection:"column",flexShrink:0,position:"sticky",top:0,height:"100vh",overflowY:"auto"}}>
         <div className="sidebar-header" style={{padding:"0 20px 20px",borderBottom:"1px solid #2e3a50"}}>
-          <div style={{fontSize:20,fontWeight:"bold",letterSpacing:1,color:"#ffffff"}}>GTD</div>
-          <div style={{fontSize:11,color:"#7a8aaa",marginTop:4}}>Getting Things Done</div>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+            <div>
+              <div style={{fontSize:20,fontWeight:"bold",letterSpacing:1,color:"#ffffff"}}>GTD</div>
+              <div style={{fontSize:11,color:"#7a8aaa",marginTop:4}}>Getting Things Done</div>
+            </div>
+            <button onClick={()=>setDarkMode(d=>!d)} title={darkMode?"Switch to light mode":"Switch to dark mode"}
+              style={{width:36,height:36,borderRadius:10,border:"1px solid #3a4a65",background:"#2a3245",color:"#e8ecf2",cursor:"pointer",display:"grid",placeItems:"center",flexShrink:0,padding:0}}>
+              {darkMode?(
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffd57a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+              ):(
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#7a8aaa" stroke="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              )}
+            </button>
+          </div>
         </div>
         <div className="sidebar-nav" style={{padding:"12px 0",flex:1}}>
           {navSections.map(s=>{
@@ -779,8 +829,8 @@ style={{
               const isExpanded=expandedTaskId===item.id;
               return(
               <div key={item.id} className="task-card" onClick={()=>setExpandedTaskId(isExpanded?null:item.id)}
-                style={{background:"#ffffff",border:"1px solid #e6e8ed",borderLeft:"4px solid "+IC.inbox.bg,borderRadius:10,padding:"13px 16px",marginBottom:8,cursor:"pointer",boxShadow:"var(--shadow-sm)"}}>
-                <div style={{fontSize:15,color:"#1a1f2c",wordBreak:"break-word",overflowWrap:"anywhere",lineHeight:"1.35"}}>{item.text}</div>
+                style={{background:"var(--surface)",border:"1px solid var(--border)",borderLeft:"4px solid "+IC.inbox.bg,borderRadius:10,padding:"13px 16px",marginBottom:8,cursor:"pointer",boxShadow:"var(--shadow-sm)"}}>
+                <div style={{fontSize:15,color:"var(--ink)",wordBreak:"break-word",overflowWrap:"anywhere",lineHeight:"1.35"}}>{item.text}</div>
                 {isExpanded&&(
                   <div onClick={e=>e.stopPropagation()} style={{display:"flex",gap:6,marginTop:10,paddingTop:10,borderTop:"1px dashed #cdd0d6"}}>
                     <button className="btn-3d" onClick={()=>openClarify(item)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(74,127,165,0.18)",color:"#2d4a6a",flex:1}}>Clarify</button>
@@ -1148,7 +1198,7 @@ style={{
       {/* CLARIFY MODAL */}
       {clarifyItem&&(
         <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
-          <div className="modal-box" style={{background:"#ffffff",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.18)",maxHeight:"90vh",overflowY:"auto"}}>
+          <div className="modal-box" style={{background:"var(--surface)",color:"var(--ink)",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.32)",maxHeight:"90vh",overflowY:"auto"}}>
             <h3 style={{margin:"0 0 14px",fontSize:18,display:"flex",alignItems:"center",gap:8,color:"#1e2430"}}>
               <Icons.inbox size={18} color={IC.inbox.bg}/>
               Clarify Item
@@ -1251,7 +1301,7 @@ style={{
       {/* EDIT MODAL */}
       {editItem&&(
         <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
-          <div className="modal-box" style={{background:"#ffffff",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.18)",maxHeight:"90vh",overflowY:"auto"}}>
+          <div className="modal-box" style={{background:"var(--surface)",color:"var(--ink)",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.32)",maxHeight:"90vh",overflowY:"auto"}}>
             <h3 style={{margin:"0 0 16px",fontSize:18,color:"#1e2430"}}>Edit Item</h3>
             <EditFields form={editForm} setForm={setEditForm} showSection={editItem.section!=="inbox"} projects={data.projects} showChecklist={false}/>
             {["twomin","defer","delegate"].includes(editForm.section)&&(
@@ -1273,7 +1323,7 @@ style={{
       {/* CAPTURE TO SECTION MODAL */}
       {captureModal&&(
         <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
-          <div className="modal-box" style={{background:"#ffffff",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.18)",maxHeight:"90vh",overflowY:"auto"}}>
+          <div className="modal-box" style={{background:"var(--surface)",color:"var(--ink)",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.32)",maxHeight:"90vh",overflowY:"auto"}}>
             <h3 style={{margin:"0 0 16px",fontSize:18,display:"flex",alignItems:"center",gap:8,color:"#1e2430"}}>
               {sectionIcons[captureModal]&&React.createElement(sectionIcons[captureModal],{size:18,color:navIconColor[captureModal]||"#4a7fa5"})}
               Capture to {sectionLabels[captureModal]}
@@ -1290,7 +1340,7 @@ style={{
       {/* ADD TASK MODAL */}
       {addTaskModal&&(
         <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
-          <div className="modal-box" style={{background:"#ffffff",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.18)",maxHeight:"90vh",overflowY:"auto"}}>
+          <div className="modal-box" style={{background:"var(--surface)",color:"var(--ink)",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.32)",maxHeight:"90vh",overflowY:"auto"}}>
             <h3 style={{margin:"0 0 16px",fontSize:18,display:"flex",alignItems:"center",gap:8,color:"#1e2430"}}>
               <Icons.projects size={18} color={IC.projects.bg}/>
               Add Task to Project
