@@ -747,10 +747,10 @@ style={{
 
       {/* Main */}
       <div className="main" style={{flex:1,padding:"32px 40px",maxWidth:900,overflowY:"auto",background:"transparent"}}>
-        <div className="capture-bar" style={{display:"flex",gap:10,marginBottom:32,alignItems:"flex-start"}}>
+        <div className="capture-bar" style={{display:"flex",gap:10,marginBottom:32,alignItems:"stretch"}}>
           <textarea ref={inputRef} className="capture-input" value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();addToInbox();}}} placeholder="Capture a thought, task, or idea..." rows={1}
             style={{flex:1,padding:"13px 16px",fontSize:15,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"#1a1f2c",resize:"none",overflow:"hidden",lineHeight:"1.4",minHeight:48,boxSizing:"border-box"}}/>
-          <button className="btn-3d" onClick={addToInbox} style={mkBtn("#1e2430",null,{padding:"12px 22px",fontSize:14})}>Capture</button>
+          <button className="btn-3d" onClick={addToInbox} style={mkBtn("#1e2430",null,{padding:"0 22px",fontSize:14,alignSelf:"stretch"})}>Capture</button>
         </div>
 
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:22,borderBottom:"1px solid #e6e8ed",paddingBottom:14,position:"relative"}}>
