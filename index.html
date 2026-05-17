@@ -276,7 +276,7 @@ function ProjectDropdown({value,onChange,projects}){
           {filtered.length===0&&<div style={{padding:"10px 12px",fontSize:13,color:"#9aa0ae",fontFamily:"sans-serif"}}>No projects found</div>}
           {filtered.map(p=>(
             <div key={p.id} onClick={()=>{onChange(p.name);setQuery(p.name);setOpen(false);}}
-              style={{padding:"9px 12px",fontSize:13,fontFamily:"sans-serif",cursor:"pointer",background:value===p.name?"#f0f4f8":"transparent",color:"#1e2430",display:"flex",alignItems:"center",gap:7,borderBottom:"1px solid #f0f1f3"}}
+              style={{padding:"9px 12px",fontSize:13,fontFamily:"sans-serif",cursor:"pointer",background:value===p.name?"#f0f4f8":"transparent",color:"var(--ink)",display:"flex",alignItems:"center",gap:7,borderBottom:"1px solid #f0f1f3"}}
               onMouseEnter={e=>e.currentTarget.style.background="#f4f5f7"}
               onMouseLeave={e=>e.currentTarget.style.background=value===p.name?"#f0f4f8":"transparent"}>
               <Icons.folder size={12} color={IC.projects.bg}/>{p.name}
@@ -819,7 +819,7 @@ style={{
       <div className="main" style={{flex:1,padding:"32px 40px",maxWidth:900,overflowY:"auto",background:"transparent"}}>
         <div className="capture-bar" style={{display:"flex",gap:10,marginBottom:32,alignItems:"stretch"}}>
           <textarea ref={inputRef} className="capture-input" value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();addToInbox();}}} placeholder="Capture a thought, task, or idea..." rows={1}
-            style={{flex:1,padding:"13px 16px",fontSize:15,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"#1a1f2c",resize:"none",overflow:"hidden",lineHeight:"1.4",minHeight:48,boxSizing:"border-box"}}/>
+            style={{flex:1,padding:"13px 16px",fontSize:15,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"var(--ink)",resize:"none",overflow:"hidden",lineHeight:"1.4",minHeight:48,boxSizing:"border-box"}}/>
           <button className="btn-3d" onClick={addToInbox} style={mkBtn("var(--primary-bg)","var(--primary-ink)",{padding:"0 22px",fontSize:14,alignSelf:"stretch"})}>Capture</button>
         </div>
 
@@ -830,13 +830,16 @@ style={{
             {sectionLabels[view]}
           </h2>
           {view==="calendar"&&(
-            <div style={{display:"flex",gap:6}}>
-              {["month","week"].map(md=>(
-                <button key={md} onClick={()=>setCalMode(md)}
-                  style={{padding:"5px 14px",border:"2px solid "+(calMode===md?"#1e2430":"#cdd0d6"),borderRadius:6,background:calMode===md?"#1e2430":"#f5f5f0",color:calMode===md?"#ffffff":"#1e2430",cursor:"pointer",fontSize:12,fontFamily:"sans-serif"}}>
-                  {md==="month"?"Month":"Week"}
-                </button>
-              ))}
+            <div style={{display:"inline-flex",gap:0,padding:3,borderRadius:9,background:"var(--surface-2)",border:"1px solid var(--border)"}}>
+              {["month","week"].map(md=>{
+                const sel=calMode===md;
+                return(
+                  <button key={md} onClick={()=>setCalMode(md)}
+                    style={{padding:"6px 16px",border:"none",borderRadius:6,background:sel?"var(--primary-bg)":"transparent",color:sel?"var(--primary-ink)":"var(--muted)",cursor:"pointer",fontSize:12,fontFamily:"sans-serif",fontWeight:sel?"600":"normal",transition:"background var(--t),color var(--t)",boxShadow:sel?"0 1px 3px rgba(20,30,55,0.15)":"none"}}>
+                    {md==="month"?"Month":"Week"}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -1028,14 +1031,14 @@ style={{
         {/* CALENDAR MONTH */}
         {view==="calendar"&&calMode==="month"&&(
           <div style={{display:"flex",gap:28,flexWrap:"wrap"}}>
-            <div style={{flex:"1 1 100%",maxWidth:"100%",border:"1px solid #e6e8ed",borderRadius:10,padding:"14px 12px",background:"#ffffff"}}>
+            <div style={{flex:"1 1 100%",maxWidth:"100%",border:"1px solid var(--border)",borderRadius:10,padding:"14px 12px",background:"var(--surface)"}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
-                <button onClick={()=>{if(calMonth===0){setCalMonth(11);setCalYear(y=>y-1);}else setCalMonth(m=>m-1);}} style={mkBtn("#dde0e6","#1e2430",{padding:"6px 12px"})}>◀</button>
-                <span style={{fontWeight:"bold",fontSize:16,fontFamily:"sans-serif",color:"#1e2430"}}>{MONTHS[calMonth]+" "+calYear}</span>
-                <button onClick={()=>{if(calMonth===11){setCalMonth(0);setCalYear(y=>y+1);}else setCalMonth(m=>m+1);}} style={mkBtn("#dde0e6","#1e2430",{padding:"6px 12px"})}>▶</button>
+                <button onClick={()=>{if(calMonth===0){setCalMonth(11);setCalYear(y=>y-1);}else setCalMonth(m=>m-1);}} style={mkBtn("var(--surface-3)","var(--ink)",{padding:"6px 12px"})}>◀</button>
+                <span style={{fontWeight:"bold",fontSize:16,fontFamily:"sans-serif",color:"var(--ink)"}}>{MONTHS[calMonth]+" "+calYear}</span>
+                <button onClick={()=>{if(calMonth===11){setCalMonth(0);setCalYear(y=>y+1);}else setCalMonth(m=>m+1);}} style={mkBtn("var(--surface-3)","var(--ink)",{padding:"6px 12px"})}>▶</button>
               </div>
               <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:3,marginBottom:6}}>
-                {DAYS.map(d=><div key={d} style={{textAlign:"center",fontSize:11,fontFamily:"sans-serif",color:"#6b7280",fontWeight:"bold",padding:"4px 0"}}>{d}</div>)}
+                {DAYS.map(d=><div key={d} style={{textAlign:"center",fontSize:11,fontFamily:"sans-serif",color:"var(--muted)",fontWeight:"bold",padding:"4px 0"}}>{d}</div>)}
               </div>
               <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:3}}>
                 {Array(firstDay).fill(null).map((_,i)=><div key={"e"+i}/>)}
@@ -1046,7 +1049,7 @@ style={{
                   const isToday=ds===todayStr,isSel=ds===calDay;
                   return(
                     <div key={d} onClick={()=>setCalDay(isSel?null:ds)}
-                      style={{textAlign:"center",padding:"7px 2px",borderRadius:6,cursor:"pointer",fontSize:13,fontFamily:"sans-serif",position:"relative",background:isSel?"#1e2430":isToday?"rgba(74,127,165,0.15)":"transparent",color:isSel?"#ffffff":"#1e2430",border:isToday?"2px solid #4a7fa5":"2px solid transparent",fontWeight:isToday?"bold":"normal"}}>
+                      style={{textAlign:"center",padding:"7px 2px",borderRadius:6,cursor:"pointer",fontSize:13,fontFamily:"sans-serif",position:"relative",background:isSel?"var(--primary-bg)":isToday?"rgba(74,127,165,0.15)":"transparent",color:isSel?"var(--primary-ink)":"var(--ink)",border:isToday?"2px solid #4a7fa5":"2px solid transparent",fontWeight:isToday?"bold":"normal"}}>
                       {d}
                       {hasConflict&&<div style={{width:5,height:5,background:IC.trash.bg,borderRadius:"50%",position:"absolute",bottom:3,left:"50%",transform:"translateX(-50%)"}}/>}
                       {!hasConflict&&di.length>0&&<div style={{width:4,height:4,background:"#4a7fa5",borderRadius:"50%",position:"absolute",bottom:3,left:"50%",transform:"translateX(-50%)"}}/>}
@@ -1054,7 +1057,7 @@ style={{
                   );
                 })}
               </div>
-              <div style={{marginTop:10,display:"flex",gap:12,fontSize:11,fontFamily:"sans-serif",color:"#6b7280"}}>
+              <div style={{marginTop:10,display:"flex",gap:12,fontSize:11,fontFamily:"sans-serif",color:"var(--muted)"}}>
                 <span style={{display:"flex",alignItems:"center",gap:4}}><span style={{width:8,height:8,background:"#4a7fa5",borderRadius:"50%",display:"inline-block"}}/>Tasks</span>
                 <span style={{display:"flex",alignItems:"center",gap:4}}><span style={{width:8,height:8,background:IC.trash.bg,borderRadius:"50%",display:"inline-block"}}/>Conflict</span>
               </div>
@@ -1062,23 +1065,23 @@ style={{
             <div style={{flex:1,minWidth:220}}>
               {calDay?(
                 <React.Fragment>
-                  <div style={{fontWeight:"bold",fontSize:16,marginBottom:4,fontFamily:"sans-serif",color:"#1e2430"}}>{new Date(calDay+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</div>
+                  <div style={{fontWeight:"bold",fontSize:16,marginBottom:4,fontFamily:"sans-serif",color:"var(--ink)"}}>{new Date(calDay+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</div>
                   {selectedDayConflicts.size>0&&<div style={{background:IC.trash.light,border:`1px solid ${IC.trash.bg}`,borderRadius:7,padding:"8px 12px",marginBottom:12,fontSize:12,fontFamily:"sans-serif",color:IC.trash.text}}>Time conflict: {selectedDayConflicts.size} tasks overlap.</div>}
-                  {selectedDayItems.length===0&&<p style={{color:"#6b7280",fontStyle:"italic",fontSize:14}}>No tasks scheduled.</p>}
+                  {selectedDayItems.length===0&&<p style={{color:"var(--muted)",fontStyle:"italic",fontSize:14}}>No tasks scheduled.</p>}
                   {selectedDayItems.map((item,idx)=>(
-                    <div key={item.id} style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"#ffffff",border:"1px solid "+(selectedDayConflicts.has(item.id)?IC.trash.bg:"#cdd0d6"),borderRadius:8,padding:"10px 14px",marginBottom:8,display:"flex",gap:10,alignItems:"flex-start"}}>
+                    <div key={item.id} style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface)",border:"1px solid "+(selectedDayConflicts.has(item.id)?IC.trash.bg:"var(--border)"),borderRadius:8,padding:"10px 14px",marginBottom:8,display:"flex",gap:10,alignItems:"flex-start"}}>
                       <div style={{fontFamily:"sans-serif",fontSize:13,color:"#4a7fa5",fontWeight:"bold",minWidth:20}}>{idx+1}.</div>
                       <div style={{flex:1}}>
-                        <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",opacity:item.done?0.6:1,color:"#1e2430"}}>{item.text}</div>
-                        <div style={{fontSize:12,color:"#6b7280",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
-                          <span style={{background:"#dde0e6",borderRadius:3,padding:"1px 5px",color:"#3a4460"}}>{sectionLabels[item.section]}</span>
-                          {item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3}}><Icons.folder size={10} color="#6b7280"/>{item.project}</span>}
-                          {item.time&&<span style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"#dde0e6",borderRadius:4,padding:"1px 5px",color:selectedDayConflicts.has(item.id)?IC.trash.text:"#3a4460",fontWeight:selectedDayConflicts.has(item.id)?"bold":"normal"}}>{(selectedDayConflicts.has(item.id)?"⚠ ":"")+fmt12(item.time)}</span>}
+                        <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",opacity:item.done?0.6:1,color:"var(--ink)"}}>{item.text}</div>
+                        <div style={{fontSize:12,color:"var(--muted)",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+                          <span style={{background:"var(--surface-3)",borderRadius:3,padding:"1px 5px",color:"var(--ink-2)"}}>{sectionLabels[item.section]}</span>
+                          {item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3}}><Icons.folder size={10} color="var(--muted)"/>{item.project}</span>}
+                          {item.time&&<span style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface-3)",borderRadius:4,padding:"1px 5px",color:selectedDayConflicts.has(item.id)?IC.trash.text:"var(--ink-2)",fontWeight:selectedDayConflicts.has(item.id)?"bold":"normal"}}>{(selectedDayConflicts.has(item.id)?"⚠ ":"")+fmt12(item.time)}</span>}
                         </div>
                       </div>
                       <div style={{display:"flex",gap:5}}>
                         <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:15,height:15,cursor:"pointer",accentColor:"#1e2430"}}/>
-                        <button onClick={()=>openEdit(item)} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Edit</button>
+                        <button onClick={()=>openEdit(item)} style={{padding:"4px 8px",fontSize:11,border:"none",borderRadius:6,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-edit-bg)",color:"var(--btn-edit-ink)"}}>Edit</button>
                       </div>
                     </div>
                   ))}
@@ -1099,12 +1102,12 @@ style={{
           return(
             <div>
               <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
-                <button onClick={prevWeek} style={mkBtn("#dde0e6","#1e2430",{padding:"6px 12px"})}>◀</button>
-                <button onClick={goToday} style={mkBtn("#dde0e6","#1e2430",{padding:"6px 12px",fontSize:12})}>Today</button>
-                <span style={{fontWeight:"bold",fontSize:15,fontFamily:"sans-serif",flex:1,textAlign:"center",color:"#1e2430"}}>{wLabel}</span>
-                <button onClick={nextWeek} style={mkBtn("#dde0e6","#1e2430",{padding:"6px 12px"})}>▶</button>
+                <button onClick={prevWeek} style={mkBtn("var(--surface-3)","var(--ink)",{padding:"6px 12px"})}>◀</button>
+                <button onClick={goToday} style={mkBtn("var(--surface-3)","var(--ink)",{padding:"6px 12px",fontSize:12})}>Today</button>
+                <span style={{fontWeight:"bold",fontSize:15,fontFamily:"sans-serif",flex:1,textAlign:"center",color:"var(--ink)"}}>{wLabel}</span>
+                <button onClick={nextWeek} style={mkBtn("var(--surface-3)","var(--ink)",{padding:"6px 12px"})}>▶</button>
               </div>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:0,border:"1px solid #dde0e6",borderRadius:10,overflow:"hidden"}}>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:0,border:"1px solid var(--border)",borderRadius:10,overflow:"hidden",background:"var(--surface)"}}>
                 {weekDays.map((dayObj,idx)=>{
                   const ds=toDateStr(dayObj.getFullYear(),dayObj.getMonth(),dayObj.getDate());
                   const isToday=ds===todayStr;
@@ -1114,22 +1117,22 @@ style={{
                   const hasConflict=dayConflicts.size>0;
                   return(
                     <div key={ds} onClick={()=>setCalDay(isSel?null:ds)}
-                      style={{background:isSel?"rgba(30,36,48,0.05)":"#ffffff",borderLeft:idx===0?"none":"1px solid #dde0e6",minHeight:140,cursor:"pointer",transition:"background 0.15s",position:"relative",minWidth:0,overflow:"hidden"}}>
-                      {isSel&&<div style={{position:"absolute",top:0,left:0,right:0,height:3,background:"#1e2430"}}/>}
-                      <div style={{padding:"6px 4px",background:isSel?"#1e2430":hasConflict?IC.trash.light:isToday?"rgba(74,127,165,0.12)":"#f4f5f7",borderBottom:"1px solid #dde0e6",textAlign:"center"}}>
-                        <div style={{fontSize:10,fontFamily:"sans-serif",color:isSel?"rgba(255,255,255,0.75)":hasConflict?IC.trash.text:"#6b7280",textTransform:"uppercase",letterSpacing:0.4}}>{DAYS[dayObj.getDay()]+(hasConflict?" ⚠":"")}</div>
-                        <div style={{fontSize:15,fontWeight:isToday||isSel?"bold":"normal",fontFamily:"sans-serif",color:isSel?"#ffffff":"#1e2430"}}>{dayObj.getDate()}</div>
+                      style={{background:isSel?"var(--surface-3)":"var(--surface)",borderLeft:idx===0?"none":"1px solid var(--border)",minHeight:140,cursor:"pointer",transition:"background 0.15s",position:"relative",minWidth:0,overflow:"hidden"}}>
+                      {isSel&&<div style={{position:"absolute",top:0,left:0,right:0,height:3,background:"var(--primary-bg)"}}/>}
+                      <div style={{padding:"6px 4px",background:isSel?"var(--primary-bg)":hasConflict?IC.trash.light:isToday?"rgba(74,127,165,0.18)":"var(--surface-2)",borderBottom:"1px solid var(--border)",textAlign:"center"}}>
+                        <div style={{fontSize:10,fontFamily:"sans-serif",color:isSel?"rgba(255,255,255,0.75)":hasConflict?IC.trash.text:"var(--muted)",textTransform:"uppercase",letterSpacing:0.4}}>{DAYS[dayObj.getDay()]+(hasConflict?" ⚠":"")}</div>
+                        <div style={{fontSize:15,fontWeight:isToday||isSel?"bold":"normal",fontFamily:"sans-serif",color:isSel?"var(--primary-ink)":"var(--ink)"}}>{dayObj.getDate()}</div>
                       </div>
                       <div style={{padding:"4px 3px"}}>
-                        {di.length===0&&<div style={{fontSize:11,color:"#b0b5c0",fontStyle:"italic",textAlign:"center",marginTop:6,fontFamily:"sans-serif"}}>–</div>}
+                        {di.length===0&&<div style={{fontSize:11,color:"var(--muted-2)",fontStyle:"italic",textAlign:"center",marginTop:6,fontFamily:"sans-serif"}}>–</div>}
                         {di.map(item=>{
                           const isConflict=dayConflicts.has(item.id);
                           return(
                             <div key={item.id}
-                              style={{background:isConflict?IC.trash.light:item.done?"#eceef2":(sectionColor[item.section]||"#4a7fa5")+"18",
+                              style={{background:isConflict?IC.trash.light:item.done?"var(--surface-3)":(sectionColor[item.section]||"#4a7fa5")+"22",
                                 borderLeft:"3px solid "+(isConflict?IC.trash.bg:sectionColor[item.section]||"#4a7fa5"),
                                 borderRadius:3,padding:"3px 4px",marginBottom:3,opacity:item.done?0.5:1,pointerEvents:"none"}}>
-                              <div style={{fontSize:10,fontFamily:"sans-serif",lineHeight:1.25,textDecoration:item.done?"line-through":"none",overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",color:"#1e2430",wordBreak:"break-all",overflowWrap:"anywhere"}}>
+                              <div style={{fontSize:10,fontFamily:"sans-serif",lineHeight:1.25,textDecoration:item.done?"line-through":"none",overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",color:"var(--ink)",wordBreak:"break-all",overflowWrap:"anywhere"}}>
                                 {(isConflict?"⚠ ":"")+item.text}
                               </div>
                             </div>
@@ -1141,24 +1144,24 @@ style={{
                 })}
               </div>
               {calDay&&weekDays.some(d=>toDateStr(d.getFullYear(),d.getMonth(),d.getDate())===calDay)&&(
-                <div style={{marginTop:20,paddingTop:16,borderTop:"1px solid #e6e8ed"}}>
-                  <div style={{fontWeight:"bold",fontSize:16,marginBottom:8,fontFamily:"sans-serif",color:"#1e2430"}}>{new Date(calDay+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</div>
+                <div style={{marginTop:20,paddingTop:16,borderTop:"1px solid var(--border)"}}>
+                  <div style={{fontWeight:"bold",fontSize:16,marginBottom:8,fontFamily:"sans-serif",color:"var(--ink)"}}>{new Date(calDay+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</div>
                   {selectedDayConflicts.size>0&&<div style={{background:IC.trash.light,border:`1px solid ${IC.trash.bg}`,borderRadius:7,padding:"8px 12px",marginBottom:12,fontSize:12,fontFamily:"sans-serif",color:IC.trash.text}}>Time conflict: {selectedDayConflicts.size} tasks overlap.</div>}
-                  {selectedDayItems.length===0&&<p style={{color:"#6b7280",fontStyle:"italic",fontSize:14}}>No tasks scheduled.</p>}
+                  {selectedDayItems.length===0&&<p style={{color:"var(--muted)",fontStyle:"italic",fontSize:14}}>No tasks scheduled.</p>}
                   {selectedDayItems.map((item,idx)=>(
-                    <div key={item.id} style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"#ffffff",border:"1px solid "+(selectedDayConflicts.has(item.id)?IC.trash.bg:"#cdd0d6"),borderRadius:8,padding:"10px 14px",marginBottom:8,display:"flex",gap:10,alignItems:"flex-start"}}>
+                    <div key={item.id} style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface)",border:"1px solid "+(selectedDayConflicts.has(item.id)?IC.trash.bg:"var(--border)"),borderRadius:8,padding:"10px 14px",marginBottom:8,display:"flex",gap:10,alignItems:"flex-start"}}>
                       <div style={{fontFamily:"sans-serif",fontSize:13,color:"#4a7fa5",fontWeight:"bold",minWidth:20}}>{idx+1}.</div>
                       <div style={{flex:1,minWidth:0}}>
-                        <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",opacity:item.done?0.6:1,color:"#1e2430",wordBreak:"break-word"}}>{item.text}</div>
-                        <div style={{fontSize:12,color:"#6b7280",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
-                          <span style={{background:"#dde0e6",borderRadius:3,padding:"1px 5px",color:"#3a4460"}}>{sectionLabels[item.section]}</span>
-                          {item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3}}><Icons.folder size={10} color="#6b7280"/>{item.project}</span>}
-                          {item.time&&<span style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"#dde0e6",borderRadius:4,padding:"1px 5px",color:selectedDayConflicts.has(item.id)?IC.trash.text:"#3a4460",fontWeight:selectedDayConflicts.has(item.id)?"bold":"normal"}}>{(selectedDayConflicts.has(item.id)?"⚠ ":"")+fmt12(item.time)}</span>}
+                        <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",opacity:item.done?0.6:1,color:"var(--ink)",wordBreak:"break-word"}}>{item.text}</div>
+                        <div style={{fontSize:12,color:"var(--muted)",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+                          <span style={{background:"var(--surface-3)",borderRadius:3,padding:"1px 5px",color:"var(--ink-2)"}}>{sectionLabels[item.section]}</span>
+                          {item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3}}><Icons.folder size={10} color="var(--muted)"/>{item.project}</span>}
+                          {item.time&&<span style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface-3)",borderRadius:4,padding:"1px 5px",color:selectedDayConflicts.has(item.id)?IC.trash.text:"var(--ink-2)",fontWeight:selectedDayConflicts.has(item.id)?"bold":"normal"}}>{(selectedDayConflicts.has(item.id)?"⚠ ":"")+fmt12(item.time)}</span>}
                         </div>
                       </div>
                       <div style={{display:"flex",gap:5,flexShrink:0}}>
                         <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:15,height:15,cursor:"pointer",accentColor:"#1e2430"}}/>
-                        <button onClick={()=>openEdit(item)} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Edit</button>
+                        <button onClick={()=>openEdit(item)} style={{padding:"4px 8px",fontSize:11,border:"none",borderRadius:6,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-edit-bg)",color:"var(--btn-edit-ink)"}}>Edit</button>
                       </div>
                     </div>
                   ))}
@@ -1168,7 +1171,7 @@ style={{
                 {Object.entries(sectionColor).filter(([s])=>s!=="trash").map(([s,c])=>{
                   const LegIcon=sectionIcons[s];
                   return(
-                    <div key={s} style={{display:"flex",alignItems:"center",gap:4,fontSize:11,fontFamily:"sans-serif",color:"#3a4460"}}>
+                    <div key={s} style={{display:"flex",alignItems:"center",gap:4,fontSize:11,fontFamily:"sans-serif",color:"var(--ink-2)"}}>
                       {LegIcon&&<LegIcon size={11} color={navIconColor[s]||c}/>}
                       {sectionLabels[s]}
                     </div>
@@ -1204,7 +1207,7 @@ style={{
                     {StepIcon&&<StepIcon size={18} color={pal.bg}/>}
                   </div>
                   <div style={{flex:1}}>
-                    <div style={{fontWeight:"bold",fontSize:15,marginBottom:4,color:"#1e2430"}}>{step.title}</div>
+                    <div style={{fontWeight:"bold",fontSize:15,marginBottom:4,color:"var(--ink)"}}>{step.title}</div>
                     <div style={{fontSize:14,color:"#3a4460",lineHeight:1.6}}>{step.desc}</div>
                     {step.action&&<button onClick={step.action} style={{...mkBtn(pal.bg,"#fff",{marginTop:10,display:"inline-flex",alignItems:"center",gap:6})}}>{step.label}</button>}
                   </div>
@@ -1219,7 +1222,7 @@ style={{
       {clarifyItem&&(
         <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
           <div className="modal-box" style={{background:"var(--surface)",color:"var(--ink)",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.32)",maxHeight:"90vh",overflowY:"auto"}}>
-            <h3 style={{margin:"0 0 14px",fontSize:18,display:"flex",alignItems:"center",gap:8,color:"#1e2430"}}>
+            <h3 style={{margin:"0 0 14px",fontSize:18,display:"flex",alignItems:"center",gap:8,color:"var(--ink)"}}>
               <Icons.inbox size={18} color={IC.inbox.bg}/>
               Clarify Item
             </h3>
@@ -1322,7 +1325,7 @@ style={{
       {editItem&&(
         <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
           <div className="modal-box" style={{background:"var(--surface)",color:"var(--ink)",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.32)",maxHeight:"90vh",overflowY:"auto"}}>
-            <h3 style={{margin:"0 0 16px",fontSize:18,color:"#1e2430"}}>Edit Item</h3>
+            <h3 style={{margin:"0 0 16px",fontSize:18,color:"var(--ink)"}}>Edit Item</h3>
             <EditFields form={editForm} setForm={setEditForm} showSection={editItem.section!=="inbox"} projects={data.projects} showChecklist={false}/>
             {["twomin","defer","delegate"].includes(editForm.section)&&(
               <div style={{marginBottom:14}}>
@@ -1344,7 +1347,7 @@ style={{
       {captureModal&&(
         <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
           <div className="modal-box" style={{background:"var(--surface)",color:"var(--ink)",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.32)",maxHeight:"90vh",overflowY:"auto"}}>
-            <h3 style={{margin:"0 0 16px",fontSize:18,display:"flex",alignItems:"center",gap:8,color:"#1e2430"}}>
+            <h3 style={{margin:"0 0 16px",fontSize:18,display:"flex",alignItems:"center",gap:8,color:"var(--ink)"}}>
               {sectionIcons[captureModal]&&React.createElement(sectionIcons[captureModal],{size:18,color:navIconColor[captureModal]||"#4a7fa5"})}
               Capture to {sectionLabels[captureModal]}
             </h3>
@@ -1361,7 +1364,7 @@ style={{
       {addTaskModal&&(
         <div className="modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}>
           <div className="modal-box" style={{background:"var(--surface)",color:"var(--ink)",borderRadius:12,padding:28,width:480,maxWidth:"95vw",boxShadow:"0 8px 40px rgba(0,0,0,0.32)",maxHeight:"90vh",overflowY:"auto"}}>
-            <h3 style={{margin:"0 0 16px",fontSize:18,display:"flex",alignItems:"center",gap:8,color:"#1e2430"}}>
+            <h3 style={{margin:"0 0 16px",fontSize:18,display:"flex",alignItems:"center",gap:8,color:"var(--ink)"}}>
               <Icons.projects size={18} color={IC.projects.bg}/>
               Add Task to Project
             </h3>
