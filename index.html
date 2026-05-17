@@ -37,22 +37,42 @@
   --field-ink:#1a1f2c;
   --topbar-bg:#2c3245;
   --topbar-ink:#f4ede2;
+  --primary-bg:#1e2430;
+  --primary-ink:#ffffff;
+  --btn-edit-ink:#2d4a6a;
+  --btn-edit-bg:rgba(74,127,165,0.18);
+  --btn-del-ink:#8a2020;
+  --btn-del-bg:rgba(209,48,48,0.15);
+  --btn-cl-ink:#7a2800;
+  --btn-cl-bg:rgba(224,90,0,0.16);
+  --btn-restore-ink:#2d5e2d;
+  --btn-restore-bg:rgba(90,154,90,0.18);
 }
 [data-theme="dark"]{
-  --bg:#10141d;
-  --surface:#1a1f2c;
-  --surface-2:#222836;
-  --surface-3:#2a3142;
-  --ink:#e6e8ed;
-  --ink-2:#c0c4cf;
-  --muted:#8a8f9e;
-  --muted-2:#6b7280;
-  --border:#2c3245;
-  --border-strong:#3d4356;
-  --field-bg:#222836;
-  --field-ink:#e6e8ed;
+  --bg:#0d1119;
+  --surface:#222837;
+  --surface-2:#2c3346;
+  --surface-3:#363e54;
+  --ink:#eef0f5;
+  --ink-2:#c8ccd6;
+  --muted:#9aa0ae;
+  --muted-2:#8a8f9e;
+  --border:#3a4256;
+  --border-strong:#4a5366;
+  --field-bg:#2c3346;
+  --field-ink:#eef0f5;
   --topbar-bg:#070a10;
   --topbar-ink:#e8d8b5;
+  --primary-bg:#4a6ea3;
+  --primary-ink:#ffffff;
+  --btn-edit-ink:#9bc4e8;
+  --btn-edit-bg:rgba(74,127,165,0.30);
+  --btn-del-ink:#f0a0a0;
+  --btn-del-bg:rgba(209,48,48,0.28);
+  --btn-cl-ink:#ffb27a;
+  --btn-cl-bg:rgba(224,90,0,0.28);
+  --btn-restore-ink:#9ed09e;
+  --btn-restore-bg:rgba(90,154,90,0.28);
   --shadow-sm:0 1px 2px rgba(0,0,0,0.35), 0 1px 0 rgba(0,0,0,0.25);
   --shadow-md:0 2px 6px rgba(0,0,0,0.45), 0 6px 18px rgba(0,0,0,0.4);
   --shadow-lg:0 10px 32px rgba(0,0,0,0.55);
@@ -74,7 +94,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .btn-3d:active{box-shadow:0 1px 2px rgba(20,30,55,0.10), inset 0 1px 0 rgba(20,30,55,0.10);transform:translateY(0);}
 .nav-item{transition:background var(--t),color var(--t),border-color var(--t);}
 .nav-item:hover{background:rgba(255,255,255,0.04);}
-.capture-input{border:1px solid var(--border)!important;background:var(--surface)!important;color:var(--ink)!important;border-radius:10px!important;box-shadow:var(--shadow-sm);transition:border-color var(--t),box-shadow var(--t);}
+.capture-input{border:1px solid var(--border)!important;background:var(--field-bg)!important;color:var(--ink)!important;border-radius:10px!important;box-shadow:var(--shadow-sm);transition:border-color var(--t),box-shadow var(--t);}
 .capture-input:focus{border-color:#bcd0ec!important;box-shadow:0 0 0 4px rgba(59,130,246,0.10),var(--shadow-sm);}
 .mobile-topbar{display:none;}
 .drawer-overlay{display:none;}
@@ -633,7 +653,7 @@ function App(){
           </button>
           <button onClick={e=>{e.stopPropagation();addChecklistLine(item.id);}}
             title="Add checklist item"
-            style={{background:"rgba(224,90,0,0.16)",color:"#7a2800",border:"none",borderRadius:7,cursor:"pointer",padding:"3px 10px",fontSize:12,fontFamily:"sans-serif",fontWeight:"bold",lineHeight:1.3}}>ADD</button>
+            style={{background:"var(--btn-cl-bg)",color:"var(--btn-cl-ink)",border:"none",borderRadius:7,cursor:"pointer",padding:"3px 10px",fontSize:12,fontFamily:"sans-serif",fontWeight:"bold",lineHeight:1.3}}>ADD</button>
         </div>
         {open&&cl.length>0&&(
           <div style={{marginTop:6,paddingLeft:4}}>
@@ -679,11 +699,11 @@ function App(){
         {!item.done&&cl.length>0&&<div onClick={e=>e.stopPropagation()}><InlineChecklist item={item}/></div>}
         {isExpanded&&(
           <div onClick={e=>e.stopPropagation()} style={{display:"flex",gap:6,marginTop:10,paddingTop:10,borderTop:"1px dashed #cdd0d6"}}>
-            <button className="btn-3d" onClick={()=>openEdit(item)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(74,127,165,0.18)",color:"#2d4a6a",flex:1}}>Edit</button>
-            {view!=="trash"&&<button className="btn-3d" onClick={()=>trashItem(item.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.15)",color:"#8a2020",flex:1}}>Delete</button>}
-            {view!=="trash"&&!item.done&&cl.length===0&&<button className="btn-3d" onClick={()=>{addChecklistLine(item.id);}} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(224,90,0,0.16)",color:"#7a2800",flex:1}}>Add Checklist</button>}
-            {view==="trash"&&<button className="btn-3d" onClick={()=>restoreItem(item.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d",flex:1}}>Restore</button>}
-            {view==="trash"&&<button className="btn-3d" onClick={()=>deleteItem(item.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.22)",color:"#8a2020",flex:1}}>Delete</button>}
+            <button className="btn-3d" onClick={()=>openEdit(item)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-edit-bg)",color:"var(--btn-edit-ink)",flex:1}}>Edit</button>
+            {view!=="trash"&&<button className="btn-3d" onClick={()=>trashItem(item.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-del-bg)",color:"var(--btn-del-ink)",flex:1}}>Delete</button>}
+            {view!=="trash"&&!item.done&&cl.length===0&&<button className="btn-3d" onClick={()=>{addChecklistLine(item.id);}} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-cl-bg)",color:"var(--btn-cl-ink)",flex:1}}>Add Checklist</button>}
+            {view==="trash"&&<button className="btn-3d" onClick={()=>restoreItem(item.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-restore-bg)",color:"var(--btn-restore-ink)",flex:1}}>Restore</button>}
+            {view==="trash"&&<button className="btn-3d" onClick={()=>deleteItem(item.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-del-bg)",color:"var(--btn-del-ink)",flex:1}}>Delete</button>}
           </div>
         )}
       </div>
@@ -800,12 +820,12 @@ style={{
         <div className="capture-bar" style={{display:"flex",gap:10,marginBottom:32,alignItems:"stretch"}}>
           <textarea ref={inputRef} className="capture-input" value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();addToInbox();}}} placeholder="Capture a thought, task, or idea..." rows={1}
             style={{flex:1,padding:"13px 16px",fontSize:15,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"#1a1f2c",resize:"none",overflow:"hidden",lineHeight:"1.4",minHeight:48,boxSizing:"border-box"}}/>
-          <button className="btn-3d" onClick={addToInbox} style={mkBtn("#1e2430",null,{padding:"0 22px",fontSize:14,alignSelf:"stretch"})}>Capture</button>
+          <button className="btn-3d" onClick={addToInbox} style={mkBtn("var(--primary-bg)","var(--primary-ink)",{padding:"0 22px",fontSize:14,alignSelf:"stretch"})}>Capture</button>
         </div>
 
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:22,borderBottom:"1px solid #e6e8ed",paddingBottom:14,position:"relative"}}>
           <div style={{position:"absolute",left:0,bottom:-1,width:80,height:3,background:navIconColor[view]||"#cdd0d6",borderRadius:3}}/>
-          <h2 style={{margin:0,fontSize:22,fontWeight:600,letterSpacing:"-0.015em",display:"flex",alignItems:"center",gap:12,color:"#1a1f2c"}}>
+          <h2 style={{margin:0,fontSize:22,fontWeight:600,letterSpacing:"-0.015em",display:"flex",alignItems:"center",gap:12,color:"var(--ink)"}}>
             {sectionIcons[view]&&<span style={{display:"grid",placeItems:"center",width:32,height:32,borderRadius:8,background:(navIconColor[view]||"#4a7fa5")+"1F"}}>{React.createElement(sectionIcons[view],{size:18,color:navIconColor[view]||"#4a7fa5"})}</span>}
             {sectionLabels[view]}
           </h2>
@@ -833,8 +853,8 @@ style={{
                 <div style={{fontSize:15,color:"var(--ink)",wordBreak:"break-word",overflowWrap:"anywhere",lineHeight:"1.35"}}>{item.text}</div>
                 {isExpanded&&(
                   <div onClick={e=>e.stopPropagation()} style={{display:"flex",gap:6,marginTop:10,paddingTop:10,borderTop:"1px dashed #cdd0d6"}}>
-                    <button className="btn-3d" onClick={()=>openClarify(item)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(74,127,165,0.18)",color:"#2d4a6a",flex:1}}>Clarify</button>
-                    <button className="btn-3d" onClick={()=>trashItem(item.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.15)",color:"#8a2020",flex:1}}>Delete</button>
+                    <button className="btn-3d" onClick={()=>openClarify(item)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-edit-bg)",color:"var(--btn-edit-ink)",flex:1}}>Clarify</button>
+                    <button className="btn-3d" onClick={()=>trashItem(item.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-del-bg)",color:"var(--btn-del-ink)",flex:1}}>Delete</button>
                   </div>
                 )}
               </div>
@@ -895,13 +915,13 @@ style={{
           <div>
             <div style={{display:"flex",gap:10,marginBottom:24}}>
               <input value={newProject} onChange={e=>setNewProject(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addProject()} placeholder="New project name..."
-                style={{flex:1,padding:"10px 14px",borderRadius:7,border:"1px solid #cdd0d6",background:"#ffffff",fontSize:14,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"#1e2430"}}/>
-              <button className="btn-3d" onClick={addProject} style={mkBtn("#1e2430",null,{padding:"10px 18px",display:"flex",alignItems:"center",gap:6})}>
+                style={{flex:1,padding:"10px 14px",borderRadius:7,border:"1px solid var(--border-strong)",background:"var(--surface)",fontSize:14,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"var(--ink)"}}/>
+              <button className="btn-3d" onClick={addProject} style={mkBtn("var(--primary-bg)","var(--primary-ink)",{padding:"10px 18px",display:"flex",alignItems:"center",gap:6})}>
                 <Icons.projects size={14} color="#ffffff"/>
                 Add Project
               </button>
             </div>
-            {data.projects.length===0&&<p style={{color:"#6b7280",fontStyle:"italic"}}>No projects yet.</p>}
+            {data.projects.length===0&&<p style={{color:"var(--muted)",fontStyle:"italic"}}>No projects yet.</p>}
             {data.projects.filter(p=>!p.archived).map(p=>{
               const tasks=data.items.filter(i=>i.project===p.name&&i.section!=="trash");
               const done=tasks.filter(i=>i.done).length;
@@ -909,19 +929,19 @@ style={{
               const grouped={};
               tasks.forEach(t=>{if(!grouped[t.section])grouped[t.section]=[];grouped[t.section].push(t);});
               return(
-                <div key={p.id} style={{background:"#ffffff",border:"1px solid #cdd0d6",borderRadius:10,marginBottom:14,overflow:"hidden"}}>
+                <div key={p.id} style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,marginBottom:14,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
                   <div style={{padding:"14px 18px",display:"flex",alignItems:"center",gap:12,cursor:"pointer"}} onClick={()=>setExpandedProject(isOpen?null:p.id)}>
                     <span style={{display:"flex",alignItems:"center",marginTop:1}}>
-                      <Icons.folder size={17} color={isOpen?IC.projects.bg:"#9aa0ae"}/>
+                      <Icons.folder size={17} color={isOpen?IC.projects.bg:"var(--muted-2)"}/>
                     </span>
-                    <span style={{fontSize:16,flex:1,fontWeight:isOpen?"bold":"normal",color:"#1e2430"}}>{p.name}</span>
-                    <span style={{fontSize:12,color:"#6b7280",fontFamily:"sans-serif"}}>{done}/{tasks.length} done</span>
-                    {tasks.length>0&&<div style={{width:80,background:"#dde0e6",borderRadius:4,height:5,overflow:"hidden"}}><div style={{width:(tasks.length?(done/tasks.length)*100:0)+"%",background:"#4a7fa5",height:"100%"}}/></div>}
-                    <span style={{fontSize:12,color:"#6b7280"}}>{isOpen?"▲":"▼"}</span>
+                    <span style={{fontSize:16,flex:1,fontWeight:isOpen?"bold":"normal",color:"var(--ink)"}}>{p.name}</span>
+                    <span style={{fontSize:12,color:"var(--muted)",fontFamily:"sans-serif"}}>{done}/{tasks.length} done</span>
+                    {tasks.length>0&&<div style={{width:80,background:"var(--border-strong)",borderRadius:4,height:5,overflow:"hidden"}}><div style={{width:(tasks.length?(done/tasks.length)*100:0)+"%",background:"#4a7fa5",height:"100%"}}/></div>}
+                    <span style={{fontSize:12,color:"var(--muted)"}}>{isOpen?"▲":"▼"}</span>
                   </div>
                   {isOpen&&(
-                    <div style={{borderTop:"1px solid #dde0e6",padding:"14px 18px"}}>
-                      {tasks.length===0&&<p style={{color:"#6b7280",fontStyle:"italic",fontSize:13,marginBottom:12}}>No tasks yet.</p>}
+                    <div style={{borderTop:"1px solid var(--border)",padding:"14px 18px"}}>
+                      {tasks.length===0&&<p style={{color:"var(--muted)",fontStyle:"italic",fontSize:13,marginBottom:12}}>No tasks yet.</p>}
                       {Object.entries(grouped).map(([sec,secTasks])=>{
                         const SecIcon=sectionIcons[sec];
                         return(
@@ -934,18 +954,18 @@ style={{
                               const cl=item.checklist||[];
                               const clDone=cl.filter(c=>c.done).length;
                               return(
-                              <div key={item.id} style={{background:item.done?"#eceef2":allConflictIds.has(item.id)?"#fdf0f0":"#f4f5f7",border:"1px solid "+(allConflictIds.has(item.id)?"#d13030":"#dde0e6"),borderRadius:7,padding:"9px 12px",marginBottom:6}}>
+                              <div key={item.id} style={{background:item.done?"var(--surface-3)":allConflictIds.has(item.id)?"#fdf0f0":"var(--surface-2)",border:"1px solid "+(allConflictIds.has(item.id)?"#d13030":"var(--border)"),borderRadius:7,padding:"9px 12px",marginBottom:6}}>
                                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                                   <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:15,height:15,cursor:"pointer",accentColor:"#1e2430",flexShrink:0}}/>
                                   <div style={{flex:1,minWidth:0}}>
-                                    <div style={{fontSize:13,textDecoration:item.done?"line-through":"none",opacity:item.done?0.5:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:"#1e2430",display:"flex",alignItems:"center",gap:5}}>
+                                    <div style={{fontSize:13,textDecoration:item.done?"line-through":"none",opacity:item.done?0.5:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:"var(--ink)",display:"flex",alignItems:"center",gap:5}}>
                                       <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.text}</span>
-                                      {cl.length>0&&<span style={{fontSize:10,fontFamily:"sans-serif",background:clDone===cl.length?IC.projects.light:"#eceef2",color:clDone===cl.length?IC.projects.text:"#6b7280",borderRadius:10,padding:"1px 6px",flexShrink:0,border:`1px solid ${clDone===cl.length?IC.projects.bg+"40":"#dde0e6"}`}}>✓ {clDone}/{cl.length}</span>}
+                                      {cl.length>0&&<span style={{fontSize:10,fontFamily:"sans-serif",background:clDone===cl.length?IC.projects.light:"var(--surface-3)",color:clDone===cl.length?IC.projects.text:"var(--muted)",borderRadius:10,padding:"1px 6px",flexShrink:0,border:`1px solid ${clDone===cl.length?IC.projects.bg+"40":"var(--border)"}`}}>✓ {clDone}/{cl.length}</span>}
                                     </div>
                                     <MetaRow item={item} conflict={allConflictIds.has(item.id)} hideProject={true}/>
                                   </div>
-                                  <button onClick={()=>openEdit(item)} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Edit</button>
-                                <button onClick={()=>trashItem(item.id)} style={mkBtn("#dde0e6","#1e2430",{padding:"4px 8px",fontSize:11})}>Delete</button>
+                                  <button onClick={()=>openEdit(item)} style={{padding:"4px 8px",fontSize:11,border:"none",borderRadius:6,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-edit-bg)",color:"var(--btn-edit-ink)"}}>Edit</button>
+                                <button onClick={()=>trashItem(item.id)} style={{padding:"4px 8px",fontSize:11,border:"none",borderRadius:6,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-del-bg)",color:"var(--btn-del-ink)"}}>Delete</button>
                                 </div>
                                 {cl.length>0&&!item.done&&(
                                   <div style={{marginTop:6,paddingTop:6,borderTop:"1px solid #e4e6ea"}}>
@@ -967,9 +987,9 @@ style={{
                         );
                       })}
                       <div style={{display:"flex",gap:6,marginTop:4}}>
-                        <button className="btn-3d" onClick={()=>openAddTask(p.id)} style={mkBtn("#1e2430",null,{padding:"12px 8px",fontSize:13,textAlign:"center",flex:1,minWidth:0,whiteSpace:"nowrap"})}>Add Task</button>
-                        <button className="btn-3d" onClick={()=>archiveProject(p.id)} style={{padding:"12px 8px",fontSize:13,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:IC.archive.bg+"26",color:IC.archive.text,textAlign:"center",flex:1,minWidth:0,whiteSpace:"nowrap"}}>Archive</button>
-                        <button className="btn-3d" onClick={()=>deleteProject(p.id)} style={mkBtn("#dde0e6","#d13030",{padding:"12px 8px",fontSize:13,textAlign:"center",flex:1,minWidth:0,whiteSpace:"nowrap"})}>Delete</button>
+                        <button className="btn-3d" onClick={()=>openAddTask(p.id)} style={mkBtn("var(--primary-bg)","var(--primary-ink)",{padding:"12px 8px",fontSize:13,textAlign:"center",flex:1,minWidth:0,whiteSpace:"nowrap"})}>Add Task</button>
+                        <button className="btn-3d" onClick={()=>archiveProject(p.id)} style={{padding:"12px 8px",fontSize:13,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:IC.archive.bg+"26",color:IC.archive.bg,textAlign:"center",flex:1,minWidth:0,whiteSpace:"nowrap"}}>Archive</button>
+                        <button className="btn-3d" onClick={()=>deleteProject(p.id)} style={{padding:"12px 8px",fontSize:13,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-del-bg)",color:"var(--btn-del-ink)",textAlign:"center",flex:1,minWidth:0,whiteSpace:"nowrap"}}>Delete</button>
                       </div>
                     </div>
                   )}
@@ -989,12 +1009,12 @@ style={{
                       const ptasks=data.items.filter(i=>i.project===p.name&&i.section!=="trash");
                       const pdone=ptasks.filter(i=>i.done).length;
                       return(
-                        <div key={p.id} style={{background:"#eceef2",border:"1px solid #dde0e6",borderRadius:8,padding:"10px 14px",marginBottom:8,display:"flex",alignItems:"center",gap:10,opacity:0.9}}>
-                          <Icons.folder size={15} color="#9aa0ae"/>
-                          <span style={{flex:1,fontSize:14,color:"#3a4460"}}>{p.name}</span>
-                          <span style={{fontSize:11,color:"#6b7280",fontFamily:"sans-serif"}}>{pdone}/{ptasks.length} done</span>
-                          <button className="btn-3d" onClick={()=>restoreProject(p.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(90,154,90,0.18)",color:"#2d5e2d"}}>Restore</button>
-                          <button className="btn-3d" onClick={()=>deleteProject(p.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"rgba(209,48,48,0.18)",color:"#8a2020"}}>Delete</button>
+                        <div key={p.id} style={{background:"var(--surface-2)",border:"1px solid var(--border)",borderRadius:8,padding:"10px 14px",marginBottom:8,display:"flex",alignItems:"center",gap:10,opacity:0.9}}>
+                          <Icons.folder size={15} color="var(--muted-2)"/>
+                          <span style={{flex:1,fontSize:14,color:"var(--ink-2)"}}>{p.name}</span>
+                          <span style={{fontSize:11,color:"var(--muted)",fontFamily:"sans-serif"}}>{pdone}/{ptasks.length} done</span>
+                          <button className="btn-3d" onClick={()=>restoreProject(p.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-restore-bg)",color:"var(--btn-restore-ink)"}}>Restore</button>
+                          <button className="btn-3d" onClick={()=>deleteProject(p.id)} style={{padding:"12px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-del-bg)",color:"var(--btn-del-ink)"}}>Delete</button>
                         </div>
                       );
                     })}
@@ -1291,8 +1311,8 @@ style={{
               </React.Fragment>
             )}
             <div style={{display:"flex",gap:10}}>
-              <button className="btn-3d" onClick={()=>setClarifyItem(null)} style={mkBtn("#dde0e6","#1e2430",{padding:"12px 16px"})}>Cancel</button>
-              <button className="btn-3d" onClick={applyClarify} style={{...mkBtn("#1e2430",null,{padding:"12px 16px"}),flex:2}}>Confirm</button>
+              <button className="btn-3d" onClick={()=>setClarifyItem(null)} style={mkBtn("var(--surface-3)","var(--ink)",{padding:"12px 16px"})}>Cancel</button>
+              <button className="btn-3d" onClick={applyClarify} style={{...mkBtn("var(--primary-bg)","var(--primary-ink)",{padding:"12px 16px"}),flex:2}}>Confirm</button>
             </div>
           </div>
         </div>
@@ -1313,8 +1333,8 @@ style={{
               </div>
             )}
             <div style={{display:"flex",gap:10,marginTop:8}}>
-              <button className="btn-3d" onClick={()=>setEditItem(null)} style={mkBtn("#dde0e6","#1e2430",{padding:"12px 16px"})}>Cancel</button>
-              <button className="btn-3d" onClick={applyEdit} style={{...mkBtn("#1e2430",null,{padding:"12px 16px"}),flex:2}}>Save Changes</button>
+              <button className="btn-3d" onClick={()=>setEditItem(null)} style={mkBtn("var(--surface-3)","var(--ink)",{padding:"12px 16px"})}>Cancel</button>
+              <button className="btn-3d" onClick={applyEdit} style={{...mkBtn("var(--primary-bg)","var(--primary-ink)",{padding:"12px 16px"}),flex:2}}>Save Changes</button>
             </div>
           </div>
         </div>
@@ -1330,8 +1350,8 @@ style={{
             </h3>
             <EditFields form={captureForm} setForm={setCaptureForm} showSection={true} projects={data.projects} showChecklist={true}/>
             <div style={{display:"flex",gap:10,marginTop:8}}>
-              <button className="btn-3d" onClick={()=>setCaptureModal(null)} style={mkBtn("#dde0e6","#1e2430",{padding:"12px 16px"})}>Cancel</button>
-              <button className="btn-3d" onClick={applyCapture} style={{...mkBtn("#1e2430",null,{padding:"12px 16px"}),flex:2}}>Capture</button>
+              <button className="btn-3d" onClick={()=>setCaptureModal(null)} style={mkBtn("var(--surface-3)","var(--ink)",{padding:"12px 16px"})}>Cancel</button>
+              <button className="btn-3d" onClick={applyCapture} style={{...mkBtn("var(--primary-bg)","var(--primary-ink)",{padding:"12px 16px"}),flex:2}}>Capture</button>
             </div>
           </div>
         </div>
@@ -1347,8 +1367,8 @@ style={{
             </h3>
             <EditFields form={taskForm} setForm={setTaskForm} showSection={true} projects={data.projects} showChecklist={false}/>
             <div style={{display:"flex",gap:10,marginTop:8}}>
-              <button className="btn-3d" onClick={()=>setAddTaskModal(null)} style={mkBtn("#dde0e6","#1e2430",{padding:"12px 16px"})}>Cancel</button>
-              <button className="btn-3d" onClick={applyAddTask} style={{...mkBtn("#1e2430",null,{padding:"12px 16px"}),flex:2}}>Add Task</button>
+              <button className="btn-3d" onClick={()=>setAddTaskModal(null)} style={mkBtn("var(--surface-3)","var(--ink)",{padding:"12px 16px"})}>Cancel</button>
+              <button className="btn-3d" onClick={applyAddTask} style={{...mkBtn("var(--primary-bg)","var(--primary-ink)",{padding:"12px 16px"}),flex:2}}>Add Task</button>
             </div>
           </div>
         </div>
