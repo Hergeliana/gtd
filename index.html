@@ -1070,23 +1070,31 @@ style={{
                   <div style={{fontWeight:"bold",fontSize:16,marginBottom:4,fontFamily:"sans-serif",color:"var(--ink)"}}>{new Date(calDay+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</div>
                   {selectedDayConflicts.size>0&&<div style={{background:IC.trash.light,border:`1px solid ${IC.trash.bg}`,borderRadius:7,padding:"8px 12px",marginBottom:12,fontSize:12,fontFamily:"sans-serif",color:IC.trash.text}}>Time conflict: {selectedDayConflicts.size} tasks overlap.</div>}
                   {selectedDayItems.length===0&&<p style={{color:"var(--muted)",fontStyle:"italic",fontSize:14}}>No tasks scheduled.</p>}
-                  {selectedDayItems.map((item,idx)=>(
-                    <div key={item.id} style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface)",border:"1px solid "+(selectedDayConflicts.has(item.id)?IC.trash.bg:"var(--border)"),borderRadius:8,padding:"10px 14px",marginBottom:8,display:"flex",gap:10,alignItems:"flex-start"}}>
-                      <div style={{fontFamily:"sans-serif",fontSize:13,color:"#4a7fa5",fontWeight:"bold",minWidth:20}}>{idx+1}.</div>
-                      <div style={{flex:1}}>
-                        <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",opacity:item.done?0.6:1,color:"var(--ink)"}}>{item.text}</div>
-                        <div style={{fontSize:12,color:"var(--muted)",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
-                          <span style={{background:"var(--surface-3)",borderRadius:3,padding:"1px 5px",color:"var(--ink-2)"}}>{sectionLabels[item.section]}</span>
-                          {item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3}}><Icons.folder size={10} color="var(--muted)"/>{item.project}</span>}
-                          {item.time&&<span style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface-3)",borderRadius:4,padding:"1px 5px",color:selectedDayConflicts.has(item.id)?IC.trash.text:"var(--ink-2)",fontWeight:selectedDayConflicts.has(item.id)?"bold":"normal"}}>{(selectedDayConflicts.has(item.id)?"⚠ ":"")+fmt12(item.time)}</span>}
+                  {selectedDayItems.map((item,idx)=>{
+                    const isCalExp=expandedTaskId===item.id;
+                    return(
+                    <div key={item.id} onClick={()=>setExpandedTaskId(isCalExp?null:item.id)}
+                      style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface)",border:"1px solid "+(selectedDayConflicts.has(item.id)?IC.trash.bg:"var(--border)"),borderRadius:8,padding:"10px 14px",marginBottom:8,cursor:"pointer",boxShadow:"var(--shadow-sm)"}}>
+                      <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+                        <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:16,height:16,cursor:"pointer",accentColor:"#1e2430",flexShrink:0,marginTop:3}}/>
+                        <div style={{fontFamily:"sans-serif",fontSize:13,color:"#4a7fa5",fontWeight:"bold",minWidth:20,marginTop:1}}>{idx+1}.</div>
+                        <div style={{flex:1,minWidth:0}}>
+                          <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",opacity:item.done?0.6:1,color:"var(--ink)",wordBreak:"break-word"}}>{item.text}</div>
+                          <div style={{fontSize:12,color:"var(--muted)",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+                            <span style={{background:"var(--surface-3)",borderRadius:3,padding:"1px 5px",color:"var(--ink-2)"}}>{sectionLabels[item.section]}</span>
+                            {item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3}}><Icons.folder size={10} color="var(--muted)"/>{item.project}</span>}
+                            {item.time&&<span style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface-3)",borderRadius:4,padding:"1px 5px",color:selectedDayConflicts.has(item.id)?IC.trash.text:"var(--ink-2)",fontWeight:selectedDayConflicts.has(item.id)?"bold":"normal"}}>{(selectedDayConflicts.has(item.id)?"⚠ ":"")+fmt12(item.time)}</span>}
+                          </div>
                         </div>
                       </div>
-                      <div style={{display:"flex",gap:5}}>
-                        <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:15,height:15,cursor:"pointer",accentColor:"#1e2430"}}/>
-                        <button onClick={()=>openEdit(item)} style={{padding:"4px 8px",fontSize:11,border:"none",borderRadius:6,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-edit-bg)",color:"var(--btn-edit-ink)"}}>Edit</button>
-                      </div>
+                      {isCalExp&&(
+                        <div onClick={e=>e.stopPropagation()} style={{display:"flex",gap:6,marginTop:10,paddingTop:10,borderTop:"1px dashed var(--border)"}}>
+                          <button className="btn-3d" onClick={()=>openEdit(item)} style={{padding:"9px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-edit-bg)",color:"var(--btn-edit-ink)",flex:1}}>Edit</button>
+                          <button className="btn-3d" onClick={()=>trashItem(item.id)} style={{padding:"9px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-del-bg)",color:"var(--btn-del-ink)",flex:1}}>Delete</button>
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  );})}
                 </React.Fragment>
               ):<p style={{color:"#6b7280",fontStyle:"italic",fontSize:14,marginTop:8}}>Select a day to see its tasks.</p>}
             </div>
@@ -1150,23 +1158,31 @@ style={{
                   <div style={{fontWeight:"bold",fontSize:16,marginBottom:8,fontFamily:"sans-serif",color:"var(--ink)"}}>{new Date(calDay+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</div>
                   {selectedDayConflicts.size>0&&<div style={{background:IC.trash.light,border:`1px solid ${IC.trash.bg}`,borderRadius:7,padding:"8px 12px",marginBottom:12,fontSize:12,fontFamily:"sans-serif",color:IC.trash.text}}>Time conflict: {selectedDayConflicts.size} tasks overlap.</div>}
                   {selectedDayItems.length===0&&<p style={{color:"var(--muted)",fontStyle:"italic",fontSize:14}}>No tasks scheduled.</p>}
-                  {selectedDayItems.map((item,idx)=>(
-                    <div key={item.id} style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface)",border:"1px solid "+(selectedDayConflicts.has(item.id)?IC.trash.bg:"var(--border)"),borderRadius:8,padding:"10px 14px",marginBottom:8,display:"flex",gap:10,alignItems:"flex-start"}}>
-                      <div style={{fontFamily:"sans-serif",fontSize:13,color:"#4a7fa5",fontWeight:"bold",minWidth:20}}>{idx+1}.</div>
-                      <div style={{flex:1,minWidth:0}}>
-                        <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",opacity:item.done?0.6:1,color:"var(--ink)",wordBreak:"break-word"}}>{item.text}</div>
-                        <div style={{fontSize:12,color:"var(--muted)",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
-                          <span style={{background:"var(--surface-3)",borderRadius:3,padding:"1px 5px",color:"var(--ink-2)"}}>{sectionLabels[item.section]}</span>
-                          {item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3}}><Icons.folder size={10} color="var(--muted)"/>{item.project}</span>}
-                          {item.time&&<span style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface-3)",borderRadius:4,padding:"1px 5px",color:selectedDayConflicts.has(item.id)?IC.trash.text:"var(--ink-2)",fontWeight:selectedDayConflicts.has(item.id)?"bold":"normal"}}>{(selectedDayConflicts.has(item.id)?"⚠ ":"")+fmt12(item.time)}</span>}
+                  {selectedDayItems.map((item,idx)=>{
+                    const isCalExp=expandedTaskId===item.id;
+                    return(
+                    <div key={item.id} onClick={()=>setExpandedTaskId(isCalExp?null:item.id)}
+                      style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface)",border:"1px solid "+(selectedDayConflicts.has(item.id)?IC.trash.bg:"var(--border)"),borderRadius:8,padding:"10px 14px",marginBottom:8,cursor:"pointer",boxShadow:"var(--shadow-sm)"}}>
+                      <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+                        <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} onClick={e=>e.stopPropagation()} style={{width:16,height:16,cursor:"pointer",accentColor:"#1e2430",flexShrink:0,marginTop:3}}/>
+                        <div style={{fontFamily:"sans-serif",fontSize:13,color:"#4a7fa5",fontWeight:"bold",minWidth:20,marginTop:1}}>{idx+1}.</div>
+                        <div style={{flex:1,minWidth:0}}>
+                          <div style={{fontSize:14,textDecoration:item.done?"line-through":"none",opacity:item.done?0.6:1,color:"var(--ink)",wordBreak:"break-word"}}>{item.text}</div>
+                          <div style={{fontSize:12,color:"var(--muted)",marginTop:3,fontFamily:"sans-serif",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+                            <span style={{background:"var(--surface-3)",borderRadius:3,padding:"1px 5px",color:"var(--ink-2)"}}>{sectionLabels[item.section]}</span>
+                            {item.project&&<span style={{display:"inline-flex",alignItems:"center",gap:3}}><Icons.folder size={10} color="var(--muted)"/>{item.project}</span>}
+                            {item.time&&<span style={{background:selectedDayConflicts.has(item.id)?IC.trash.light:"var(--surface-3)",borderRadius:4,padding:"1px 5px",color:selectedDayConflicts.has(item.id)?IC.trash.text:"var(--ink-2)",fontWeight:selectedDayConflicts.has(item.id)?"bold":"normal"}}>{(selectedDayConflicts.has(item.id)?"⚠ ":"")+fmt12(item.time)}</span>}
+                          </div>
                         </div>
                       </div>
-                      <div style={{display:"flex",gap:5,flexShrink:0}}>
-                        <input type="checkbox" checked={item.done} onChange={()=>toggleDone(item.id)} style={{width:15,height:15,cursor:"pointer",accentColor:"#1e2430"}}/>
-                        <button onClick={()=>openEdit(item)} style={{padding:"4px 8px",fontSize:11,border:"none",borderRadius:6,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-edit-bg)",color:"var(--btn-edit-ink)"}}>Edit</button>
-                      </div>
+                      {isCalExp&&(
+                        <div onClick={e=>e.stopPropagation()} style={{display:"flex",gap:6,marginTop:10,paddingTop:10,borderTop:"1px dashed var(--border)"}}>
+                          <button className="btn-3d" onClick={()=>openEdit(item)} style={{padding:"9px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-edit-bg)",color:"var(--btn-edit-ink)",flex:1}}>Edit</button>
+                          <button className="btn-3d" onClick={()=>trashItem(item.id)} style={{padding:"9px 10px",fontSize:12,border:"none",borderRadius:7,cursor:"pointer",fontFamily:"sans-serif",background:"var(--btn-del-bg)",color:"var(--btn-del-ink)",flex:1}}>Delete</button>
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  );})}
                 </div>
               )}
               <div style={{marginTop:12,display:"flex",gap:16,flexWrap:"wrap",alignItems:"center"}}>
