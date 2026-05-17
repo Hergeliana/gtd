@@ -7,6 +7,7 @@
 <title>GTD v3 - Getting Things Done</title>
 <link rel="manifest" href="manifest.json"/>
 <meta name="theme-color" content="#1e2430"/>
+<meta name="color-scheme" content="light dark"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="GTD"/>
@@ -403,6 +404,8 @@ function App(){
   const[darkMode,setDarkMode]=useState(()=>{try{return localStorage.getItem("gtd-theme")==="dark";}catch{return false;}});
   useEffect(()=>{
     document.documentElement.setAttribute("data-theme",darkMode?"dark":"light");
+    document.documentElement.style.colorScheme=darkMode?"dark":"light";
+    document.body.style.colorScheme=darkMode?"dark":"light";
     try{localStorage.setItem("gtd-theme",darkMode?"dark":"light");}catch{}
   },[darkMode]);
   const[openChecklists,setOpenChecklists]=useState({});
@@ -820,9 +823,19 @@ style={{
       {/* Main */}
       <div className="main" style={{flex:1,padding:"32px 40px",maxWidth:900,overflowY:"auto",background:"transparent"}}>
         <div className="capture-bar" style={{display:"flex",gap:10,marginBottom:32,alignItems:"stretch"}}>
-          <textarea ref={inputRef} className="capture-input" value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();addToInbox();}}} placeholder="Capture a thought, task, or idea..." rows={1}
-            style={{flex:1,padding:"13px 16px",fontSize:15,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"var(--ink)",resize:"none",overflow:"hidden",lineHeight:"1.4",minHeight:48,boxSizing:"border-box"}}/>
-          <button className="btn-3d" onClick={addToInbox} style={mkBtn("var(--primary-bg)","var(--primary-ink)",{padding:"0 22px",fontSize:14,alignSelf:"stretch"})}>Capture</button>
+          {view==="projects"?(
+            <React.Fragment>
+              <input className="capture-input" value={newProject} onChange={e=>setNewProject(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();addProject();}}} placeholder="New project name..."
+                style={{flex:1,padding:"13px 16px",fontSize:15,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"var(--ink)",lineHeight:"1.4",minHeight:48,boxSizing:"border-box"}}/>
+              <button className="btn-3d" onClick={addProject} style={mkBtn("var(--primary-bg)","var(--primary-ink)",{padding:"0 22px",fontSize:14,alignSelf:"stretch"})}>Add Project</button>
+            </React.Fragment>
+          ):(
+            <React.Fragment>
+              <textarea ref={inputRef} className="capture-input" value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();addToInbox();}}} placeholder="Capture a thought, task, or idea..." rows={1}
+                style={{flex:1,padding:"13px 16px",fontSize:15,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"var(--ink)",resize:"none",overflow:"hidden",lineHeight:"1.4",minHeight:48,boxSizing:"border-box"}}/>
+              <button className="btn-3d" onClick={addToInbox} style={mkBtn("var(--primary-bg)","var(--primary-ink)",{padding:"0 22px",fontSize:14,alignSelf:"stretch"})}>Capture</button>
+            </React.Fragment>
+          )}
         </div>
 
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:22,borderBottom:"1px solid #e6e8ed",paddingBottom:14,position:"relative"}}>
@@ -918,14 +931,6 @@ style={{
         {/* PROJECTS */}
         {view==="projects"&&(
           <div>
-            <div style={{display:"flex",gap:10,marginBottom:24}}>
-              <input value={newProject} onChange={e=>setNewProject(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addProject()} placeholder="New project name..."
-                style={{flex:1,padding:"10px 14px",borderRadius:7,border:"1px solid var(--border-strong)",background:"var(--surface)",fontSize:14,fontFamily:"system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",outline:"none",color:"var(--ink)"}}/>
-              <button className="btn-3d" onClick={addProject} style={mkBtn("var(--primary-bg)","var(--primary-ink)",{padding:"10px 18px",display:"flex",alignItems:"center",gap:6})}>
-                <Icons.projects size={14} color="#ffffff"/>
-                Add Project
-              </button>
-            </div>
             {data.projects.length===0&&<p style={{color:"var(--muted)",fontStyle:"italic"}}>No projects yet.</p>}
             {data.projects.filter(p=>!p.archived).map(p=>{
               const tasks=data.items.filter(i=>i.project===p.name&&i.section!=="trash");
