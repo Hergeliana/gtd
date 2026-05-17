@@ -248,178 +248,10 @@ function getConflicts(items){
 }
 
 function TimePicker({value,onChange}){
-  const[open,setOpen]=useState(false);
-  const ref=useRef(null);
-  useEffect(()=>{
-    const h=e=>{if(ref.current&&!ref.current.contains(e.target))setOpen(false);};
-    document.addEventListener("mousedown",h);
-    return()=>document.removeEventListener("mousedown",h);
-  },[]);
-  const has=!!value;
-  const[h24,m]=has?value.split(":").map(Number):[9,0];
-  const isPM=h24>=12;
-  const h12=(h24%12)||12;
-  const ap=isPM?"PM":"AM";
-  const pad=n=>String(n).padStart(2,"0");
-  const display=has?`${h12}:${pad(m)} ${ap}`:"";
-  const commit=(nh12,nm,nap)=>{
-    let nh24=nh12%12;
-    if(nap==="PM")nh24+=12;
-    onChange(`${pad(nh24)}:${pad(nm)}`);
-  };
   return(
-    <div ref={ref} style={{position:"relative"}}>
-      <button type="button" onClick={()=>setOpen(o=>!o)}
-        style={{...fieldStyle,display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",textAlign:"left",padding:"8px 10px",width:"100%"}}>
-        <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:has?"var(--ink)":"var(--muted)"}}>{display||"Select time..."}</span>
-        <span style={{fontSize:11,color:"var(--muted)",marginLeft:6,flexShrink:0}}>▾</span>
-      </button>
-      {open&&(
-        <div style={{position:"absolute",zIndex:400,top:"calc(100% + 4px)",left:0,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:8,boxShadow:"var(--shadow-md)",padding:12,minWidth:240}}>
-          <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
-            <div style={{flex:1}}>
-              <div style={{fontSize:10,color:"var(--muted)",fontWeight:"bold",marginBottom:5,textTransform:"uppercase",letterSpacing:0.5}}>Hour</div>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:3}}>
-                {[1,2,3,4,5,6,7,8,9,10,11,12].map(hr=>{
-                  const sel=has&&hr===h12;
-                  return(
-                    <button key={hr} type="button" onClick={()=>commit(hr,m,ap)}
-                      style={{padding:"6px 0",border:"none",borderRadius:5,cursor:"pointer",fontSize:12,fontFamily:"sans-serif",background:sel?"var(--primary-bg)":"var(--surface-2)",color:sel?"var(--primary-ink)":"var(--ink)",fontWeight:sel?"bold":"normal"}}>{hr}</button>
-                  );
-                })}
-              </div>
-            </div>
-            <div style={{flexShrink:0}}>
-              <div style={{fontSize:10,color:"var(--muted)",fontWeight:"bold",marginBottom:5,textTransform:"uppercase",letterSpacing:0.5}}>Min</div>
-              <div style={{display:"flex",flexDirection:"column",gap:3}}>
-                {[0,15,30,45].map(mm=>{
-                  const sel=has&&mm===m;
-                  return(
-                    <button key={mm} type="button" onClick={()=>commit(h12,mm,ap)}
-                      style={{padding:"6px 10px",border:"none",borderRadius:5,cursor:"pointer",fontSize:12,fontFamily:"sans-serif",background:sel?"var(--primary-bg)":"var(--surface-2)",color:sel?"var(--primary-ink)":"var(--ink)",fontWeight:sel?"bold":"normal",minWidth:42}}>{pad(mm)}</button>
-                  );
-                })}
-              </div>
-            </div>
-            <div style={{flexShrink:0}}>
-              <div style={{fontSize:10,color:"var(--muted)",fontWeight:"bold",marginBottom:5,textTransform:"uppercase",letterSpacing:0.5}}>AM/PM</div>
-              <div style={{display:"flex",flexDirection:"column",gap:3}}>
-                {["AM","PM"].map(a=>{
-                  const sel=has&&a===ap;
-                  return(
-                    <button key={a} type="button" onClick={()=>commit(h12,m,a)}
-                      style={{padding:"6px 10px",border:"none",borderRadius:5,cursor:"pointer",fontSize:12,fontFamily:"sans-serif",background:sel?"var(--primary-bg)":"var(--surface-2)",color:sel?"var(--primary-ink)":"var(--ink)",fontWeight:sel?"bold":"normal",minWidth:42}}>{a}</button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-          {has&&(
-            <div style={{marginTop:10,paddingTop:8,borderTop:"1px solid var(--border)",display:"flex",justifyContent:"flex-end"}}>
-              <button type="button" onClick={()=>{onChange("");setOpen(false);}}
-                style={{background:"none",border:"none",cursor:"pointer",color:"var(--muted)",fontSize:11,padding:"3px 6px"}}>Clear</button>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function SelectDropdown({value,options,onChange,placeholder}){
-  const[open,setOpen]=useState(false);
-  const ref=useRef(null);
-  useEffect(()=>{
-    const handler=e=>{if(ref.current&&!ref.current.contains(e.target))setOpen(false);};
-    document.addEventListener("mousedown",handler);
-    return()=>document.removeEventListener("mousedown",handler);
-  },[]);
-  const selected=options.find(o=>o.value===value);
-  return(
-    <div ref={ref} style={{position:"relative"}}>
-      <button type="button" onClick={()=>setOpen(o=>!o)}
-        style={{...fieldStyle,display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",textAlign:"left",padding:"8px 10px",width:"100%"}}>
-        <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{selected?selected.label:(placeholder||"Select...")}</span>
-        <span style={{fontSize:10,color:"var(--muted)",marginLeft:6,flexShrink:0}}>▾</span>
-      </button>
-      {open&&(
-        <div style={{position:"absolute",zIndex:400,top:"calc(100% + 4px)",left:0,right:0,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:8,boxShadow:"var(--shadow-md)",overflow:"hidden",maxHeight:240,overflowY:"auto"}}>
-          {options.map((opt,i)=>(
-            <div key={opt.value+"_"+i} onClick={()=>{onChange(opt.value);setOpen(false);}}
-              style={{padding:"10px 12px",fontSize:13,cursor:"pointer",background:value===opt.value?"var(--surface-2)":"transparent",color:"var(--ink)",borderBottom:i<options.length-1?"1px solid var(--border)":"none",fontWeight:value===opt.value?"600":"normal"}}>
-              {opt.label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function DatePicker({value,onChange}){
-  const[open,setOpen]=useState(false);
-  const today=new Date();
-  const[viewMonth,setViewMonth]=useState(()=>value?new Date(value+"T12:00:00").getMonth():today.getMonth());
-  const[viewYear,setViewYear]=useState(()=>value?new Date(value+"T12:00:00").getFullYear():today.getFullYear());
-  const ref=useRef(null);
-  useEffect(()=>{
-    const h=e=>{if(ref.current&&!ref.current.contains(e.target))setOpen(false);};
-    document.addEventListener("mousedown",h);
-    return()=>document.removeEventListener("mousedown",h);
-  },[]);
-  useEffect(()=>{
-    if(open&&value){
-      const d=new Date(value+"T12:00:00");
-      setViewMonth(d.getMonth());setViewYear(d.getFullYear());
-    }
-  },[open]);
-  const daysInMo=new Date(viewYear,viewMonth+1,0).getDate();
-  const firstDay=new Date(viewYear,viewMonth,1).getDay();
-  const pad=n=>String(n).padStart(2,"0");
-  const todayDs=`${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
-  const display=value?new Date(value+"T12:00:00").toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"}):"";
-  return(
-    <div ref={ref} style={{position:"relative"}}>
-      <button type="button" onClick={()=>setOpen(o=>!o)}
-        style={{...fieldStyle,display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",textAlign:"left",padding:"8px 10px",width:"100%"}}>
-        <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:value?"var(--ink)":"var(--muted)"}}>{display||"Select date..."}</span>
-        <span style={{fontSize:11,color:"var(--muted)",marginLeft:6,flexShrink:0}}>▾</span>
-      </button>
-      {open&&(
-        <div style={{position:"absolute",zIndex:400,top:"calc(100% + 4px)",left:0,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:8,boxShadow:"var(--shadow-md)",padding:12,minWidth:260}}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-            <button type="button" onClick={()=>{if(viewMonth===0){setViewMonth(11);setViewYear(y=>y-1);}else setViewMonth(m=>m-1);}}
-              style={{background:"var(--surface-2)",border:"none",borderRadius:6,cursor:"pointer",color:"var(--ink)",padding:"4px 10px",fontSize:12}}>◀</button>
-            <span style={{fontWeight:"bold",color:"var(--ink)",fontSize:13}}>{MONTHS[viewMonth]} {viewYear}</span>
-            <button type="button" onClick={()=>{if(viewMonth===11){setViewMonth(0);setViewYear(y=>y+1);}else setViewMonth(m=>m+1);}}
-              style={{background:"var(--surface-2)",border:"none",borderRadius:6,cursor:"pointer",color:"var(--ink)",padding:"4px 10px",fontSize:12}}>▶</button>
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2,marginBottom:4}}>
-            {DAYS.map(d=><div key={d} style={{textAlign:"center",fontSize:10,color:"var(--muted)",fontWeight:"bold",padding:"3px 0"}}>{d}</div>)}
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2}}>
-            {Array(firstDay).fill(null).map((_,i)=><div key={"e"+i}/>)}
-            {Array(daysInMo).fill(null).map((_,i)=>{
-              const d=i+1;
-              const ds=`${viewYear}-${pad(viewMonth+1)}-${pad(d)}`;
-              const isSel=ds===value;
-              const isToday=ds===todayDs;
-              return(
-                <button key={d} type="button" onClick={()=>{onChange(ds);setOpen(false);}}
-                  style={{padding:"6px 0",border:"none",borderRadius:5,cursor:"pointer",fontSize:12,fontFamily:"sans-serif",background:isSel?"var(--primary-bg)":isToday?"var(--surface-2)":"transparent",color:isSel?"var(--primary-ink)":"var(--ink)",fontWeight:isSel||isToday?"bold":"normal"}}>
-                  {d}
-                </button>
-              );
-            })}
-          </div>
-          {value&&(
-            <div style={{marginTop:10,paddingTop:8,borderTop:"1px solid var(--border)",display:"flex",justifyContent:"flex-end"}}>
-              <button type="button" onClick={()=>{onChange("");setOpen(false);}}
-                style={{background:"none",border:"none",cursor:"pointer",color:"var(--muted)",fontSize:11,padding:"3px 6px"}}>Clear</button>
-            </div>
-          )}
-        </div>
-      )}
+    <div style={{display:"flex",alignItems:"center",gap:6}}>
+      <input type="time" value={value||""} onChange={e=>onChange(e.target.value)} style={{...fieldStyle,flex:1}}/>
+      {value&&<button type="button" onClick={()=>onChange("")} style={{width:30,height:30,background:"#f0f1f3",border:"1px solid #cdd0d6",borderRadius:6,cursor:"pointer",fontSize:14,color:"#6b7280",flexShrink:0}}>×</button>}
     </div>
   );
 }
@@ -524,17 +356,22 @@ function EditFields({form,setForm,showSection,projects,showChecklist}){
       <div style={{display:"flex",gap:12,marginBottom:12}}>
         <div style={{flex:1}}>
           <label style={labelStyle}>Context</label>
-          <SelectDropdown value={form.context} onChange={v=>setForm(f=>({...f,context:v}))} options={CONTEXTS.map(c=>({value:c,label:c}))}/>
+          <select value={form.context} onChange={e=>setForm(f=>({...f,context:e.target.value}))} style={fieldStyle}>
+            {CONTEXTS.map(c=><option key={c}>{c}</option>)}
+          </select>
         </div>
         <div style={{flex:1}}>
           <label style={labelStyle}>Project</label>
-          <SelectDropdown value={form.project||""} onChange={v=>setForm(f=>({...f,project:v}))} options={[{value:"",label:"— None —"},...projects.map(p=>({value:p.name,label:p.name}))]}/>
+          <select value={form.project||""} onChange={e=>setForm(f=>({...f,project:e.target.value}))} style={fieldStyle}>
+            <option value="">— None —</option>
+            {projects.map(p=><option key={p.id} value={p.name}>{p.name}</option>)}
+          </select>
         </div>
       </div>
       <div style={{display:"flex",gap:12,marginBottom:12}}>
         <div style={{flex:1}}>
           <label style={labelStyle}>Due date (optional)</label>
-          <DatePicker value={form.due||""} onChange={v=>setForm(f=>({...f,due:v}))}/>
+          <input type="date" value={form.due||""} onChange={e=>setForm(f=>({...f,due:e.target.value}))} style={fieldStyle}/>
         </div>
         <div style={{flex:1}}>
           <label style={labelStyle}>Time (optional)</label>
@@ -1457,17 +1294,22 @@ style={{
                 <div style={{display:"flex",gap:12,marginBottom:12}}>
                   <div style={{flex:1}}>
                     <label style={labelStyle}>Context</label>
-                    <SelectDropdown value={clarify.context} onChange={v=>setClarify(c=>({...c,context:v}))} options={CONTEXTS.map(ctx=>({value:ctx,label:ctx}))}/>
+                    <select value={clarify.context} onChange={e=>setClarify(c=>({...c,context:e.target.value}))} style={fieldStyle}>
+                      {CONTEXTS.map(ctx=><option key={ctx}>{ctx}</option>)}
+                    </select>
                   </div>
                   <div style={{flex:1}}>
                     <label style={labelStyle}>Project (optional)</label>
-                    <SelectDropdown value={clarify.project||""} onChange={v=>setClarify(c=>({...c,project:v}))} options={[{value:"",label:"— None —"},...data.projects.map(p=>({value:p.name,label:p.name}))]}/>
+                    <select value={clarify.project||""} onChange={e=>setClarify(c=>({...c,project:e.target.value}))} style={fieldStyle}>
+                      <option value="">— None —</option>
+                      {data.projects.map(p=><option key={p.id} value={p.name}>{p.name}</option>)}
+                    </select>
                   </div>
                 </div>
                 <div style={{display:"flex",gap:12,marginBottom:16}}>
                   <div style={{flex:1}}>
                     <label style={labelStyle}>Due date (optional)</label>
-                    <DatePicker value={clarify.due} onChange={v=>setClarify(c=>({...c,due:v}))}/>
+                    <input type="date" value={clarify.due} onChange={e=>setClarify(c=>({...c,due:e.target.value}))} style={fieldStyle}/>
                   </div>
                   <div style={{flex:1}}>
                     <label style={labelStyle}>Time (optional)</label>
