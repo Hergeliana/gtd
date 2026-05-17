@@ -1034,9 +1034,8 @@ style={{
                 <span style={{fontWeight:"bold",fontSize:15,fontFamily:"sans-serif",flex:1,textAlign:"center",color:"#1e2430"}}>{wLabel}</span>
                 <button onClick={nextWeek} style={mkBtn("#dde0e6","#1e2430",{padding:"6px 12px"})}>▶</button>
               </div>
-              <div style={{overflowX:"auto",WebkitOverflowScrolling:"touch",paddingBottom:6}}>
-                <div style={{display:"grid",gridTemplateColumns:"repeat(7,minmax(120px,1fr))",gap:8,minWidth:"100%"}}>
-                {weekDays.map(dayObj=>{
+              <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:0,border:"1px solid #dde0e6",borderRadius:10,overflow:"hidden"}}>
+                {weekDays.map((dayObj,idx)=>{
                   const ds=toDateStr(dayObj.getFullYear(),dayObj.getMonth(),dayObj.getDate());
                   const isToday=ds===todayStr;
                   const isSel=ds===calDay;
@@ -1045,28 +1044,24 @@ style={{
                   const hasConflict=dayConflicts.size>0;
                   return(
                     <div key={ds} onClick={()=>setCalDay(isSel?null:ds)}
-                      style={{background:"#ffffff",border:"2px solid "+(isSel?"#1e2430":hasConflict?IC.trash.bg:isToday?"#4a7fa5":"#dde0e6"),borderRadius:10,minHeight:160,overflow:"hidden",cursor:"pointer",boxShadow:isSel?"0 4px 14px rgba(20,30,55,0.15)":"none",transition:"all 0.15s"}}>
-                      <div style={{padding:"8px 10px",background:isSel?"#1e2430":hasConflict?IC.trash.light:isToday?"rgba(74,127,165,0.12)":"#f0f1f3",borderBottom:"1px solid #dde0e6",textAlign:"center"}}>
-                        <div style={{fontSize:11,fontFamily:"sans-serif",color:isSel?"rgba(255,255,255,0.7)":hasConflict?IC.trash.text:"#6b7280",textTransform:"uppercase",letterSpacing:0.5}}>{DAYS[dayObj.getDay()]+(hasConflict?" ⚠":"")}</div>
-                        <div style={{fontSize:18,fontWeight:isToday||isSel?"bold":"normal",fontFamily:"sans-serif",color:isSel?"#ffffff":"#1e2430"}}>{dayObj.getDate()}</div>
+                      style={{background:isSel?"rgba(30,36,48,0.05)":"#ffffff",borderLeft:idx===0?"none":"1px solid #dde0e6",minHeight:140,cursor:"pointer",transition:"background 0.15s",position:"relative"}}>
+                      {isSel&&<div style={{position:"absolute",top:0,left:0,right:0,height:3,background:"#1e2430"}}/>}
+                      <div style={{padding:"6px 4px",background:isSel?"#1e2430":hasConflict?IC.trash.light:isToday?"rgba(74,127,165,0.12)":"#f4f5f7",borderBottom:"1px solid #dde0e6",textAlign:"center"}}>
+                        <div style={{fontSize:10,fontFamily:"sans-serif",color:isSel?"rgba(255,255,255,0.75)":hasConflict?IC.trash.text:"#6b7280",textTransform:"uppercase",letterSpacing:0.4}}>{DAYS[dayObj.getDay()]+(hasConflict?" ⚠":"")}</div>
+                        <div style={{fontSize:15,fontWeight:isToday||isSel?"bold":"normal",fontFamily:"sans-serif",color:isSel?"#ffffff":"#1e2430"}}>{dayObj.getDate()}</div>
                       </div>
-                      <div style={{padding:"6px 6px"}}>
-                        {di.length===0&&<div style={{fontSize:11,color:"#b0b5c0",fontStyle:"italic",textAlign:"center",marginTop:8,fontFamily:"sans-serif"}}>–</div>}
+                      <div style={{padding:"4px 3px"}}>
+                        {di.length===0&&<div style={{fontSize:11,color:"#b0b5c0",fontStyle:"italic",textAlign:"center",marginTop:6,fontFamily:"sans-serif"}}>–</div>}
                         {di.map(item=>{
                           const isConflict=dayConflicts.has(item.id);
                           return(
                             <div key={item.id}
                               style={{background:isConflict?IC.trash.light:item.done?"#eceef2":(sectionColor[item.section]||"#4a7fa5")+"18",
                                 borderLeft:"3px solid "+(isConflict?IC.trash.bg:sectionColor[item.section]||"#4a7fa5"),
-                                borderTop:"1px solid "+(isConflict?IC.trash.bg:"#cdd0d6")+"40",
-                                borderRight:"1px solid "+(isConflict?IC.trash.bg:"#cdd0d6")+"40",
-                                borderBottom:"1px solid "+(isConflict?IC.trash.bg:"#cdd0d6")+"40",
-                                borderRadius:5,padding:"5px 7px",marginBottom:4,opacity:item.done?0.5:1,pointerEvents:"none"}}>
-                              <div style={{fontSize:11,fontFamily:"sans-serif",lineHeight:1.3,textDecoration:item.done?"line-through":"none",overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",color:"#1e2430"}}>
+                                borderRadius:3,padding:"3px 4px",marginBottom:3,opacity:item.done?0.5:1,pointerEvents:"none"}}>
+                              <div style={{fontSize:10,fontFamily:"sans-serif",lineHeight:1.25,textDecoration:item.done?"line-through":"none",overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",color:"#1e2430",wordBreak:"break-word"}}>
                                 {(isConflict?"⚠ ":"")+item.text}
                               </div>
-                              {item.time&&<div style={{fontSize:10,fontFamily:"sans-serif",marginTop:2,color:isConflict?IC.trash.text:"#6b7280",fontWeight:isConflict?"bold":"normal"}}>{fmt12(item.time)}</div>}
-                              {item.project&&<div style={{fontSize:10,color:"#6b7280",fontFamily:"sans-serif",marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:3}}><Icons.folder size={8} color="#6b7280"/>{item.project}</div>}
                             </div>
                           );
                         })}
@@ -1074,7 +1069,6 @@ style={{
                     </div>
                   );
                 })}
-                </div>
               </div>
               {calDay&&weekDays.some(d=>toDateStr(d.getFullYear(),d.getMonth(),d.getDate())===calDay)&&(
                 <div style={{marginTop:20,paddingTop:16,borderTop:"1px solid #e6e8ed"}}>
